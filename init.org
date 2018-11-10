@@ -1,0 +1,404 @@
+#+TITLE: Emacs configuration file
+#+AUTHOR: Matthias Schmitt
+#+BABEL: :cache yes
+#+LATEX_HEADER: \usepackage{parskip}
+#+LATEX_HEADER: \usepackage{inconsolata}
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
+#+PROPERTY: header-args :tangle yes
+
+This is my emacs configuration file in literate style as an org mode file.
+
+#+BEGIN_SRC elisp
+
+(defvar *emacs-load-start* (current-time))
+
+(setq user-emacs-directory "~/.emacs.d.old/")
+
+
+(setq gc-cons-threshold 400000000)
+
+;;; Begin initialization
+;; Turn off mouse interface early in startup to avoid momentary display
+(when window-system
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tooltip-mode -1))
+
+(setq inhibit-startup-message t)
+(setq initial-scratch-message "")
+
+;; Bootstrap straight.el
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+
+
+
+;; Package `use-package' provides a handy macro by the same name which
+;; is essentially a wrapper around `with-eval-after-load' with a lot
+;; of handy syntactic sugar and useful features.
+(straight-use-package 'use-package)
+
+;; Tell `use-package' to always load features lazily unless told
+;; otherwise. It's nicer to have this kind of thing be deterministic:
+;; if `:demand' is present, the loading is eager; otherwise, the
+;; loading is lazy. See
+;; https://github.com/jwiegley/use-package#notes-about-lazy-loading.
+;; (setq use-package-always-defer t)
+
+;; When configuring a feature with `use-package', also tell
+;; straight.el to install a package of the same name, unless otherwise
+;; specified using the `:straight' keyword.
+(setq straight-use-package-by-default t)
+
+(setq use-package-compute-statistics t)
+(setq use-package-verbose t)
+
+
+(load-theme 'wombat t)
+
+(setq custom-file "emacs-custom.el")
+(load custom-file)
+
+(defun rename-current-file ()
+  "Renames both current buffer and file it's visiting a file."
+  (interactive
+   (progn
+     (if (not (buffer-file-name))
+	 (error "Buffer '%s' is not visiting a file!" (buffer-name)))
+     (let ((new-file-name (read-file-name "Rename current file to: " (file-name-directory buffer-file-name)))
+	   )
+       (message "Current file renamed to %s." new-file-name)
+       (rename-file buffer-file-name new-file-name)
+       (rename-buffer new-file-name)
+       (set-visited-file-name new-file-name)
+       (set-buffer-modified-p nil)
+       (setq default-directory (file-name-directory new-file-name))
+     ))))
+
+;;Backup
+
+(defvar --backup-directory (expand-file-name "tmp/backup" user-emacs-directory))
+(if (not (file-exists-p --backup-directory))
+        (make-directory --backup-directory t))
+
+(setq backup-directory-alist `(("." . ,--backup-directory)))
+(setq make-backup-files t
+      backup-by-copying t
+      version-control t
+      delete-old-versions t)
+
+;;Indent
+
+(use-package clean-aindent-mode
+ :config (progn
+	   (setq clean-aindent-is-simple-indent t)))
+
+
+;;Spelling
+
+(cond
+ ((executable-find "aspell")
+  ;; you may also need `ispell-extra-args'
+  (setq ispell-program-name "aspell")
+  (setq-default ispell-local-dictionary "de_DE")
+  ;; (setq-default ispell-local-dictionary "en_US")
+  ;; (setq ispell-local-dictionary "en_US" "de_DE")
+  (setq ispell-local-dictionary "de_DE")
+  (setq ispell-list-command "--list"))
+ ((executable-find "hunspell")
+  (setq ispell-program-name "hunspell")
+
+  ;; Please note that `ispell-local-dictionary` itself will be passed to hunspell cli with "-d"
+  ;; it's also used as the key to lookup ispell-local-dictionary-alist
+  ;; if we use different dictionary
+  (setq-default ispell-local-dictionary "en_US")
+  (setq ispell-local-dictionary-alist
+        '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))))
+ (t (setq ispell-program-name nil)))
+
+
+(use-package flyspell
+  :config (progn
+	    ;; ommit error messages on spell checking for performance sake
+	    (setq flyspell-issue-message-flag nil)))
+
+
+(use-package diminish)
+
+(use-package general
+  :config (progn
+            (general-evil-setup t))
+  :demand)
+
+(use-package which-key
+  :diminish which-key-mode
+  :config (progn
+            (which-key-mode))
+  :demand)
+
+(use-package epkg
+ ;; epkg-list-packages)
+  )
+
+
+;;; abo-abo goodness
+
+(use-package ivy
+  :demand
+  :diminish ivy-mode
+  :general (:states 'normal
+                    "SPC TAB" 'mode-line-other-buffer
+                    "SPC b" (general-key-dispatch 'ivy-switch-buffer
+			      :timeout .33
+			      "m" (lambda () (interactive (switch-to-buffer "*Messages*")))
+			      "s" (lambda () (interactive (switch-to-buffer "*Scratch*")))
+			      "b" 'ivy-switch-buffer
+			      "d" 'evil-delete-buffer
+			      "q" 'burry-buffer
+		    )
+		    "SPC B m" (lambda () (interactive (switch-to-buffer "*Messages*")))
+		    "SPC B M" (lambda () (interactive (switch-to-buffer-other-window "*Messages*")))
+                    "SPC B s" (lambda () (interactive (switch-to-buffer "*Scratch*")))
+                    "SPC B S" (lambda () (interactive (switch-to-buffer-other-window "*Scratch*")))
+		    "SPC B d" 'evil-delete-buffer
+		    "SPC B q" 'burry-buffer
+
+		    "SPC w" 'other-window
+		    "SPC W d" 'delete-window
+
+		    :keymaps 'ivy-minibuffer-map
+                    "C-l" 'ivy-alt-done
+                    "C-h" 'ivy-alt-done
+		    "C-SPC" 'ivy-avy)
+  :config (progn
+            (ivy-mode 1)
+            (setq ivy-use-virtual-buffers t)
+	    (setq ivy-count-format "(%d/%d) ")
+            (setq enable-recursive-minibuffers t)
+	    (setq ivy-wrap t)))
+
+(use-package prescient
+  :after (ivy))
+
+(use-package ivy-prescient
+  :after (prescient)
+  :config (progn
+	    (ivy-prescient-mode t)))
+
+(use-package ivy-rich
+  :after (ivy)
+  :config (progn
+	    (ivy-rich-mode 1)))
+
+(use-package counsel
+  :demand
+  :diminish counsel-mode
+  :general (:states 'normal
+		    "SPC f" 'counsel-find-file
+		    "SPC F r" 'counsel-recentf
+		    "SPC r" 'counsel-recentf
+		    "SPC SPC" 'counsel-M-x)
+
+  :config (progn
+            (counsel-mode)))
+
+(use-package counsel-tramp
+  :after (counsel)
+  :general (:states 'normal
+		    "SPC F t" 'counsle-tramp))
+
+(use-package swiper
+  :defer 5
+  :general (:keymaps '(normal insert emacs)
+		     :prefix "SPC"
+		     :non-normal-prefix "M-SPC"
+		     "/" 'swiper)
+  :config (setq tramp-default-method "ssh"))
+
+(use-package avy
+  :defer 5)
+
+(use-package hydra
+  :defer 5)
+
+
+(use-package undo-tree
+  :defer 10
+  :diminish undo-tree-mode
+  :general (:states 'normal
+		    "U" 'undo-tree-visualize))
+
+(use-package evil
+  :init (progn
+	  (setq evil-want-C-w-delete nil)
+	  (setq evil-want-C-w-in-emacs-state t)
+	  (evil-mode 1))
+  :config (progn
+	    (cl-loop for (mode . state) in '((haskell-interactive-mode . emacs)
+					     (haskell-error-mode . emacs)
+					     (term-mode . emacs)
+					     (helpful-mode . motion)
+					     )
+		     do (evil-set-initial-state mode state))
+	    ))
+
+(use-package evil-mc
+  :after (evil)
+  :config (progn (global-evil-mc-mode 1)
+		 (add-hook 'magit-mode-hook #'evil-mc-mode -1)))
+
+(use-package evil-commentary
+  :after (evil)
+  :diminish (evil-commentary-mode)
+	:config (evil-commentary-mode))
+
+(use-package evil-surround
+  :after (evil)
+	:config (global-evil-surround-mode 1))
+
+(use-package smartparens
+  :config (progn
+            (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode)))
+
+(use-package evil-smartparens
+  :after (evil smartparens))
+
+(use-package evil-magit
+  :after (evil magit))
+
+(use-package evil-org
+  :after (evil org))
+
+
+
+(use-package helpful
+  :defer 5
+  :general (:states 'normal
+		    "SPC h" 'helpful-at-point
+		    "SPC H v" 'helpful-variable
+		    "SPC H f" 'helpful-function
+		    )
+  :config (progn
+	    (general-define-key
+	     :keymaps 'helpful-mode-map
+	     "q" 'bury-buffer)))
+
+(use-package projectile
+  :general (:states 'normal
+		    "SPC P" 'projectile-command-map)
+  :config (progn
+	    (projectile-mode +1)
+	    (setq projectile-project-search-path '("~/proj/"))))
+
+(use-package org
+  :defer 15)
+
+(use-package magit
+  :defer 15
+  :general (:states 'normal
+		    "SPC g s" 'magit-status))
+
+(use-package yasnippet
+  :defer 5
+  :diminish yas-minor-mode
+  :config (yas-global-mode 1))
+
+(use-package yasnippet-snippets
+  :after yasnippet
+  :config (yasnippet-snippets-initialize))
+
+(use-package auto-yasnippet
+  :after yasnippet
+  :config (setq aya-case-fold t))
+
+(use-package company
+  :defer 30)
+
+(use-package company-prescient
+  :after (company))
+
+(use-package pos-tip)
+
+(use-package company-quickhelp
+  :after (company pos-tip)
+  :config (company-quickhelp-mode))
+
+(use-package flycheck
+  :defer 30
+  )
+
+;; (use-package haskell-mode
+;;   :defer t
+;;   :bind (:map haskell-mode-map
+;; 	      ("C-c C-c" . haskell-compile))
+;;   )
+
+(use-package intero
+  :defer t
+  :hook (haskell-mode . intero-mode)
+  )
+    
+
+;; (use-package haskell-process
+;;   :after haskell-mode)
+
+;; (use-package haskell-interactive-mode
+;;   :after haskell-mode
+;;   :contig (add-hook 'haskell-mode-hook 'interactive-haskell-mode))
+
+(use-package auctex
+  :defer t
+  :hook (latex-mode)
+  :config (progn
+	    (setq TeX-parse-self t) ;; enable parse on load
+	    (setq TeX-auto-safe t) ;; enable parse on safe
+	    (setq TeX-safe-query nil)
+	    (setq-default TeX-master nil)
+	    (setq TeX-PDF-mode t)
+	    (add-hook 'TeX-mode-hook 'flyspell-mode)
+	    (if (executable-find "latexmk")
+		)))
+
+(use-package auctex-latexmk
+  :after (auctex)
+  :config (progn
+	    (auctex-latexmk-setup)
+	    (setq auctex-latexmk-inherit-TeX-PDF-mode t)))
+
+;; (use-package latex-preview-pane
+;;   :defer t)
+
+(use-package rust-mode
+  :defer t
+  :hook (rust-mode))
+
+(use-package rustfmt
+  :after (rust-mode))
+
+(setq debug-on-error t)
+
+(defun anarcat/time-to-ms (time)
+  (+ (* (+ (* (car time) (expt 2 16)) (car (cdr time))) 1000000) (car (cdr (cdr time)))))
+
+(defun anarcat/display-timing ()
+  (message ".emacs loaded in %fms" (/ (- (anarcat/time-to-ms (current-time)) (anarcat/time-to-ms *emacs-load-start*)) 1000000.0)))
+
+(anarcat/display-timing)
+;; (add-hook 'after-init-hook 'anarcat/display-timing t)
+
+
+(message "%s" (file-name-directory buffer-file-name))
+
+#+END_SRC
