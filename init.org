@@ -117,16 +117,28 @@ straight.el
     :demand
     :config (progn
 	      (general-evil-setup t)
-	      (defconst my-leader "SPC")
-	      (defconst my-non-normal-leader "M-SPC")
+	      (defconst my-menu-key "SPC")
+	      (defconst my-non-normal-menu-key "M-SPC")
+	      (defconst my-leader-key ",")
+	      (defconst my-non-normal-leader-key "M-,")
 
-	      (general-create-definer my-leader-def
-	        :states '(normal insert emacs)
-                :prefix my-leader
-		:non-normal-prefix my-non-normal-leader)
+	      (general-create-definer my-menu-def
+		:states '(normal insert emacs)
+		:prefix my-menu-key
+		:non-normal-prefix my-non-normal-menu-key)
 
-              (my-leader-def
-                "?" 'general-describe-keybindings)))
+	      (general-define-key
+	       :keymaps 'dired-mode-map
+	       "SPC" nil)
+
+	      (my-menu-def
+	       "?" 'general-describe-keybindings))
+
+    (general-create-definer my-leader-def
+      :states '(normal)
+      :prefix my-leader-key
+      :non-normal-prefix my-non-normal-leader-key)
+    )
 
   (use-package which-key
     :demand
@@ -149,7 +161,7 @@ straight.el
 
     ;;; abo-abo goodness
 
-  (my-leader-def
+  (my-menu-def
    "TAB" '(mode-line-other-buffer :which-key "last-buffer")
    "M-TAB" '((lambda () (interactive (switch-to-buffer-other-window (other-buffer))))
 	     :which-key "last-buffer-other-window")
@@ -159,12 +171,12 @@ straight.el
 	   :which-key "messages")
    "B M" '((lambda () (interactive (switch-to-buffer-other-window "*Messages*")))
 	   :which-key "messages-in-other")
-   "B s" '((lambda () (interactive (switch-to-buffer "*Scratch*")))
+   "B s" '((lambda () (interactive (switch-to-buffer "*scratch*")))
 	   :which-key "scratch")
-   "B S" '((lambda () (interactive (switch-to-buffer-other-window "*Scratch*")))
+   "B S" '((lambda () (interactive (switch-to-buffer-other-window "*scratch*")))
 	   :which-key "scratch-in-other")
    "B d" 'evil-delete-buffer
-   "B q" 'bury-buffer
+   "B q" 'quit-window
 
    "w" 'other-window
    "W" '(:ignore t :which-key "Window")
@@ -173,7 +185,7 @@ straight.el
   (use-package ivy
     :demand
     :diminish ivy-mode
-    :general (my-leader-def
+    :general (my-menu-def
 		      "b" '(:ignore t :which-key "Buffer")
 		      "b" (general-key-dispatch 'ivy-switch-buffer
 				:timeout .33
@@ -181,7 +193,7 @@ straight.el
 				"s" (lambda () (interactive (switch-to-buffer "*Scratch*")))
 				"b" 'ivy-switch-buffer
 				"d" 'evil-delete-buffer
-				"q" 'bury-buffer
+				"q" 'quit-window
 				))
 
 		      (:keymaps 'ivy-minibuffer-map
@@ -216,7 +228,7 @@ straight.el
   (use-package counsel
     :demand
     :diminish counsel-mode
-    :general (my-leader-def
+    :general (my-menu-def
 		      "f" '(:ignore t :which-key "File")
 		      "f" 'counsel-find-file
 		      "F" '(:ignore t :which-key "File")
@@ -230,12 +242,12 @@ straight.el
   (use-package counsel-tramp
     :defer 15
     :after counsel
-    :general (my-leader-def
+    :general (my-menu-def
 		      "F t" 'counsle-tramp))
 
   (use-package swiper
     :defer 5
-    :general (my-leader-def
+    :general (my-menu-def
 		       "/" 'swiper)
     :config (setq tramp-default-method "ssh"))
 
@@ -276,6 +288,8 @@ https://github.com/noctuid/evil-guide
 					       (haskell-error-mode . emacs)
 					       (term-mode . emacs)
 					       (messages-mode . motion)
+					       (helpful-mode . motion)
+					       (compilation-mode . motion)
 					       )
 		       do (evil-set-initial-state mode state))
 	      ))
@@ -313,7 +327,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 
   (use-package projectile
     ;; :demand
-    :general (my-leader-def
+    :general (my-menu-def
 		      "p" 'projectile-find-file
 		      "P" 'projectile-switch-project)
     :config (progn
@@ -326,7 +340,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
   (use-package counsel-projectile
     ;; :demand
     :after (counsel projectile)
-    :general (my-leader-def
+    :general (my-menu-def
 		      "p" 'counsel-projectile
 		      "P" 'counsel-projectile-switch-project
 		      "/" 'counsel-projectile-rg)
@@ -350,7 +364,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :defer 30
-    :general (my-leader-def
+    :general (my-menu-def
 		      "g s" 'magit-status))
 
   (use-package evil-magit
@@ -502,7 +516,7 @@ https://commercialhaskell.github.io/intero/
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
     :defer 5
-    :general (my-leader-def
+    :general (my-menu-def
 		      "h" '(helpful-at-point :which-key "help")
 		      "H" '(:ignore t :which-key "Help")
 		      "H v" 'helpful-variable
@@ -511,7 +525,7 @@ https://commercialhaskell.github.io/intero/
     :config (progn
 	      (general-define-key
 	       :keymaps 'helpful-mode-map
-	       "q" 'bury-buffer)))
+	       "q" 'quit-window)))
 #+END_SRC
 
 ** Backup
