@@ -578,6 +578,12 @@ https://commercialhaskell.github.io/intero/
     (interactive)
     (evil-ex-normal (region-beginning) (region-end) "@q"))
 
+(defun reload-dir-locals-for-current-buffer ()
+  "reload dir locals for the current buffer"
+  (interactive)
+  (let ((enable-local-variables :all))
+    (hack-dir-local-variables-non-file-buffer)))
+
   ;; (general-define-key
   ;;  :states '(visual global)
   ;;  "Q" 'my-norm@q)
