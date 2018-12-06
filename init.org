@@ -107,7 +107,8 @@ straight.el
   (load custom-file)
 
 #+END_SRC
-  
+
+* Basic packages
 
 #+BEGIN_SRC emacs-lisp
   (use-package diminish
@@ -190,7 +191,7 @@ straight.el
 		      "b" (general-key-dispatch 'ivy-switch-buffer
 				:timeout .33
 				"m" (lambda () (interactive (switch-to-buffer "*Messages*")))
-				"s" (lambda () (interactive (switch-to-buffer "*Scratch*")))
+				"s" (lambda () (interactive (switch-to-buffer "*scratch*")))
 				"b" 'ivy-switch-buffer
 				"d" 'evil-delete-buffer
 				"q" 'quit-window
@@ -411,7 +412,13 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
   (use-package flycheck
     :defer 30
-    )
+    :general (my-menu-def
+               "e" '(:ignore t :which-key "Errors")
+	       "e e" 'flycheck-buffer
+	       "e b" 'flycheck-buffer
+	       "e c" 'flycheck-compile
+	       "e n" 'flycheck-next-error
+	       "e p" 'flycheck-prev-error))
 
 #+END_SRC
 
