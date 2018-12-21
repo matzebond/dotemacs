@@ -390,6 +390,18 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     :config (setq aya-case-fold t))
 #+END_SRC
 
+* Semantic
+test
+
+#+BEGIN_SRC emacs-lisp
+  (use-package srefactor
+    :defer
+    ;;:general
+    :config (progn
+
+  ))
+#+END_SRC
+
 * Completion
 
 https://company-mode.github.io/
@@ -452,7 +464,32 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 	      (setq flyspell-issue-message-flag nil)))
 #+END_SRC
 
+* LSP
+
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-mode
+  :defer)
+  
+(use-package lsp-ui
+  :after (lsp-mode))
+  
+(use-package company-lsp
+  :after (company lsp-mode)
+  :config (push 'company-lsp company-backends))
+#+END_SRC
+
 * Programming languages
+** C++
+https://github.com/realgud/realgud
+https://github.com/tuhdo/semantic-refactor
+   
+#+BEGIN_SRC emacs-lisp
+
+(use-package realgud
+  :defer)
+
+#+END_SRC
+
 ** Haskell
 https://commercialhaskell.github.io/intero/
 
@@ -518,6 +555,7 @@ https://commercialhaskell.github.io/intero/
 #+END_SRC
 
 * Misc
+https://github.com/purcell/exec-path-from-shell
 ** Help
 
 #+BEGIN_SRC emacs-lisp
