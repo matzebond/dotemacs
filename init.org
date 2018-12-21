@@ -280,9 +280,6 @@ https://github.com/noctuid/evil-guide
 	    (setq evil-want-C-w-delete nil)
 	    (setq evil-want-C-w-in-emacs-state t)
 	    (evil-mode 1)
-	    (cl-loop for map in '(helpful-mode-map
-				   )
-		    do (evil-make-overriding-map map))
 	    )
     :config (progn
 	      (cl-loop for (mode . state) in '((haskell-interactive-mode . emacs)
@@ -293,6 +290,9 @@ https://github.com/noctuid/evil-guide
 					       (compilation-mode . motion)
 					       )
 		       do (evil-set-initial-state mode state))
+	      ;; (cl-loop for map in '(helpful-mode-map
+	      ;; 			  )
+	      ;; 	     do (evil-make-overriding-map map))
 	      ))
 
   (use-package evil-commentary
@@ -303,6 +303,10 @@ https://github.com/noctuid/evil-guide
   (use-package evil-surround
     :demand
     :config (global-evil-surround-mode 1))
+
+  (use-package evil-matchit
+    :demand
+    :config (global-evil-matchit-mode 1))
 
   (use-package smartparens
     :demand
@@ -316,8 +320,9 @@ https://github.com/noctuid/evil-guide
   (use-package evil-mc
     :demand
     :diminish emc
-    :config (progn (global-evil-mc-mode 1)
-		   (add-hook 'magit-mode-hook #'evil-mc-mode -1)))
+    ;; :config (progn (global-evil-mc-mode 1)
+    ;; 		 (add-hook 'magit-mode-hook #'evil-mc-mode -1))
+    )
 #+END_SRC
 
 * Project management
