@@ -198,10 +198,11 @@ straight.el
 				))
 
 		      (:keymaps 'ivy-minibuffer-map
-			  "C-l" 'ivy-alt-done
-			  "C-h" 'ivy-backward-delete-char
-			  ;;"C-SPC" 'ivy-avy
-			  )
+				"C-l" 'ivy-alt-done
+				"C-h" 'ivy-backward-delete-char
+				"<escape>" 'minibuffer-keyboard-quit
+				;;"C-SPC" 'ivy-avy
+				)
 
     :config (progn
 	      (ivy-mode 1)
@@ -333,6 +334,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 
   (use-package projectile
     ;; :demand
+    :diminish (projectile-mode)
     :general (my-menu-def
 		      "p" 'projectile-find-file
 		      "P" 'projectile-switch-project)
