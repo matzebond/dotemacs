@@ -159,50 +159,47 @@ straight.el
 [[http://oremacs.com/swiper/][ivy & swiper manual]]
 
 #+BEGIN_SRC emacs-lisp
-
-    ;;; abo-abo goodness
-
   (my-menu-def
-   "TAB" '(mode-line-other-buffer :which-key "last-buffer")
-   "M-TAB" '((lambda () (interactive (switch-to-buffer-other-window (other-buffer))))
-	     :which-key "last-buffer-other-window")
+    "TAB" '(mode-line-other-buffer :which-key "last-buffer")
+    "M-TAB" '((lambda () (interactive (switch-to-buffer-other-window (other-buffer))))
+	      :which-key "last-buffer-other-window")
 
-   "B" '(:ignore t :which-key "Buffer")
-   "B m" '((lambda () (interactive (switch-to-buffer "*Messages*")))
-	   :which-key "messages")
-   "B M" '((lambda () (interactive (switch-to-buffer-other-window "*Messages*")))
-	   :which-key "messages-in-other")
-   "B s" '((lambda () (interactive (switch-to-buffer "*scratch*")))
-	   :which-key "scratch")
-   "B S" '((lambda () (interactive (switch-to-buffer-other-window "*scratch*")))
-	   :which-key "scratch-in-other")
-   "B d" 'evil-delete-buffer
-   "B q" 'quit-window
+    "B" '(:ignore t :which-key "Buffer")
+    "B m" '((lambda () (interactive (switch-to-buffer "*Messages*")))
+	    :which-key "messages")
+    "B M" '((lambda () (interactive (switch-to-buffer-other-window "*Messages*")))
+	    :which-key "messages-in-other")
+    "B s" '((lambda () (interactive (switch-to-buffer "*scratch*")))
+	    :which-key "scratch")
+    "B S" '((lambda () (interactive (switch-to-buffer-other-window "*scratch*")))
+	    :which-key "scratch-in-other")
+    "B d" 'evil-delete-buffer
+    "B q" 'quit-window
 
-   "w" 'other-window
-   "W" '(:ignore t :which-key "Window")
-   "W d" 'delete-window)
+    "w" 'other-window
+    "W" '(:ignore t :which-key "Window")
+    "W d" 'delete-window)
 
   (use-package ivy
     :demand
     :diminish ivy-mode
     :general (my-menu-def
-		      "b" '(:ignore t :which-key "Buffer")
-		      "b" (general-key-dispatch 'ivy-switch-buffer
-				:timeout .33
-				"m" (lambda () (interactive (switch-to-buffer "*Messages*")))
-				"s" (lambda () (interactive (switch-to-buffer "*scratch*")))
-				"b" 'ivy-switch-buffer
-				"d" 'evil-delete-buffer
-				"q" 'quit-window
-				))
+	       "b" '(:ignore t :which-key "Buffer")
+	       "b" (general-key-dispatch 'ivy-switch-buffer
+		     :timeout .33
+		     "m" (lambda () (interactive (switch-to-buffer "*Messages*")))
+		     "s" (lambda () (interactive (switch-to-buffer "*scratch*")))
+		     "b" 'ivy-switch-buffer
+		     "d" 'evil-delete-buffer
+		     "q" 'quit-window
+		     ))
 
-		      (:keymaps 'ivy-minibuffer-map
-				"C-l" 'ivy-alt-done
-				"C-h" 'ivy-backward-delete-char
-				"<escape>" 'minibuffer-keyboard-quit
-				;;"C-SPC" 'ivy-avy
-				)
+    (:keymaps 'ivy-minibuffer-map
+	      "C-l" 'ivy-alt-done
+	      "C-h" 'ivy-backward-delete-char
+	      "<escape>" 'minibuffer-keyboard-quit
+	      ;;"C-SPC" 'ivy-avy
+	      )
 
     :config (progn
 	      (ivy-mode 1)
@@ -231,12 +228,12 @@ straight.el
     :demand
     :diminish counsel-mode
     :general (my-menu-def
-		      "f" '(:ignore t :which-key "File")
-		      "f" 'counsel-find-file
-		      "F" '(:ignore t :which-key "File")
-		      "F r" '(counsel-recentf :which-key "recent")
-		      "r" '(counsel-recentf :which-key "recent")
-		      "SPC" '(counsel-M-x :which-key "M-x"))
+	       "f" '(:ignore t :which-key "File")
+	       "f" 'counsel-find-file
+	       "F" '(:ignore t :which-key "File")
+	       "F r" '(counsel-recentf :which-key "recent")
+	       "r" '(counsel-recentf :which-key "recent")
+	       "SPC" '(counsel-M-x :which-key "M-x"))
 
     :config (progn
 	      (counsel-mode)))
@@ -245,12 +242,12 @@ straight.el
     :defer 15
     :after counsel
     :general (my-menu-def
-		      "F t" 'counsle-tramp))
+	       "F t" 'counsle-tramp))
 
   (use-package swiper
     :defer 5
     :general (my-menu-def
-		       "/" 'swiper)
+	       "/" 'swiper)
     :config (setq tramp-default-method "ssh"))
 
   (use-package avy
