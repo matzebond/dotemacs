@@ -553,10 +553,13 @@ https://commercialhaskell.github.io/intero/
 
 #+BEGIN_SRC emacs-lisp
   (use-package rust-mode
-    :hook (rust-mode))
+    :mode "\\.rs\\'"
+  )
 
   (use-package rustfmt
-    :after (rust-mode))
+    :after (rust-mode)
+    :hook (rust-mode)
+  )
 #+END_SRC
 
 * Misc
