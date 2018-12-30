@@ -242,16 +242,21 @@ straight.el
     :defer 15
     :after counsel
     :general (my-menu-def
-	       "F t" 'counsle-tramp))
+	       "F t" 'counsle-tramp)
+    :config (setq tramp-default-method "ssh"))
 
   (use-package swiper
     :defer 5
-    :general (my-menu-def
-	       "/" 'swiper)
-    :config (setq tramp-default-method "ssh"))
+    :general (:states 'normal
+		      "C-s" 'swiper
+		      ))
 
   (use-package avy
-    :defer 5)
+    :defer 5
+    :commands (avy-goto-char-2 avy-goto-char-timer avy-goto-line)
+    :general (:states 'normal
+		      "g t" 'avy-goto-char-2
+		      ))
 
   (use-package hydra
     :defer 5)
