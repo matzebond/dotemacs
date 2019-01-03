@@ -133,7 +133,7 @@ straight.el
 	       "SPC" nil)
 
 	      (my-menu-def
-	       "?" 'general-describe-keybindings))
+	       "?" '(general-describe-keybindings :which-key "show bindings")))
 
     (general-create-definer my-leader-def
       :states '(normal)
@@ -246,13 +246,13 @@ straight.el
     :config (setq tramp-default-method "ssh"))
 
   (use-package swiper
-    :defer 5
+    :defer 15
     :general (:states 'normal
 		      "C-s" 'swiper
 		      ))
 
   (use-package avy
-    :defer 5
+    :defer 15
     :commands (avy-goto-char-2 avy-goto-char-timer avy-goto-line)
     :general (:states 'normal
 		      "g t" 'avy-goto-char-2
@@ -312,13 +312,13 @@ https://github.com/noctuid/evil-guide
     :config (global-evil-matchit-mode 1))
 
   (use-package smartparens
-    :demand
-    :config (progn
-	      (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode)))
+    :demand)
 
   (use-package evil-smartparens
     :demand
-    :after (evil smartparens))
+    :after (evil smartparens)
+    :config (progn
+	      (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode)))
 
   (use-package evil-mc
     :demand
@@ -353,7 +353,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     :general (my-menu-def
 		      "p" 'counsel-projectile
 		      "P" 'counsel-projectile-switch-project
-		      "/" 'counsel-projectile-rg)
+		      "/" '(counsel-projectile-rg :which-key "search proj"))
     :config (progn
 	      (counsel-projectile-mode)))
 #+END_SRC
@@ -375,7 +375,10 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
   (use-package magit
     :defer 30
     :general (my-menu-def
-		      "g s" 'magit-status))
+	       "g" '(nil :which-key "git/vc")
+	       "g s" 'magit-status)
+    (:keymaps 'magit-mode-map
+	      "SPC" nil ))
 
   (use-package evil-magit
     :demand
