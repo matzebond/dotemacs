@@ -149,6 +149,37 @@ Turn off mouse interface early in startup to avoid momentary display.
 
 #+END_SRC
 
+* Saving
+** Backup
+
+#+BEGIN_SRC emacs-lisp
+  (defvar --backup-directory (concat user-emacs-directory ".cache/backups"))
+  (if (not (file-exists-p --backup-directory))
+      (make-directory --backup-directory t))
+  (setq backup-directory-alist `(("." . ,--backup-directory)))
+  (setq make-backup-files t               ; backup of a file the first time it is saved.
+	backup-by-copying t               ; don't clobber symlinks
+	version-control t                 ; version numbers for backup files
+	delete-old-versions t             ; delete excess backup files silently
+	;; delete-by-moving-to-trash t
+	kept-old-versions 6               ; oldest versions to keep when a new numbered backup is made (default: 2)
+	kept-new-versions 9               ; newest versions to keep when a new numbered backup is made (default: 2)
+	auto-save-default t               ; auto-save every buffer that visits a file
+	auto-save-timeout 20              ; number of seconds idle time before auto-save (default: 30)
+	auto-save-interval 200            ; number of keystrokes between auto-saves (default: 300)
+	)
+#+END_SRC
+
+** Undo history
+
+#+BEGIN_SRC emacs-lisp
+  (defvar --undo-directory (concat user-emacs-directory ".cache/undo"))
+  (if (not (file-exists-p --undo-directory))
+      (make-directory --undo-directory t))
+  (setq undo-tree-auto-save-history t)
+  (setq undo-tree-history-directory-alist `(("." . ,--undo-directory)))
+#+END_SRC
+
 * abo-abo
 
 [[http://oremacs.com/swiper/][ivy & swiper manual]]
@@ -599,28 +630,23 @@ https://github.com/purcell/exec-path-from-shell
 	       "q" 'quit-window)))
 #+END_SRC
 
-** Backup
-
-#+BEGIN_SRC emacs-lisp
-
-  (defvar --backup-directory (expand-file-name "tmp/backup" user-emacs-directory))
-  (if (not (file-exists-p --backup-directory))
-      (make-directory --backup-directory t))
-
-  (setq backup-directory-alist `(("." . ,--backup-directory)))
-  (setq make-backup-files t
-	backup-by-copying t
-	version-control t
-	delete-old-versions t)
-
-#+END_SRC
-
-** Indent
+*** Indent
 
 #+BEGIN_SRC emacs-lisp
   (use-package clean-aindent-mode
-    :config (progn
-	      (setq clean-aindent-is-simple-indent t)))
+    :config (setq clean-aindent-is-simple-indent t))
+#+END_SRC
+
+** Settings
+Always follow symlinks to vc controlled sources.
+This happens a lot because my dotfiles are linked by stow.
+#+BEGIN_SRC emacs-lisp
+  (setq vc-follow-symlinks t)
+#+END_SRC
+
+Recognize arch linux pgkbuild files
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("PKGBUILD\\'" . shell-script-mode))
 #+END_SRC
 
 ** Functions
