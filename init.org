@@ -460,6 +460,22 @@ Nicer mode line
     (sml/setup))
 #+END_SRC
 
+Highlight delimiters such as parentheses, brackets or braces according to their depth
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :defer 15
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+END_SRC
+
+Display '~' on empty lines like in vi
+
+#+BEGIN_SRC emacs-lisp
+  (use-package vi-tilde-fringe
+    :defer 15
+    :hook (prog-mode . vi-tilde-fringe-mode))
+#+END_SRC
+
 * Completion
 
 https://company-mode.github.io/
