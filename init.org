@@ -396,7 +396,9 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     :after (evil org))
 #+END_SRC
 
-* Magit
+
+* Git
+** Magit
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -410,8 +412,29 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
   (use-package evil-magit
     :demand
     :after (evil magit))
+#+END_SRC
 
-* Mail
+** Forge
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ghub
+    :demand)
+
+  (use-package forge
+    :demand
+    :after (magit ghub))
+#+END_SRC
+
+** Additional
+
+#+BEGIN_SRC emacs-lisp
+  (use-package git-gutter-fringe-plus
+    :ensure t
+    :init (global-git-gutter-fringe+-mode)
+    )
+#+END_SRC
+
+* TODO Mail
 
 todo
 
@@ -437,7 +460,13 @@ Nicer mode line
     (sml/setup))
 #+END_SRC
 
-* Snippets
+* Completion
+
+https://company-mode.github.io/
+
+https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.html
+
+** Snippets
 
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
@@ -453,22 +482,6 @@ Nicer mode line
     :after yasnippet
     :config (setq aya-case-fold t))
 #+END_SRC
-
-* Semantic
-test
-
-#+BEGIN_SRC emacs-lisp
-  (use-package srefactor
-    :defer
-    ;;:general
-  )
-#+END_SRC
-
-* Completion
-
-https://company-mode.github.io/
-
-https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.html
 
 ** Company
 
@@ -514,6 +527,15 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 (use-package company-lsp
   :after (company lsp-mode)
   :config (push 'company-lsp company-backends))
+#+END_SRC
+
+* TODO Semantic
+
+#+BEGIN_SRC emacs-lisp
+  (use-package srefactor
+    :defer
+    ;;:general
+  )
 #+END_SRC
 
 * Spelling
@@ -657,6 +679,7 @@ https://github.com/purcell/exec-path-from-shell
 #+END_SRC
 
 ** Settings
+
 Always follow symlinks to vc controlled sources.
 This happens a lot because my dotfiles are linked by stow.
 #+BEGIN_SRC emacs-lisp
