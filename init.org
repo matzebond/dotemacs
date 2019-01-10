@@ -43,16 +43,6 @@ by reducing the number of GC runs.
   ;; 			     (setq gc-cons-threshold radian--orig-gc-cons-threshold)))
 #+END_SRC
 
-Turn off mouse interface early in startup to avoid momentary display.
-
-#+BEGIN_SRC emacs-lisp
-  (when window-system
-    (menu-bar-mode -1)
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1)
-    (tooltip-mode -1))
-#+END_SRC
-
 ** straight.el
 
 #+BEGIN_SRC emacs-lisp
@@ -416,6 +406,26 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 
 todo
 
+* Visual
+
+Turn off mouse interface early in startup to avoid momentary display.
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    (tooltip-mode -1))
+#+END_SRC
+
+Nicer mode line
+
+#+BEGIN_SRC emacs-lisp
+  (use-package smart-mode-line
+    ;; :demand
+    :config
+    (setq sml/theme 'dark)
+    (sml/setup))
 #+END_SRC
 
 * Snippets
