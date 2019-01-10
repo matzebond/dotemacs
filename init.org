@@ -9,7 +9,11 @@ This is my emacs configuration file in literate style as an org mode file.
 
 We automatically reload the configuration after changes to the 'init.org' file.
 
-* Tangle
+** Tangle
+
+#+BEGIN_SRC emacs-lisp
+  (setq user-emacs-directory "~/.emacs.d.old/")
+#+END_SRC
 
 TODO why are there use-package errors when using byte-compile-file
 
@@ -31,16 +35,21 @@ TODO why are there use-package errors when using byte-compile-file
 * Initial Stuff
 ** Garbage Collection
 Disabling GC (by setting `gc-cons-threshold' to a very large value)
-during startup is said to improve startup time
-by reducing the number of GC runs.
+during startup is said to improve startup time by reducing the number of GC runs.
+After startup reset it to reasonable value
 
 #+BEGIN_SRC emacs-lisp
-  (setq user-emacs-directory "~/.emacs.d.old/")
+  ;; (message (format "%s - %s" gc-cons-threshold gc-cons-percentage))
+  (setq garbage-collection-messages t)
 
-  (setq gc-cons-threshold 402653184 gc-cons-percentage 0.6)
-
-  ;; (add-hook 'after-init-hook (lambda ()
-  ;; 			     (setq gc-cons-threshold radian--orig-gc-cons-threshold)))
+  (setq gc-cons-threshold 402653184) ;;gc-cons-percentage 0.6)
+  (add-hook 'after-init-hook (lambda ()
+			       (run-with-idle-timer
+				  60
+				  nil
+				  (lambda ()
+				    (setq gc-cons-threshold 20000000)))))
+  (add-hook 'focus-out-hook 'garbage-collect)
 #+END_SRC
 
 ** straight.el
