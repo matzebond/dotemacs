@@ -1,9 +1,6 @@
 #+TITLE: Emacs configuration file
 #+AUTHOR: Matthias Schmitt
 #+BABEL: :cache yes
-#+LATEX_HEADER: \usepackage{parskip}
-#+LATEX_HEADER: \usepackage{inconsolata}
-#+LATEX_HEADER: \usepackage[utf8]{inputenc}
 #+PROPERTY: header-args :tangle yes
 
 This is my emacs configuration file in literate style as an org mode file.
@@ -32,7 +29,7 @@ TODO why are there use-package errors when using byte-compile-file
 #+END_SRC
 
 * Initial Stuff
-
+** Garbage Collection
 Disabling GC (by setting `gc-cons-threshold' to a very large value)
 during startup is said to improve startup time
 by reducing the number of GC runs.
@@ -56,7 +53,7 @@ Turn off mouse interface early in startup to avoid momentary display.
     (tooltip-mode -1))
 #+END_SRC
 
-straight.el 
+** straight.el
 
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-message t)
@@ -82,7 +79,7 @@ straight.el
   ;; Package `use-package' provides a handy macro by the same name which
   ;; is essentially a wrapper around `with-eval-after-load' with a lot
   ;; of handy syntactic sugar and useful features.
-  (eval-when-compile 
+  (eval-when-compile
     (straight-use-package 'use-package))
 
   ;; Tell `use-package' to always load features lazily unless told
@@ -108,7 +105,7 @@ straight.el
 
 #+END_SRC
 
-* Basic packages
+** Basic packages
 
 #+BEGIN_SRC emacs-lisp
   (use-package diminish
@@ -116,25 +113,24 @@ straight.el
 
   (use-package general
     :demand
-    :config (progn
-	      (general-evil-setup t)
-	      (defconst my-menu-key "SPC")
-	      (defconst my-non-normal-menu-key "M-SPC")
-	      (defconst my-leader-key ",")
-	      (defconst my-non-normal-leader-key "M-,")
+    :config
+    (general-evil-setup t)
 
-	      (general-create-definer my-menu-def
-		:states '(normal insert emacs)
-		:prefix my-menu-key
-		:non-normal-prefix my-non-normal-menu-key)
+    (general-define-key
+     :keymaps 'dired-mode-map
+     "SPC" nil)
 
-	      (general-define-key
-	       :keymaps 'dired-mode-map
-	       "SPC" nil)
+    (defconst my-menu-key "SPC")
+    (defconst my-non-normal-menu-key "M-SPC")
+    (general-create-definer my-menu-def
+      :states '(normal insert emacs)
+      :prefix my-menu-key
+      :non-normal-prefix my-non-normal-menu-key)
+    (my-menu-def
+      "?" '(general-describe-keybindings :which-key "show bindings"))
 
-	      (my-menu-def
-	       "?" '(general-describe-keybindings :which-key "show bindings")))
-
+    (defconst my-leader-key ",")
+    (defconst my-non-normal-leader-key "M-,")
     (general-create-definer my-leader-def
       :states '(normal)
       :prefix my-leader-key
@@ -144,8 +140,7 @@ straight.el
   (use-package which-key
     :demand
     :diminish which-key-mode
-    :config (progn
-	      (which-key-mode)))
+    :config (which-key-mode))
 
   (use-package epkg
     :defer t
@@ -173,6 +168,10 @@ straight.el
 	    :which-key "scratch")
     "B S" '((lambda () (interactive (switch-to-buffer-other-window "*scratch*")))
 	    :which-key "scratch-in-other")
+    "B w" '((lambda () (interactive (switch-to-buffer "*Warnings*")))
+	    :which-key "warnings")
+    "B W" '((lambda () (interactive (switch-to-buffer-other-window "*Warnings*")))
+	    :which-key "warnings-in-other")
     "B d" 'evil-delete-buffer
     "B q" 'quit-window
 
@@ -183,16 +182,18 @@ straight.el
   (use-package ivy
     :demand
     :diminish ivy-mode
-    :general (my-menu-def
-	       "b" '(:ignore t :which-key "Buffer")
-	       "b" (general-key-dispatch 'ivy-switch-buffer
-		     :timeout .33
-		     "m" (lambda () (interactive (switch-to-buffer "*Messages*")))
-		     "s" (lambda () (interactive (switch-to-buffer "*scratch*")))
-		     "b" 'ivy-switch-buffer
-		     "d" 'evil-delete-buffer
-		     "q" 'quit-window
-		     ))
+    :general
+    (my-menu-def
+      "b" '(:ignore t :which-key "Buffer")
+      "b" (general-key-dispatch 'ivy-switch-buffer
+	    :timeout .33
+	    "m" (lambda () (interactive (switch-to-buffer "*Messages*")))
+	    "s" (lambda () (interactive (switch-to-buffer "*scratch*")))
+	    "w" (lambda () (interactive (switch-to-buffer "*Warnings*")))
+	    "b" 'ivy-switch-buffer
+	    "d" 'evil-delete-buffer
+	    "q" 'quit-window
+	    ))
 
     (:keymaps 'ivy-minibuffer-map
 	      "C-l" 'ivy-alt-done
@@ -201,12 +202,12 @@ straight.el
 	      ;;"C-SPC" 'ivy-avy
 	      )
 
-    :config (progn
-	      (ivy-mode 1)
-	      (setq ivy-use-virtual-buffers t)
-	      (setq ivy-count-format "(%d/%d) ")
-	      (setq enable-recursive-minibuffers t)
-	      (setq ivy-wrap t)))
+    :config
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    (setq ivy-count-format "(%d/%d) ")
+    (setq enable-recursive-minibuffers t)
+    (setq ivy-wrap t))
 
   (use-package prescient
     :demand
@@ -215,14 +216,12 @@ straight.el
   (use-package ivy-prescient
     :demand
     :after prescient
-    :config (progn
-	      (ivy-prescient-mode t)))
+    :config (ivy-prescient-mode t))
 
   (use-package ivy-rich
     :demand
     :after (ivy counsel)
-    :config (progn
-	      (ivy-rich-mode 1)))
+    :config (ivy-rich-mode 1))
 
   (use-package counsel
     :demand
@@ -235,8 +234,7 @@ straight.el
 	       "r" '(counsel-recentf :which-key "recent")
 	       "SPC" '(counsel-M-x :which-key "M-x"))
 
-    :config (progn
-	      (counsel-mode)))
+    :config (counsel-mode))
 
   (use-package counsel-tramp
     :defer 15
@@ -274,29 +272,29 @@ https://github.com/noctuid/evil-guide
     :diminish undo-tree-mode
     :general (:states 'normal
 		      "U" 'undo-tree-visualize)
-    :config (progn
-	      (global-undo-tree-mode +1)))
+    :config
+    (global-undo-tree-mode +1))
 
   (use-package evil
     :demand
-    :init (progn
-	    (setq evil-want-C-w-delete nil)
-	    (setq evil-want-C-w-in-emacs-state t)
-	    (evil-mode 1)
-	    )
-    :config (progn
-	      (cl-loop for (mode . state) in '((haskell-interactive-mode . emacs)
-					       (haskell-error-mode . emacs)
-					       (term-mode . emacs)
-					       (messages-mode . motion)
-					       (helpful-mode . motion)
-					       (compilation-mode . motion)
-					       )
-		       do (evil-set-initial-state mode state))
-	      ;; (cl-loop for map in '(helpful-mode-map
-	      ;; 			  )
-	      ;; 	     do (evil-make-overriding-map map))
-	      ))
+    :init
+    (setq evil-want-C-w-delete nil)
+    (setq evil-want-C-w-in-emacs-state t)
+    :config
+    (evil-mode 1)
+    (evil-set-command-property 'evil-yank :move-point t)
+    (cl-loop for (mode . state) in '((haskell-interactive-mode . emacs)
+				     (haskell-error-mode . emacs)
+				     (term-mode . emacs)
+				     (messages-mode . motion)
+				     (helpful-mode . motion)
+				     (compilation-mode . motion)
+				     )
+	     do (evil-set-initial-state mode state))
+    ;; (cl-loop for map in '(helpful-mode-map
+    ;;			  )
+    ;;	     do (evil-make-overriding-map map))
+    )
 
   (use-package evil-commentary
     :demand
@@ -317,14 +315,14 @@ https://github.com/noctuid/evil-guide
   (use-package evil-smartparens
     :demand
     :after (evil smartparens)
-    :config (progn
-	      (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode)))
+    :config (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode))
 
   (use-package evil-mc
     :demand
     :diminish emc
-    ;; :config (progn (global-evil-mc-mode 1)
-    ;; 		 (add-hook 'magit-mode-hook #'evil-mc-mode -1))
+    ;; :config
+    ;; (global-evil-mc-mode 1)
+    ;; (add-hook 'magit-mode-hook #'evil-mc-mode -1))
     )
 #+END_SRC
 
@@ -335,27 +333,26 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 #+BEGIN_SRC emacs-lisp
 
   (use-package projectile
-    ;; :demand
+    :demand
     :diminish (projectile-mode)
     :general (my-menu-def
 		      "p" 'projectile-find-file
 		      "P" 'projectile-switch-project)
-    :config (progn
-	      (projectile-mode +1)
-	      (setq projectile-completion-system 'ivy)
-	      (setq projectile-generic-command "fd -H --ignore-file .projectile -t f -0")
-	      ;; (setq projectile-indexing-method 'turbo-alien) 
-	      (setq projectile-project-search-path '("~/proj/"))))
+    :config
+    (projectile-mode +1)
+    (setq projectile-completion-system 'ivy)
+    (setq projectile-generic-command "fd -H --ignore-file .projectile -t f -0")
+    ;; (setq projectile-indexing-method 'turbo-alien)
+    (setq projectile-project-search-path '("~/proj/")))
 
   (use-package counsel-projectile
-    ;; :demand
+    :demand
     :after (counsel projectile)
     :general (my-menu-def
 		      "p" 'counsel-projectile
 		      "P" 'counsel-projectile-switch-project
 		      "/" '(counsel-projectile-rg :which-key "search proj"))
-    :config (progn
-	      (counsel-projectile-mode)))
+    :config (counsel-projectile-mode))
 #+END_SRC
 
 * Org
@@ -383,6 +380,11 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
   (use-package evil-magit
     :demand
     :after (evil magit))
+
+* Mail
+
+todo
+
 #+END_SRC
 
 * Snippets
@@ -409,9 +411,7 @@ test
   (use-package srefactor
     :defer
     ;;:general
-    :config (progn
-
-  ))
+  )
 #+END_SRC
 
 * Completion
@@ -419,6 +419,8 @@ test
 https://company-mode.github.io/
 
 https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.html
+
+** Company
 
 #+BEGIN_SRC emacs-lisp
   (use-package company
@@ -433,17 +435,35 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
   (use-package company-quickhelp
     :after (company pos-tip)
     :config (company-quickhelp-mode))
+#+END_SRC
 
+** Flycheck
+
+#+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :defer 30
     :general (my-menu-def
-               "e" '(:ignore t :which-key "Errors")
+	       "e" '(:ignore t :which-key "Errors")
 	       "e e" 'flycheck-buffer
 	       "e b" 'flycheck-buffer
 	       "e c" 'flycheck-compile
 	       "e n" 'flycheck-next-error
 	       "e p" 'flycheck-prev-error))
 
+#+END_SRC
+
+** LSP
+
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-mode
+  :defer)
+
+(use-package lsp-ui
+  :after (lsp-mode))
+
+(use-package company-lsp
+  :after (company lsp-mode)
+  :config (push 'company-lsp company-backends))
 #+END_SRC
 
 * Spelling
@@ -471,34 +491,24 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
 
   (use-package flyspell
-    :config (progn
-	      ;; ommit error messages on spell checking for performance sake
-	      (setq flyspell-issue-message-flag nil)))
-#+END_SRC
+    :config
+    ;; ommit error messages on spell checking for performance sake
+    (setq flyspell-issue-message-flag nil))
 
-* LSP
-
-#+BEGIN_SRC emacs-lisp
-(use-package lsp-mode
-  :defer)
-  
-(use-package lsp-ui
-  :after (lsp-mode))
-  
-(use-package company-lsp
-  :after (company lsp-mode)
-  :config (push 'company-lsp company-backends))
-#+END_SRC
+#+End_SRC
 
 * Programming languages
 ** C++
 https://github.com/realgud/realgud
 https://github.com/tuhdo/semantic-refactor
-   
+
 #+BEGIN_SRC emacs-lisp
 
-(use-package realgud
-  :defer)
+  ;; (use-package cc-mode
+  ;;   :hook)
+
+  (use-package realgud
+    :defer)
 
 #+END_SRC
 
@@ -507,23 +517,23 @@ https://commercialhaskell.github.io/intero/
 
 #+BEGIN_SRC emacs-lisp
 
-;; (use-package haskell-mode
-;;   :defer t
-;;   :bind (:map haskell-mode-map
-;; 	      ("C-c C-c" . haskell-compile))
-;;   )
+  (use-package haskell-mode
+    :defer t
+    :bind (:map haskell-mode-map
+		("C-c C-c" . haskell-compile))
+    )
 
-(use-package intero
-  :hook (haskell-mode . intero-mode)
-  )
-    
+  (use-package intero
+    :hook (haskell-mode . intero-mode)
+    )
 
-;; (use-package haskell-process
-;;   :after haskell-mode)
 
-;; (use-package haskell-interactive-mode
-;;   :after haskell-mode
-;;   :contig (add-hook 'haskell-mode-hook 'interactive-haskell-mode))
+  ;; (use-package haskell-process
+  ;;   :after haskell-mode)
+
+  ;; (use-package haskell-interactive-mode
+  ;;   :after haskell-mode
+  ;;   :contig (add-hook 'haskell-mode-hook 'interactive-haskell-mode))
 
 
 #+END_SRC
@@ -571,7 +581,8 @@ https://commercialhaskell.github.io/intero/
 
 * Misc
 https://github.com/purcell/exec-path-from-shell
-** Help
+** Packages
+*** Helpful
 
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
@@ -612,7 +623,7 @@ https://github.com/purcell/exec-path-from-shell
 	      (setq clean-aindent-is-simple-indent t)))
 #+END_SRC
 
-* Functions
+** Functions
 
 #+BEGIN_SRC emacs-lisp
   (defun rename-current-file ()
