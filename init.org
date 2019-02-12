@@ -2,6 +2,7 @@
 #+AUTHOR: Matthias Schmitt
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
+#+PROPERTY: header-args :comments both
 
 This is my emacs configuration file in literate style as an org mode file.
 
@@ -57,8 +58,11 @@ After startup reset it to reasonable value
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-message t)
   (setq initial-scratch-message "")
+#+END_SRC
 
-  ;; Bootstrap straight.el
+Bootstrap straight.el
+
+#+BEGIN_SRC emacs-lisp
   (defvar bootstrap-version)
   (let ((bootstrap-file
 	 (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -71,13 +75,15 @@ After startup reset it to reasonable value
 	(goto-char (point-max))
 	(eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
+#+END_SRC
 
+Use ~straight.el~ together with ~use-package~
 
+Package `use-package' provides a handy macro by the same name which
+is essentially a wrapper around `with-eval-after-load' with a lot
+of handy syntactic sugar and useful features.
 
-
-  ;; Package `use-package' provides a handy macro by the same name which
-  ;; is essentially a wrapper around `with-eval-after-load' with a lot
-  ;; of handy syntactic sugar and useful features.
+#+BEGIN_SRC emacs-lisp
   (eval-when-compile
     (straight-use-package 'use-package))
 
@@ -95,13 +101,14 @@ After startup reset it to reasonable value
 
   (setq use-package-compute-statistics t)
   (setq use-package-verbose t)
+#+END_SRC
 
-  (load-theme 'wombat t)
+Don't clobber the init.el file
+use a own file for emacs custom definition
 
+#+BEGIN_SRC emacs-lisp
   (setq custom-file (expand-file-name "emacs-custom.el" user-emacs-directory))
-
   (load custom-file)
-
 #+END_SRC
 
 ** Basic packages
@@ -109,7 +116,9 @@ After startup reset it to reasonable value
 #+BEGIN_SRC emacs-lisp
   (use-package diminish
     :demand)
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp
   (use-package general
     :demand
     :config
@@ -135,17 +144,20 @@ After startup reset it to reasonable value
       :prefix my-leader-key
       :non-normal-prefix my-non-normal-leader-key)
     )
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp
   (use-package which-key
     :demand
     :diminish which-key-mode
     :config (which-key-mode))
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp
   (use-package epkg
     :defer t
     ;; on func epkg-list-packages)
     )
-
 #+END_SRC
 
 * Saving
@@ -450,7 +462,13 @@ Turn off mouse interface early in startup to avoid momentary display.
     (tooltip-mode -1))
 #+END_SRC
 
-Nicer mode line
+** Theme
+
+#+BEGIN_SRC emacs-lisp
+  (load-theme 'wombat t)
+#+END_SRC
+
+** Mode Line
 
 #+BEGIN_SRC emacs-lisp
   (use-package smart-mode-line
@@ -459,6 +477,8 @@ Nicer mode line
     (setq sml/theme 'dark)
     (sml/setup))
 #+END_SRC
+
+** Other
 
 Highlight delimiters such as parentheses, brackets or braces according to their depth
 
@@ -711,7 +731,7 @@ Recognize arch linux pgkbuild files
 
 #+BEGIN_SRC emacs-lisp
   (defun rename-current-file ()
-    "Renames both current buffer and file it's visiting a file."
+    "Renames both current buffer and the file it's visiting."
     (interactive
      (progn
        (if (not (buffer-file-name))
@@ -726,23 +746,33 @@ Recognize arch linux pgkbuild files
 	 (setq default-directory (file-name-directory new-file-name))
 	 ))))
 
+  (defun delete-current-file ()
+    "Deletes the current buffer and the file it's visiting."
+    (interactive
+     (progn
+       (if (not (buffer-file-name))
+	   (error "Buffer '%s' is not visiting a file!" (buffer-name)))
+       (delete-file buffer-file-name)
+       (kill-buffer)
+       )))
+#+END_SRC
 
-  ;; alternative command version
-  (defun my-norm@q ()
-    "Apply macro in q register on selected lines."
+#+BEGIN_SRC emacs-lisp
+    ;; alternative command version
+    (defun my-norm@q ()
+      "Apply macro in q register on selected lines."
+      (interactive)
+      (evil-ex-normal (region-beginning) (region-end) "@q"))
+
+  (defun reload-dir-locals-for-current-buffer ()
+    "reload dir locals for the current buffer"
     (interactive)
-    (evil-ex-normal (region-beginning) (region-end) "@q"))
+    (let ((enable-local-variables :all))
+      (hack-dir-local-variables-non-file-buffer)))
 
-(defun reload-dir-locals-for-current-buffer ()
-  "reload dir locals for the current buffer"
-  (interactive)
-  (let ((enable-local-variables :all))
-    (hack-dir-local-variables-non-file-buffer)))
-
-  ;; (general-define-key
-  ;;  :states '(visual global)
-  ;;  "Q" 'my-norm@q)
-
+    ;; (general-define-key
+    ;;  :states '(visual global)
+    ;;  "Q" 'my-norm@q)
 #+END_SRC
 
 * End
