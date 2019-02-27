@@ -1,6 +1,5 @@
 #+TITLE: Emacs configuration file
 #+AUTHOR: Matthias Schmitt
-#+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
 #+PROPERTY: header-args :comments both
 
@@ -13,7 +12,7 @@ We automatically reload the configuration after changes to the 'init.org' file.
 ** Tangle
 
 #+BEGIN_SRC emacs-lisp
-  (setq user-emacs-directory "~/.emacs.d.old/")
+  (setq user-emacs-directory "~/.emacs.d/")
 #+END_SRC
 
 TODO why are there use-package errors when using byte-compile-file
@@ -164,7 +163,7 @@ use a own file for emacs custom definition
 ** Backup
 
 #+BEGIN_SRC emacs-lisp
-  (defvar --backup-directory (concat user-emacs-directory ".cache/backups"))
+  (defvar --backup-directory (expand-file-name ".cache/backups" user-emacs-directory))
   (if (not (file-exists-p --backup-directory))
       (make-directory --backup-directory t))
   (setq backup-directory-alist `(("." . ,--backup-directory)))
@@ -184,7 +183,7 @@ use a own file for emacs custom definition
 ** Undo history
 
 #+BEGIN_SRC emacs-lisp
-  (defvar --undo-directory (concat user-emacs-directory ".cache/undo"))
+  (defvar --undo-directory (expand-file-name ".cache/undo" user-emacs-directory))
   (if (not (file-exists-p --undo-directory))
       (make-directory --undo-directory t))
   (setq undo-tree-auto-save-history t)
@@ -282,7 +281,7 @@ use a own file for emacs custom definition
     :defer 15
     :after counsel
     :general (my-menu-def
-	       "F t" 'counsle-tramp)
+	       "F t" 'counsel-tramp)
     :config (setq tramp-default-method "ssh"))
 
   (use-package swiper
@@ -471,11 +470,10 @@ todo
 Turn off mouse interface early in startup to avoid momentary display.
 
 #+BEGIN_SRC emacs-lisp
-  (when window-system
-    (menu-bar-mode -1)
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1)
-    (tooltip-mode -1))
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tooltip-mode -1)
 #+END_SRC
 
 ** Theme
@@ -695,12 +693,7 @@ https://commercialhaskell.github.io/intero/
 #+BEGIN_SRC emacs-lisp
   (use-package rust-mode
     :mode "\\.rs\\'"
-  )
-
-  (use-package rustfmt
-    :after (rust-mode)
-    :hook (rust-mode)
-  )
+    :config (push "target" projectile-globally-ignored-directories))
 #+END_SRC
 
 * Misc
