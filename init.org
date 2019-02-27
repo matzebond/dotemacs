@@ -33,7 +33,26 @@ TODO why are there use-package errors when using byte-compile-file
 #+END_SRC
 
 * Initial Stuff
+
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-message t)
+  (setq initial-scratch-message "")
+#+END_SRC
+
+** Init Time
+
+#+begin_src emacs-lisp
+  (add-hook 'emacs-startup-hook
+	    (lambda ()
+	      (message "Emacs ready in %s with %d garbage collections."
+		       (format "%.2f seconds"
+			       (float-time
+				(time-subtract after-init-time before-init-time)))
+		       gcs-done)))
+#+end_src
+
 ** Garbage Collection
+
 Disabling GC (by setting `gc-cons-threshold' to a very large value)
 during startup is said to improve startup time by reducing the number of GC runs.
 After startup reset it to reasonable value
@@ -45,19 +64,16 @@ After startup reset it to reasonable value
   (setq gc-cons-threshold 402653184) ;;gc-cons-percentage 0.6)
   (add-hook 'after-init-hook (lambda ()
 			       (run-with-idle-timer
-				  60
+				  10
 				  nil
 				  (lambda ()
+				    (interactive)
+				    (message "Reset gc threshold after init and idle")
 				    (setq gc-cons-threshold 20000000)))))
   (add-hook 'focus-out-hook 'garbage-collect)
 #+END_SRC
 
 ** straight.el
-
-#+BEGIN_SRC emacs-lisp
-  (setq inhibit-startup-message t)
-  (setq initial-scratch-message "")
-#+END_SRC
 
 Bootstrap straight.el
 
