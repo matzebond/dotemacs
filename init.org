@@ -274,11 +274,12 @@ use a own file for emacs custom definition
 
   (use-package prescient
     :demand
-    :after ivy)
+    :after ivy
+    :config (setq prescient-filter-method 'literal+initialism))
 
   (use-package ivy-prescient
     :demand
-    :after prescient
+    :after (prescient ivy)
     :config (ivy-prescient-mode t))
 
   (use-package ivy-rich
@@ -343,6 +344,8 @@ https://github.com/noctuid/evil-guide
     :init
     (setq evil-want-C-w-delete nil)
     (setq evil-want-C-w-in-emacs-state t)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-Y-yank-to-eol t)
     ;; (cl-loop for map in '(helpful-mode-map
     ;; 			  )
     ;; 	     do (evil-make-overriding-map map))
@@ -357,16 +360,25 @@ https://github.com/noctuid/evil-guide
 				     (compilation-mode . motion)
 				     )
 	     do (evil-set-initial-state mode state))
+    (setq evil-echo-state nil)
+    (setq evil-ex-substitute-global t)
     )
 #+END_SRC
+
+Folding
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode 'hs-minor-mode)
+#+END_SRC
+
 
 Equivalent of ~nnoremap n nzz~
     
 #+BEGIN_SRC emacs-lisp
-(defun my-center-line (&rest _)
-  (evil-scroll-line-to-center nil))
+  (defun my-center-line (&rest _)
+    (evil-scroll-line-to-center nil))
 
-(advice-add 'evil-search-next :after #'my-center-line)
+  (advice-add 'evil-search-next :after #'my-center-line)
 #+END_SRC
 
 
