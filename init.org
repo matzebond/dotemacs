@@ -159,6 +159,12 @@ use a own file for emacs custom definition
     )
 #+END_SRC
 
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :demand
+    :config (exec-path-from-shell-initialize))
+#+end_src
+
 * Saving
 ** Backup
 
