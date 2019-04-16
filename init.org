@@ -489,10 +489,10 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 ** Additional
 
 #+BEGIN_SRC emacs-lisp
-  (use-package git-gutter-fringe-plus
-    :ensure t
-    :init (global-git-gutter-fringe+-mode)
-    )
+  ;; (use-package git-gutter-fringe+
+  ;;   :ensure t
+  ;;   :init (global-git-gutter-fringe+-mode)
+  ;;   )
 #+END_SRC
 
 * TODO Mail
