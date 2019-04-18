@@ -1,6 +1,7 @@
 ;; This file replaces itself with the actual configuration at first run.
 
-(setq user-emacs-directory "~/.emacs.d.old/")
+;; incase emacs is at different dir
+;; (setq user-emacs-directory "~/.emacs.d.old/")
 
 ;; We can't tangle without org!
 (require 'org)
