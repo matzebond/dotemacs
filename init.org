@@ -365,12 +365,18 @@ https://github.com/noctuid/evil-guide
     )
 #+END_SRC
 
+** Fixing modes
+
+#+BEGIN_SRC emacs-lisp
+#+END_SRC
+
+** Vim goodies
+
 Folding
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode 'hs-minor-mode)
+  (add-hook 'prog-mode 'hs-minor-mode)
 #+END_SRC
-
 
 Equivalent of ~nnoremap n nzz~
     
@@ -381,6 +387,7 @@ Equivalent of ~nnoremap n nzz~
   (advice-add 'evil-search-next :after #'my-center-line)
 #+END_SRC
 
+** Evil packages
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-commentary
@@ -457,7 +464,6 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     :after (evil org))
 #+END_SRC
 
-
 * Git
 ** Magit
 
@@ -508,6 +514,12 @@ Turn off mouse interface early in startup to avoid momentary display.
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
   (tooltip-mode -1)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'default-frame-alist
+	       '(font . "Hack-12"))
 #+END_SRC
 
 ** Theme
@@ -743,6 +755,8 @@ https://github.com/purcell/exec-path-from-shell
 		      "H" '(:ignore t :which-key "Help")
 		      "H v" 'helpful-variable
 		      "H f" 'helpful-function
+		      "H k" 'helpful-key
+		      "H s" 'helpful-symbol
 		      )
     :config (progn
 	      (general-define-key
