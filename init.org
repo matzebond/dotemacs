@@ -1,6 +1,6 @@
 #+TITLE: Emacs configuration file
 #+AUTHOR: Matthias Schmitt
-#+PROPERTY: header-args :tangle yes
+#+PROPERTY: header-args:emacs-lisp :tangle yes
 #+PROPERTY: header-args :comments both
 
 This is my emacs configuration file in literate style as an org mode file.
