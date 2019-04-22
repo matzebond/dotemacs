@@ -790,6 +790,16 @@ https://commercialhaskell.github.io/intero/
     :config (push "target" projectile-globally-ignored-directories))
 #+END_SRC
 
+** Elm
+
+#+begin_src emacs-lisp
+  (use-package elm-mode
+    :mode ("\\.elm\\'")
+    :config
+    (add-to-list 'company-backends 'company-elm)
+    (push "elm-stuff" projectile-globally-ignored-directories))
+#+end_src
+
 * Misc
 https://github.com/purcell/exec-path-from-shell
 ** Packages
