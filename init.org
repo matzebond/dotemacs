@@ -486,11 +486,27 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 
 #+BEGIN_SRC emacs-lisp
   (use-package org
-    :defer 60)
+    :defer 60
+    :config
+    (add-hook 'org-mode-hook 'flyspell-mode)
+    (setq org-directory "~/org/")
+    (setq org-default-notes-file (expand-file-name "tage.org" org-directory))
+    (org-babel-do-load-languages 'org-babel-load-languages
+				 '((shell . t))))
 
   (use-package evil-org
     :demand
     :after (evil org))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-caldav
+    :defer 15
+    :config
+    (setq org-caldav-url "https://posteo.de:8443/calendars/male.schmitt"
+	  org-caldav-calendar-id "default"
+	  org-caldav-inbox "~/org/cal.org"
+	  org-icalendar-timezone "Europe/Berlin"))
 #+END_SRC
 
 * Git
