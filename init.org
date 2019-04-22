@@ -660,13 +660,16 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-mode
-  :defer)
+  :hook (prog-mode . lsp)
+  :commands lsp)
 
 (use-package lsp-ui
-  :after (lsp-mode))
+  :after (lsp-mode)
+  :commands lsp-ui-mode)
 
 (use-package company-lsp
   :after (company lsp-mode)
+  :commands company-lsp
   :config (push 'company-lsp company-backends))
 #+END_SRC
 
