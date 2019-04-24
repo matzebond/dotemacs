@@ -212,7 +212,8 @@ use a own file for emacs custom definition
   (setq undo-tree-history-directory-alist `(("." . ,--undo-directory)))
 #+END_SRC
 
-* abo-abo
+* Navigation
+** abo-abo
 
 [[http://oremacs.com/swiper/][ivy & swiper manual]]
 
@@ -323,6 +324,30 @@ use a own file for emacs custom definition
   (use-package hydra
     :defer 5)
 #+END_SRC
+
+** Symbol
+
+#+begin_src emacs-lisp
+  (use-package symbol-overlay
+    :demand
+    :general (my-menu-def
+	       "s" '(:ignore t :which-key "Symbol")
+	       "s" (general-key-dispatch 'symbol-overlay-put
+		     :timeout .33
+		     "n" 'symbol-overlay-jump-next
+		     "p" 'symbol-overlay-jump-previous
+		     "d" 'symbol-overlay-remove-all
+		     "r" 'symbol-overlay-rename
+		     )
+
+	       "S" '(:ignore t :which-key "Symbol")
+	       "S s" 'symbol-overlay-mode
+	       "S n" 'symbol-overlay-jump-next
+	       "S p" 'symbol-overlay-jump-prev
+	       "S d" 'symbol-overlay-remove-all
+	       "S r" 'symbol-overlay-rename
+	       ))
+#+end_src
 
 * Evil
 
