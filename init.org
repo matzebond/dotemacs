@@ -496,7 +496,14 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 
   (use-package evil-org
     :demand
-    :after (evil org))
+    :after (evil org)
+    :config
+    (add-hook 'org-mode-hook 'evil-org-mode)
+    (add-hook 'evil-org-mode-hook
+	      (lambda ()
+		(evil-org-set-key-theme)))
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
