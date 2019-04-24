@@ -139,14 +139,11 @@ use a own file for emacs custom definition
     :config
     (general-evil-setup t)
 
-    (general-define-key
-     :keymaps 'dired-mode-map
-     "SPC" nil)
-
     (defconst my-menu-key "SPC")
     (defconst my-non-normal-menu-key "M-SPC")
     (general-create-definer my-menu-def
       :states '(normal insert emacs)
+      :keymaps 'override
       :prefix my-menu-key
       :non-normal-prefix my-non-normal-menu-key)
     (my-menu-def
@@ -156,6 +153,7 @@ use a own file for emacs custom definition
     (defconst my-non-normal-leader-key "M-,")
     (general-create-definer my-leader-def
       :states '(normal)
+      :keymaps 'override
       :prefix my-leader-key
       :non-normal-prefix my-non-normal-leader-key)
     )
@@ -371,20 +369,19 @@ https://github.com/noctuid/evil-guide
     (setq evil-want-C-w-in-emacs-state t)
     (setq evil-want-C-u-scroll t)
     (setq evil-want-Y-yank-to-eol t)
-    ;; (cl-loop for map in '(helpful-mode-map
-    ;; 			  )
-    ;; 	     do (evil-make-overriding-map map))
     :config
     (evil-mode 1)
-    (evil-set-command-property 'evil-yank :move-point t)
     (cl-loop for (mode . state) in '((haskell-interactive-mode . emacs)
 				     (haskell-error-mode . emacs)
 				     (term-mode . emacs)
-				     (messages-mode . motion)
-				     (helpful-mode . motion)
+				     (messages-mode . normal)
 				     (compilation-mode . motion)
 				     )
 	     do (evil-set-initial-state mode state))
+    ;; (cl-loop for map in '(helpful-mode-map
+    ;; 			  )
+    ;; 	     do (evil-make-overriding-map map))
+    (evil-set-command-property 'evil-yank :move-point t)
     (setq evil-echo-state nil)
     (setq evil-ex-substitute-global t)
     )
@@ -393,6 +390,13 @@ https://github.com/noctuid/evil-guide
 ** Fixing modes
 
 #+BEGIN_SRC emacs-lisp
+  (general-define-key
+   :keymaps 'dired-mode-map
+   "SPC" nil)
+
+  (general-define-key
+   :keymaps 'Info-mode-map
+   "SPC" nil)
 #+END_SRC
 
 ** Vim goodies
@@ -783,10 +787,13 @@ https://github.com/purcell/exec-path-from-shell
 		      "H k" 'helpful-key
 		      "H s" 'helpful-symbol
 		      )
-    :config (progn
-	      (general-define-key
-	       :keymaps 'helpful-mode-map
-	       "q" 'quit-window)))
+    :config
+    (general-define-key
+     :keymaps 'helpful-mode-map
+     "SPC" nil
+     "q" 'quit-window)
+    (evil-make-overriding-map helpful-mode-map 'normal))
+
 #+END_SRC
 
 *** Indent
