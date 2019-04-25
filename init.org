@@ -816,6 +816,16 @@ https://commercialhaskell.github.io/intero/
     (push "elm-stuff" projectile-globally-ignored-directories))
 #+end_src
 
+** Markups
+
+#+begin_src emacs-lisp
+  (use-package yaml-mode
+    :mode ("\\.yml\\'"))
+
+  (use-package toml-mode
+    :mode ("\\.toml\\'"))
+#+end_src
+
 * Misc
 https://github.com/purcell/exec-path-from-shell
 ** Packages
