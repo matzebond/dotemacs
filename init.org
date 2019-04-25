@@ -239,7 +239,8 @@ use a own file for emacs custom definition
 
     "w" 'other-window
     "W" '(:ignore t :which-key "Window")
-    "W d" 'delete-window)
+    "W d" 'delete-window
+    "W o" 'delete-other-windows)
 
   (use-package ivy
     :demand
