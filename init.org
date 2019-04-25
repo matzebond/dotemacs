@@ -261,15 +261,24 @@ use a own file for emacs custom definition
 	      "C-l" 'ivy-alt-done
 	      "C-h" 'ivy-backward-delete-char
 	      "<escape>" 'minibuffer-keyboard-quit
-	      ;;"C-SPC" 'ivy-avy
+	      "C-SPC" 'nil
 	      )
+
+    (:keymaps 'ivy-occur-grep-mode-map
+	      "SPC" nil)
 
     :config
     (ivy-mode 1)
     (setq ivy-use-virtual-buffers t)
     (setq ivy-count-format "(%d/%d) ")
     (setq enable-recursive-minibuffers t)
+    (setq ivy-extra-directories nil)
     (setq ivy-wrap t))
+
+  (use-package ivy-hydra
+    :defer 15
+    :after (ivy hydra)
+    :commands (hydra-ivy/body))
 
   (use-package prescient
     :demand
@@ -320,14 +329,14 @@ use a own file for emacs custom definition
 		      ))
 
   (use-package hydra
-    :defer 5)
+    :defer 15)
 #+END_SRC
 
 ** Symbol
 
 #+begin_src emacs-lisp
   (use-package symbol-overlay
-    :demand
+    :defer 15
     :general (my-menu-def
 	       "s" '(:ignore t :which-key "Symbol")
 	       "s" (general-key-dispatch 'symbol-overlay-put
