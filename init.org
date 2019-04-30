@@ -517,10 +517,30 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :defer 60
+    :general (my-menu-def
+	       "o" '(nil :which-key "org")
+	       "o a" 'org-agenda
+	       "o c" 'org-capture)
     :config
     (add-hook 'org-mode-hook 'flyspell-mode)
     (setq org-directory "~/org/")
-    (setq org-default-notes-file (expand-file-name "tage.org" org-directory))
+    (setq org-default-notes-file (expand-file-name "inbox.org" org-directory))
+    (setq org-agenda-files '("~/org/inbox.org"
+			     "~/org/gtd.org"
+			     "~/org/tickler.org"))
+    (setq org-capture-templates '(("t" "Todo [inbox]" entry
+				   (file+headline "~/org/inbox.org" "Tasks")
+				   "* TODO %i%?")
+				  ("T" "Tickler" entry
+				   (file+headline "~/org/tickler.org" "Tickler")
+				   "* %i%? \n %U")))
+    (setq org-refile-targets '(("~/org/gtd.org" :maxlevel . 3)
+			       ("~/org/someday.org" :level . 1)
+			       ("~/org/tickler.org" :maxlevel . 2)))
+    (setq org-refile-use-outline-path 'file)
+    (setq org-outline-path-complete-in-steps nil)
+
+    (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
     (org-babel-do-load-languages 'org-babel-load-languages
 				 '((shell . t))))
 
