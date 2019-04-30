@@ -210,6 +210,26 @@ use a own file for emacs custom definition
   (setq undo-tree-history-directory-alist `(("." . ,--undo-directory)))
 #+END_SRC
 
+** File history
+
+#+begin_src emacs-lisp
+  (save-place-mode 1) ;; save last cursor position
+  (savehist-mode 1) ;; save minibuffer history
+#+end_src
+
+*** recentf
+#+begin_src emacs-lisp
+  (recentf-mode 1)
+  (setq recentf-max-menu-items 200 ;; MRU configs
+	recentf-max-saved-items 200
+	recentf-exclude '("recentf" "autoload" "emacs-customizations.el"))
+#+end_src
+
+** Lockfile
+#+begin_src emacs-lisp
+  (setq create-lockfiles nil)
+#+end_src
+
 * Navigation
 ** abo-abo
 
@@ -863,12 +883,18 @@ https://github.com/purcell/exec-path-from-shell
 #+END_SRC
 
 ** Settings
+#+begin_src emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+end_src
+*** follow symlinks
 
 Always follow symlinks to vc controlled sources.
 This happens a lot because my dotfiles are linked by stow.
 #+BEGIN_SRC emacs-lisp
   (setq vc-follow-symlinks t)
 #+END_SRC
+
+*** PKGBUILD
 
 Recognize arch linux pgkbuild files
 #+BEGIN_SRC emacs-lisp
