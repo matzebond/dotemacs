@@ -590,14 +590,19 @@ Turn off mouse interface early in startup to avoid momentary display.
   (load-theme 'wombat t)
 #+END_SRC
 
-** Mode Line
+** Modeline
 
 #+BEGIN_SRC emacs-lisp
-  (use-package smart-mode-line
-    ;; :demand
+  (use-package minions
+    :demand
+    :config (minions-mode 1))
+
+  (use-package moody
+    :demand
     :config
-    (setq sml/theme 'dark)
-    (sml/setup))
+    (setq x-underline-at-descent-line t)
+    (moody-replace-mode-line-buffer-identification)
+    (moody-replace-vc-mode))
 #+END_SRC
 
 ** Other
