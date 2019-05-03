@@ -603,9 +603,83 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
   ;;   )
 #+END_SRC
 
-* TODO Mail
+* Mail
 
-todo
+#+begin_src emacs-lisp
+  (use-package mu4e
+    :defer 15
+    :config
+    (setq mail-user-agent 'mu4e-user-agent)
+    (setq mu4e-maildir "~/.mail")
+    (setq mu4e-get-mail-command "mbsync -a")
+    (setq mu4e-change-filenames-when-moving t) ;; needed by mbsync
+    
+    (setq message-send-mail-function 'smtpmail-send-it
+	  smtpmail-default-smtp-server "posteo.de"
+	  smtpmail-smtp-server "posteo.de"
+	  smtpmail-stream-type 'starttls
+	  smtpmail-smtp-service 587
+	  smtpmail-debug-info t
+	  smtpmail-debug-verbose t)
+
+    (setq mu4e-user-mail-address-list '("male.schmitt@posteo.de" "uydvo@student.kit.edu"))
+    (setq mu4e-contexts
+	  `( ,(make-mu4e-context
+	       :name "posteo"
+	       :enter-func (lambda () (mu4e-message "Entering posteo context"))
+	       :leave-func (lambda () (mu4e-message "Leaving posteo context"))
+	       :match-func (lambda (msg)
+			     (when msg
+			       (string-match-p "^/posteo" (mu4e-message-field msg :maildir))))
+	       :vars '( ( user-mail-address  . "male.schmitt@posteo.de"  )
+			( user-full-name     . "Matthias Schmitt" )
+			( mu4e-sent-folder   . "/posteo/Sent")
+			( mu4e-drafts-folder . "/posteo/Drafts")
+			( mu4e-trash-folder  . "/posteo/Trash")
+			( mu4e-refile-folder . "/posteo/Archive")
+			( smtpmail-smtp-server . "posteo.de"))
+	       )
+	     ,(make-mu4e-context
+	       :name "uni"
+	       :enter-func (lambda () (mu4e-message "Entering uni context"))
+	       :leave-func (lambda () (mu4e-message "Leaving uni context"))
+	       :match-func (lambda (msg)
+			     (when msg
+			       (string-match-p "^/uni" (mu4e-message-field msg :maildir))))
+	       :vars '( ( user-mail-address  . "uydvo@student.kit.edu"  )
+			( user-full-name     . "Matthias Schmitt" )
+			( mu4e-sent-folder   . "/uni/Sent")
+			( mu4e-drafts-folder . "/uni/Drafts")
+			( mu4e-trash-folder  . "/uni/Trash")
+			( mu4e-refile-folder . "/uni/Archives")
+			( smtpmail-smtp-server . "smtp.kit.edu"))
+	    )))
+    (setq mu4e-context-policy 'ask-if-none)
+    (setq message-kill-buffer-on-exit t))
+#+end_src
+
+** Additional mu4e packages
+
+#+begin_src emacs-lisp
+  ;; (use-package org-mu4e
+  ;;   :after mu4e)
+  
+  (use-package mu4e-conversation
+    :after mu4e)
+
+  (use-package mu4e-alert
+    :after mu4e
+    :config
+    (mu4e-alert-set-default-style 'libnotify)
+    (mu4e-alert-enable-notifications))
+
+  (use-package mu4e-conversation
+    :disable
+    :after mu4e
+    :config
+    (global-mu4e-conversation-mode))
+
+#+end_src
 
 * Visual
 
