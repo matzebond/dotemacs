@@ -409,8 +409,8 @@ https://github.com/noctuid/evil-guide
 				     )
 	     do (evil-set-initial-state mode state))
     ;; (cl-loop for map in '(helpful-mode-map
-    ;; 			  )
-    ;; 	     do (evil-make-overriding-map map))
+    ;;			  )
+    ;;	     do (evil-make-overriding-map map))
     (evil-set-command-property 'evil-yank :move-point t)
     (setq evil-echo-state nil)
     (setq evil-ex-substitute-global t)
@@ -438,7 +438,7 @@ Folding
 #+END_SRC
 
 Equivalent of ~nnoremap n nzz~
-    
+
 #+BEGIN_SRC emacs-lisp
   (defun my-center-line (&rest _)
     (evil-scroll-line-to-center nil))
@@ -531,6 +531,9 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     (setq org-capture-templates '(("t" "Todo [inbox]" entry
 				   (file+headline "~/org/inbox.org" "Tasks")
 				   "* TODO %i%?")
+				   ("m" "Mail Todo [inbox]" entry
+				   (file+headline "~/org/inbox.org" "Tasks")
+				   "* TODO %i%?\n%a\n")
 				  ("T" "Tickler" entry
 				   (file+headline "~/org/tickler.org" "Tickler")
 				   "* %i%? \n %U")))
@@ -959,6 +962,7 @@ https://github.com/purcell/exec-path-from-shell
 		      "H f" 'helpful-function
 		      "H k" 'helpful-key
 		      "H s" 'helpful-symbol
+		      "H K" 'helpful-kill-buffers
 		      )
     :config
     (general-define-key
