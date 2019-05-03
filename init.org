@@ -73,7 +73,7 @@ After startup reset it to reasonable value
   (add-hook 'focus-out-hook 'garbage-collect)
 #+END_SRC
 
-** straight.el
+** Package management & straight.el
 
 Bootstrap straight.el
 
@@ -117,6 +117,8 @@ of handy syntactic sugar and useful features.
   (setq use-package-compute-statistics t)
   (setq use-package-verbose t)
 #+END_SRC
+
+** Custom
 
 Don't clobber the init.el file
 use a own file for emacs custom definition
@@ -231,9 +233,7 @@ use a own file for emacs custom definition
 #+end_src
 
 * Navigation
-** abo-abo
-
-[[http://oremacs.com/swiper/][ivy & swiper manual]]
+** Buffer & Window menu
 
 #+BEGIN_SRC emacs-lisp
   (my-menu-def
@@ -261,7 +261,13 @@ use a own file for emacs custom definition
     "W" '(:ignore t :which-key "Window")
     "W d" 'delete-window
     "W o" 'delete-other-windows)
+#+end_src
 
+** abo-abo
+[[http://oremacs.com/swiper/][ivy & swiper manual]]
+*** ivy
+
+#+begin_src emacs-lisp
   (use-package ivy
     :demand
     :diminish ivy-mode
@@ -315,7 +321,11 @@ use a own file for emacs custom definition
     :demand
     :after (ivy counsel)
     :config (ivy-rich-mode 1))
+#+end_src
 
+*** counsel
+
+#+begin_src emacs-lisp
   (use-package counsel
     :demand
     :diminish counsel-mode
@@ -335,23 +345,34 @@ use a own file for emacs custom definition
     :general (my-menu-def
 	       "F t" 'counsel-tramp)
     :config (setq tramp-default-method "ssh"))
+#+end_src
 
+*** swiper
+
+#+begin_src emacs-lisp
   (use-package swiper
     :defer 15
     :general (:states 'normal
-		      "C-s" 'swiper
-		      ))
+		      "C-s" 'swiper))
+#+end_src
 
+*** avy
+
+#+begin_src emacs-lisp
   (use-package avy
     :defer 15
     :commands (avy-goto-char-2 avy-goto-char-timer avy-goto-line)
     :general (:states 'normal
 		      "g t" 'avy-goto-char-2
 		      ))
+#+end_src
 
+*** hydra
+
+#+begin_src emacs-lisp
   (use-package hydra
     :defer 15)
-#+END_SRC
+#+end_src
 
 ** Symbol
 
@@ -376,6 +397,35 @@ use a own file for emacs custom definition
 	       "S r" 'symbol-overlay-rename
 	       ))
 #+end_src
+
+** projectile
+
+TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project]] vs projectile
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package projectile
+    :demand
+    :diminish (projectile-mode)
+    :general (my-menu-def
+		      "p" 'projectile-find-file
+		      "P" 'projectile-switch-project)
+    :config
+    (projectile-mode +1)
+    (setq projectile-completion-system 'ivy)
+    (setq projectile-generic-command "fd -H --ignore-file .projectile -t f -0")
+    ;; (setq projectile-indexing-method 'turbo-alien)
+    (setq projectile-project-search-path '("~/proj/")))
+
+  (use-package counsel-projectile
+    :demand
+    :after (counsel projectile)
+    :general (my-menu-def
+		      "p" 'counsel-projectile
+		      "P" 'counsel-projectile-switch-project
+		      "/" '(counsel-projectile-rg :which-key "search proj"))
+    :config (counsel-projectile-mode))
+#+END_SRC
 
 * Evil
 
@@ -418,15 +468,49 @@ https://github.com/noctuid/evil-guide
 #+END_SRC
 
 ** Fixing modes
+*** dired
 
 #+BEGIN_SRC emacs-lisp
   (general-define-key
    :keymaps 'dired-mode-map
    "SPC" nil)
+#+END_SRC
 
+*** info
+
+#+BEGIN_SRC emacs-lisp
   (general-define-key
    :keymaps 'Info-mode-map
-   "SPC" nil)
+   "SPC" nil
+   "TAB" 'Info-next-reference-or-link
+   "S-TAB" 'Info-prev-reference-or-link
+   "C-o" 'Info-history-back
+   "C-i" 'Info-history-forward
+   "C-]" 'Info-follow-nearest-node
+
+   "u" 'Info-up
+   "g" nil
+   "gj" 'Info-next
+   "gk" 'Info-prev
+   "gg" 'evil-goto-first-line
+
+   "q" 'Info-exit)
+#+END_SRC
+
+*** help
+
+#+BEGIN_SRC emacs-lisp
+  (general-define-key
+   :keymaps 'help-mode-map
+   "SPC" nil
+
+   "C-o" 'help-go-back
+   "C-i" 'help-go-forward
+   "<" 'help-go-back
+   ">" 'help-go-forward
+   "r" 'help-follow
+
+   "q" 'quit-window)
 #+END_SRC
 
 ** Vim goodies
@@ -481,35 +565,6 @@ Equivalent of ~nnoremap n nzz~
   (use-package evil-visualstar
     :demand
     :config (global-evil-visualstar-mode))
-#+END_SRC
-
-* Project management
-
-TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project]] vs projectile
-
-#+BEGIN_SRC emacs-lisp
-
-  (use-package projectile
-    :demand
-    :diminish (projectile-mode)
-    :general (my-menu-def
-		      "p" 'projectile-find-file
-		      "P" 'projectile-switch-project)
-    :config
-    (projectile-mode +1)
-    (setq projectile-completion-system 'ivy)
-    (setq projectile-generic-command "fd -H --ignore-file .projectile -t f -0")
-    ;; (setq projectile-indexing-method 'turbo-alien)
-    (setq projectile-project-search-path '("~/proj/")))
-
-  (use-package counsel-projectile
-    :demand
-    :after (counsel projectile)
-    :general (my-menu-def
-		      "p" 'counsel-projectile
-		      "P" 'counsel-projectile-switch-project
-		      "/" '(counsel-projectile-rg :which-key "search proj"))
-    :config (counsel-projectile-mode))
 #+END_SRC
 
 * Org
@@ -616,7 +671,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     (setq mu4e-maildir "~/.mail")
     (setq mu4e-get-mail-command "mbsync -a")
     (setq mu4e-change-filenames-when-moving t) ;; needed by mbsync
-    
+
     (setq message-send-mail-function 'smtpmail-send-it
 	  smtpmail-default-smtp-server "posteo.de"
 	  smtpmail-smtp-server "posteo.de"
@@ -666,7 +721,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 #+begin_src emacs-lisp
   ;; (use-package org-mu4e
   ;;   :after mu4e)
-  
+
   (use-package mu4e-conversation
     :after mu4e)
 
@@ -677,7 +732,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     (mu4e-alert-enable-notifications))
 
   (use-package mu4e-conversation
-    :disable
+    :disabled
     :after mu4e
     :config
     (global-mu4e-conversation-mode))
@@ -937,7 +992,7 @@ https://commercialhaskell.github.io/intero/
     (push "elm-stuff" projectile-globally-ignored-directories))
 #+end_src
 
-** Markups
+** Config & Markup Langs
 
 #+begin_src emacs-lisp
   (use-package yaml-mode
