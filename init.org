@@ -917,6 +917,12 @@ https://github.com/tuhdo/semantic-refactor
 
   (use-package realgud
     :defer)
+  (use-package glsl-mode
+    :defer
+    :mode ("\\.glsm\\'" "\\.vert\\'" "\\.frag\\'" "\\.geom\\'")
+    )
+
+  (use-package company-c-headers
 
 #+END_SRC
 
@@ -1000,6 +1006,12 @@ https://commercialhaskell.github.io/intero/
 
   (use-package toml-mode
     :mode ("\\.toml\\'"))
+
+  (use-package systemd)
+
+  (use-package nginx-mode
+    :init
+    (add-to-list 'auto-mode-alist '("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode)))
 #+end_src
 
 * Misc
