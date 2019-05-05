@@ -513,6 +513,7 @@ https://github.com/noctuid/evil-guide
    "q" 'quit-window)
 #+END_SRC
 
+*** TODO view
 ** Vim goodies
 
 Folding
@@ -576,6 +577,9 @@ Equivalent of ~nnoremap n nzz~
 	       "o" '(nil :which-key "org")
 	       "o a" 'org-agenda
 	       "o c" 'org-capture)
+    (:keymap global-map
+	     "C-c c" 'org-capture
+	     "C-c a" 'org-agenda)
     :config
     (add-hook 'org-mode-hook 'flyspell-mode)
     (setq org-directory "~/org/")
@@ -655,6 +659,8 @@ Equivalent of ~nnoremap n nzz~
 ** Additional
 
 #+BEGIN_SRC emacs-lisp
+  (use-package magit-todos
+    :after magit)
   ;; (use-package git-gutter-fringe+
   ;;   :ensure t
   ;;   :init (global-git-gutter-fringe+-mode)
@@ -915,14 +921,36 @@ https://github.com/tuhdo/semantic-refactor
   ;; (use-package cc-mode
   ;;   :hook)
 
+  (use-package ccls
+    :after projectile
+    ;; :ensure-system-package ccls
+    :custom
+    (ccls-args nil)
+    (ccls-executable (executable-find "ccls"))
+    (projectile-project-root-files-top-down-recurring
+     (append '("compile_commands.json" ".ccls")
+	     projectile-project-root-files-top-down-recurring))
+    :config (push ".ccls-cache" projectile-globally-ignored-directories))
+
   (use-package realgud
-    :defer)
+    :defer
+    :after (cc-mode))
+
   (use-package glsl-mode
     :defer
     :mode ("\\.glsm\\'" "\\.vert\\'" "\\.frag\\'" "\\.geom\\'")
     )
 
   (use-package company-c-headers
+    :after (cc-mode)
+    :config
+    (add-to-list 'company-backends 'company-c-headers)
+    ;; (setq company-c-headers-path-system "" )
+    )
+
+  (setq tab-width 8) ; or any other preferred value
+  ;; (defvaralias 'c-basic-offset 'tab-width)
+  (setq-default c-basic-offset 8)
 
 #+END_SRC
 
@@ -952,31 +980,29 @@ https://commercialhaskell.github.io/intero/
 
 #+END_SRC
 
-** Latex
+** TODO Pdf/Latex
 
 #+BEGIN_SRC emacs-lisp
 
-;;(use-package auctex
-  ;;:defer t
-  ;;:hook (latex-mode)
-  ;;:config (progn
-	    ;;(setq TeX-parse-self t) ;; enable parse on load
-	    ;;(setq TeX-auto-safe t) ;; enable parse on safe
-	    ;;(setq TeX-safe-query nil)
-	    ;;(setq-default TeX-master nil)
-	    ;;(setq TeX-PDF-mode t)
-	    ;;(add-hook 'TeX-mode-hook 'flyspell-mode)
-	    ;;(if (executable-find "latexmk")
-		;;)))
-;;
-;;(use-package auctex-latexmk
-  ;;:after (auctex)
-  ;;:config (progn
-	    ;;(auctex-latexmk-setup)
-	    ;;(setq auctex-latexmk-inherit-TeX-PDF-mode t)))
+  (use-package auctex
+    :defer t
+    :hook (latex-mode)
+    :config (progn
+	      (setq TeX-parse-self t) ;; enable parse on load
+	      (setq TeX-auto-safe t) ;; enable parse on safe
+	      (setq TeX-safe-query nil)
+	      (setq-default TeX-master nil)
+	      (setq TeX-PDF-mode t)
+	      (add-hook 'TeX-mode-hook 'flyspell-mode)))
+  ;;
+  ;;(use-package auctex-latexmk
+    ;;:after (auctex)
+    ;;:config (progn
+	      ;;(auctex-latexmk-setup)
+	      ;;(setq auctex-latexmk-inherit-TeX-PDF-mode t)))
 
-;; (use-package latex-preview-pane
-;;   :defer t)
+  ;; (use-package latex-preview-pane
+  ;;   :defer t)
 
 #+END_SRC
 
