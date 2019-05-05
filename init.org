@@ -263,6 +263,18 @@ use a own file for emacs custom definition
     "W o" 'delete-other-windows)
 #+end_src
 
+** winner
+   undo and redo for window operations
+
+#+begin_src emacs-lisp
+  (use-package winner
+    :demand
+    :general (my-menu-def
+	       "W u" 'winner-undo
+	       "W r" 'winner-redo)
+    :config (winner-mode 1))
+#+end_src
+
 ** abo-abo
 [[http://oremacs.com/swiper/][ivy & swiper manual]]
 *** ivy
@@ -1065,6 +1077,23 @@ https://github.com/purcell/exec-path-from-shell
     (evil-make-overriding-map helpful-mode-map 'normal))
 
 #+END_SRC
+
+*** ediff
+
+#+begin_src emacs-lisp
+  (use-package ediff
+      :defer t
+      :after (winner outline)
+      :init
+      (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+      (setq ediff-split-window-function 'split-window-horizontally)
+      (setq ediff-merge-split-window-function 'split-window-horizontally)
+      :config
+      ;; show org ediffs unfolded
+      (add-hook 'ediff-prepare-buffer-hook #'show-all)
+      ;; restore window layout when done
+      (add-hook 'ediff-quit-hook #'winner-undo))
+#+end_src
 
 *** Indent
 
