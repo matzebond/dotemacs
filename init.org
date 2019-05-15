@@ -69,7 +69,7 @@ After startup reset it to reasonable value
 				  (lambda ()
 				    (interactive)
 				    (message "Reset gc threshold after init and idle")
-				    (setq gc-cons-threshold 20000000)))))
+				    (setq gc-cons-threshold 50000000)))))
   (add-hook 'focus-out-hook 'garbage-collect)
 #+END_SRC
 
