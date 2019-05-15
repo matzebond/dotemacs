@@ -650,7 +650,9 @@ Equivalent of ~nnoremap n nzz~
 	       "g" '(nil :which-key "git/vc")
 	       "g s" 'magit-status)
     (:keymaps 'magit-mode-map
-	      "SPC" nil ))
+	      "SPC" nil )
+    :config
+    (setq magit-diff-refine-hunk t))
 
   (use-package evil-magit
     :demand
