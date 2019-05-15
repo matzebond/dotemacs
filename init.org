@@ -476,6 +476,7 @@ https://github.com/noctuid/evil-guide
     (evil-set-command-property 'evil-yank :move-point t)
     (setq evil-echo-state nil)
     (setq evil-ex-substitute-global t)
+    (setq evil-vsplit-window-right t)
     )
 #+END_SRC
 
