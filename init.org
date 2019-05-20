@@ -1068,7 +1068,6 @@ https://commercialhaskell.github.io/intero/
 ** TODO Pdf/Latex
 
 #+BEGIN_SRC emacs-lisp
-
   (use-package auctex
     :defer t
     :hook (latex-mode)
@@ -1088,8 +1087,23 @@ https://commercialhaskell.github.io/intero/
 
   ;; (use-package latex-preview-pane
   ;;   :defer t)
-
 #+END_SRC
+
+*** pdf-tools
+
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    ;; manually update
+    :pin manual
+    :general (:keymaps pdf-view-mode-map
+		       "C-s" 'isearch-forward)
+    :config
+    ;; (pdf-tools-install)
+    ;; open pdfs scaled to fit page
+    (setq-default pdf-view-display-size 'fit-page)
+    ;; automatically annotate highlights
+    (setq pdf-annot-activate-created-annotations t))
+#+end_src
 
 ** Rust
 
