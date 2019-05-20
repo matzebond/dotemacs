@@ -596,7 +596,8 @@ Equivalent of ~nnoremap n nzz~
 
 	       "O" '(nil :which-key "org")
 	       "O a" 'org-agenda
-	       "O c" 'org-capture)
+	       "O c" 'org-capture
+	       "O l" 'org-store-link)
 
     (:keymap global-map
 	     "C-c c" 'org-capture
@@ -608,6 +609,8 @@ Equivalent of ~nnoremap n nzz~
     (setq org-return-follows-link t)
     (setq org-startup-folded t)
     (setq org-hide-leading-stars t)
+    (setq org-return-follows-link t)
+
     (setq org-default-notes-file (expand-file-name "inbox.org" org-directory))
     (setq org-agenda-files '("~/org/inbox.org"
 			     "~/org/gtd.org"
