@@ -896,6 +896,22 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     :config (company-quickhelp-mode))
 #+END_SRC
 
+** Tags
+
+#+begin_src elisp
+  (use-package counsel-etags
+    :general
+    (my-menu-def
+      "t" 'counsel-etags-find-tag-at-point)
+    :config
+    ;; counsel-etags-ignore-directories does NOT support wildcast
+    (add-to-list 'counsel-etags-ignore-directories "build_clang")
+    (add-to-list 'counsel-etags-ignore-directories "build_clang")
+    ;; counsel-etags-ignore-filenames supports wildcast
+    (add-to-list 'counsel-etags-ignore-filenames "TAGS")
+    (add-to-list 'counsel-etags-ignore-filenames "*.json")))
+#+end_src
+
 ** Flycheck
 
 #+BEGIN_SRC emacs-lisp
