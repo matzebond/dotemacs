@@ -989,8 +989,9 @@ https://github.com/tuhdo/semantic-refactor
 
 #+BEGIN_SRC emacs-lisp
 
-  ;; (use-package cc-mode
-  ;;   :hook)
+  (use-package cc-mode
+    :general (my-menu-def
+	       "F o" 'ff-get-other-file))
 
   (use-package ccls
     :after projectile
