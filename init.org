@@ -582,28 +582,41 @@ Equivalent of ~nnoremap n nzz~
 #+END_SRC
 
 * Org
+** org-mode
 
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :defer 60
     :general (my-menu-def
-	       "o" '(nil :which-key "org")
-	       "o a" 'org-agenda
-	       "o c" 'org-capture)
+	       "o" '(:ignore :which-key "org-outline")
+	       "o" (general-key-dispatch 'counsel-outline
+		     :timeout .33
+		     "a" 'org-agenda
+		     "c" 'org-capture)
+
+	       "O" '(nil :which-key "org")
+	       "O a" 'org-agenda
+	       "O c" 'org-capture)
+
     (:keymap global-map
 	     "C-c c" 'org-capture
-	     "C-c a" 'org-agenda)
+	     "C-c a" 'org-agenda
+	     "C-c l" 'org-store-link)
     :config
     (add-hook 'org-mode-hook 'flyspell-mode)
     (setq org-directory "~/org/")
+    (setq org-return-follows-link t)
+    (setq org-startup-folded t)
+    (setq org-hide-leading-stars t)
     (setq org-default-notes-file (expand-file-name "inbox.org" org-directory))
     (setq org-agenda-files '("~/org/inbox.org"
 			     "~/org/gtd.org"
 			     "~/org/tickler.org"))
+    (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
     (setq org-capture-templates '(("t" "Todo [inbox]" entry
 				   (file+headline "~/org/inbox.org" "Tasks")
 				   "* TODO %i%?")
-				   ("m" "Mail Todo [inbox]" entry
+				  ("m" "Mail Todo [inbox]" entry
 				   (file+headline "~/org/inbox.org" "Tasks")
 				   "* TODO %i%?\n%a\n")
 				  ("T" "Tickler" entry
@@ -612,10 +625,12 @@ Equivalent of ~nnoremap n nzz~
     (setq org-refile-targets '(("~/org/gtd.org" :maxlevel . 3)
 			       ("~/org/someday.org" :level . 1)
 			       ("~/org/tickler.org" :maxlevel . 2)))
+    (setq org-tag-alist '(("@home" . "h") ("@uni" . "u") ("@work" . "w"))) 
     (setq org-refile-use-outline-path 'file)
     (setq org-outline-path-complete-in-steps nil)
 
-    (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+    (push '("se" . "src elisp") org-structure-template-alist)
+    (push '("sp" . "src python") org-structure-template-alist)
     (org-babel-do-load-languages 'org-babel-load-languages
 				 '((shell . t))))
 
@@ -631,6 +646,8 @@ Equivalent of ~nnoremap n nzz~
     (evil-org-agenda-set-keys))
 #+END_SRC
 
+** org-caldav
+
 #+BEGIN_SRC emacs-lisp
   (use-package org-caldav
     :defer 15
@@ -638,8 +655,31 @@ Equivalent of ~nnoremap n nzz~
     (setq org-caldav-url "https://posteo.de:8443/calendars/male.schmitt"
 	  org-caldav-calendar-id "default"
 	  org-caldav-inbox "~/org/cal.org"
-	  org-icalendar-timezone "Europe/Berlin"))
+	  org-caldav-files '("~/org/tickler.org")
+	  org-caldav-save-directory "~/org"
+	  org-icalendar-timezone "Europe/Berlin"
+	  org-caldav-delete-calendar-entries 'ask))
 #+END_SRC
+
+** org-brain
+
+#+begin_src elisp
+  (use-package org-brain
+    :after org
+    :general (my-menu-def
+	       "O v" 'org-brain-visualize)
+    :init
+    (setq org-brain-path "~/org/brain")
+    :config
+    (setq org-id-track-globally t)
+    (evil-set-initial-state 'org-brain-visualize-mode 'emacs)
+    (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
+    (push '("b" "Brain" plain (function org-brain-goto-end)
+	    "* %i%?" :empty-lines 1)
+	  org-capture-templates)
+    (setq org-brain-visualize-default-choices 'all)
+    (setq org-brain-title-max-length 0))
+#+end_src
 
 * Git
 ** Magit
