@@ -527,6 +527,12 @@ https://github.com/noctuid/evil-guide
 #+END_SRC
 
 *** TODO view
+*** message
+#+begin_src emacs-lisp
+    (general-define-key
+    :keymaps 'message-mode-map
+    "q" 'bury-window)
+#+end_src
 ** Vim goodies
 
 Folding
