@@ -736,6 +736,10 @@ Equivalent of ~nnoremap n nzz~
 #+begin_src emacs-lisp
   (use-package mu4e
     :defer 15
+    :general (my-menu-def
+	       "m" '(mu4e :which-key "mail")
+	       "M" '(nil :which-key "Mail")
+	       "M u" 'mu4e-update-mail-and-index)
     :config
     (setq mail-user-agent 'mu4e-user-agent)
     (setq mu4e-maildir "~/.mail")
@@ -791,9 +795,11 @@ Equivalent of ~nnoremap n nzz~
 #+begin_src emacs-lisp
   ;; (use-package org-mu4e
   ;;   :after mu4e)
-
-  (use-package mu4e-conversation
-    :after mu4e)
+  
+  (use-package mu4e-maildirs-extension
+    :after mu4e 
+    :config
+    (mu4e-maildirs-extension))
 
   (use-package mu4e-alert
     :after mu4e
@@ -802,7 +808,6 @@ Equivalent of ~nnoremap n nzz~
     (mu4e-alert-enable-notifications))
 
   (use-package mu4e-conversation
-    :disabled
     :after mu4e
     :config
     (global-mu4e-conversation-mode))
