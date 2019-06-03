@@ -550,6 +550,17 @@ Equivalent of ~nnoremap n nzz~
   (advice-add 'evil-search-next :after #'my-center-line)
 #+END_SRC
 
+Use < in visual mode to continuously shift selection
+#+begin_src emacs-lisp
+  (defun maschm/visual-restore ()
+    "Restore visual selection."
+    (interactive)
+    (evil-normal-state)
+    (evil-visual-restore))
+
+  (advice-add 'evil-shift-right :after #'maschm/visual-restore)
+#+end_src
+
 ** Evil packages
 
 #+BEGIN_SRC emacs-lisp
