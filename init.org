@@ -439,6 +439,13 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     :config (counsel-projectile-mode))
 #+END_SRC
 
+** wgrep
+
+#+BEGIN_SRC emacs-lisp
+(use-package wgrep
+  :defer 5)
+#+END_SRC
+
 * Evil
 
 https://github.com/emacs-evil/evil-collection
