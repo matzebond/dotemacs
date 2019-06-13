@@ -1,6 +1,7 @@
 #+TITLE: Emacs configuration file
 #+AUTHOR: Matthias Schmitt
 #+PROPERTY: header-args:emacs-lisp :tangle yes
+#+PROPERTY: header-args:elisp :tangle yes
 #+PROPERTY: header-args :comments both
 
 This is my emacs configuration file in literate style as an org mode file.
@@ -690,9 +691,9 @@ Use < in visual mode to continuously shift selection
 
 ** org-brain
 
-#+begin_src elisp
+#+begin_src emacs-lisp
   (use-package org-brain
-    :after org
+    :defer 15
     :general (my-menu-def
 	       "O v" 'org-brain-visualize)
     :init
@@ -891,7 +892,7 @@ Display '~' on empty lines like in vi
 
 this or https://github.com/purcell/default-text-scale/blob/master/default-text-scale.el
 
-#+begin_src elisp
+#+begin_src emacs-lisp
   (defcustom default-text-scale-amount 10
     "Increment by which to adjust the :height of the default face."
     :type 'integer)
@@ -955,7 +956,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
 ** Tags
 
-#+begin_src elisp
+#+begin_src emacs-lisp
   (use-package counsel-etags
     :general
     (my-menu-def
