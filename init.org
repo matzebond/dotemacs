@@ -814,9 +814,9 @@ Use < in visual mode to continuously shift selection
 #+begin_src emacs-lisp
   ;; (use-package org-mu4e
   ;;   :after mu4e)
-  
+
   (use-package mu4e-maildirs-extension
-    :after mu4e 
+    :after mu4e
     :config
     (mu4e-maildirs-extension))
 
@@ -1143,11 +1143,11 @@ https://commercialhaskell.github.io/intero/
 #+begin_src emacs-lisp
   (use-package pdf-tools
     ;; manually update
-    :pin manual
-    :general (:keymaps pdf-view-mode-map
-		       "C-s" 'isearch-forward)
+    ;; :pin manual
+    ;; :general (:keymaps pdf-view-mode-map
+    ;;		     "C-s" 'isearch-forward)
     :config
-    ;; (pdf-tools-install)
+    (pdf-tools-install)
     ;; open pdfs scaled to fit page
     (setq-default pdf-view-display-size 'fit-page)
     ;; automatically annotate highlights
