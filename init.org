@@ -1229,12 +1229,12 @@ https://github.com/purcell/exec-path-from-shell
 		      "H f" 'helpful-function
 		      "H k" 'helpful-key
 		      "H s" 'helpful-symbol
-		      "H K" 'helpful-kill-buffers
-		      )
+		      "H K" 'helpful-kill-buffers)
     :config
     (general-define-key
      :keymaps 'helpful-mode-map
      "SPC" nil
+     "gr" 'helpful-update
      "q" 'quit-window)
     (evil-make-overriding-map helpful-mode-map 'normal))
 
