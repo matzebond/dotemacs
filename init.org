@@ -834,26 +834,21 @@ Use < in visual mode to continuously shift selection
 #+end_src
 
 * Visual
-
-Turn off mouse interface early in startup to avoid momentary display.
-
-#+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (tooltip-mode -1)
-#+END_SRC
-
+** Font
 
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'default-frame-alist
-	       '(font . "Hack-12"))
+  (add-to-list 'default-frame-alist '(font . "Hack-12"))
 #+END_SRC
 
 ** Theme
 
 #+BEGIN_SRC emacs-lisp
   (load-theme 'wombat t)
+  ;; (disable-theme 'doom-nord)
+  ;; (setq frame-background-mode nil)
+  ;; (setq frame-background-mode 'dark)
+  ;; (mapc 'frame-set-background-mode (frame-list))
+
 #+END_SRC
 
 ** Modeline
@@ -870,25 +865,13 @@ Turn off mouse interface early in startup to avoid momentary display.
     (moody-replace-mode-line-buffer-identification)
     (moody-replace-vc-mode))
 #+END_SRC
-
-** Other
-
-Highlight delimiters such as parentheses, brackets or braces according to their depth
+** Fringe
 
 #+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :defer 15
-    :hook (prog-mode . rainbow-delimiters-mode))
+  (setq indicate-buffer-boundaries 'left)
 #+END_SRC
 
-Display '~' on empty lines like in vi
-
-#+BEGIN_SRC emacs-lisp
-  (use-package vi-tilde-fringe
-    :defer 15
-    :hook (prog-mode . vi-tilde-fringe-mode))
-#+END_SRC
-
+** Scale
 
 this or https://github.com/purcell/default-text-scale/blob/master/default-text-scale.el
 
@@ -913,6 +896,48 @@ this or https://github.com/purcell/default-text-scale/blob/master/default-text-s
     (interactive)
     (set-face-attribute 'default nil :height 130))
 #+end_src
+
+** Scrolling
+
+** Other
+
+Turn off mouse interface early in startup to avoid momentary display.
+
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tooltip-mode -1)
+#+END_SRC
+
+Highlight trailing whitespace
+
+#+BEGIN_SRC emacs-lisp
+  (setq show-trailing-whitespace t)
+#+END_SRC
+
+Highlight delimiters such as parentheses, brackets or braces according to their depth
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :defer 15
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+END_SRC
+
+Display line numbers in programming modes
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode 'display-line-numbers-mode)
+
+#+END_SRC
+
+Display '~' on empty lines like in vi (only in programming modes)
+
+#+BEGIN_SRC emacs-lisp
+  (use-package vi-tilde-fringe
+    :defer 15
+    :hook (prog-mode . vi-tilde-fringe-mode))
+#+END_SRC
 
 * Completion
 
