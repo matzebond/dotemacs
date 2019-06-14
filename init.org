@@ -622,7 +622,8 @@ Use < in visual mode to continuously shift selection
 	       "O" '(nil :which-key "org")
 	       "O a" 'org-agenda
 	       "O c" 'org-capture
-	       "O l" 'org-store-link)
+	       "O l" 'org-insert-link
+	       "O L" 'org-store-link)
 
     (:keymap global-map
 	     "C-c c" 'org-capture
@@ -633,8 +634,7 @@ Use < in visual mode to continuously shift selection
     (setq org-directory "~/org/")
     (setq org-return-follows-link t)
     (setq org-startup-folded t)
-    (setq org-hide-leading-stars t)
-    (setq org-return-follows-link t)
+    (setq org-pretty-entities t)
 
     (setq org-default-notes-file (expand-file-name "inbox.org" org-directory))
     (setq org-agenda-files '("~/org/inbox.org"
@@ -653,11 +653,11 @@ Use < in visual mode to continuously shift selection
     (setq org-refile-targets '(("~/org/gtd.org" :maxlevel . 3)
 			       ("~/org/someday.org" :level . 1)
 			       ("~/org/tickler.org" :maxlevel . 2)))
-    (setq org-tag-alist '(("@home" . "h") ("@uni" . "u") ("@work" . "w"))) 
+    (setq org-tag-alist '(("@home" . "h") ("@uni" . "u") ("@work" . "w")))
     (setq org-refile-use-outline-path 'file)
     (setq org-outline-path-complete-in-steps nil)
 
-    (push '("se" . "src elisp") org-structure-template-alist)
+    (push '("se" . "src emacs-lisp") org-structure-template-alist)
     (push '("sp" . "src python") org-structure-template-alist)
     (org-babel-do-load-languages 'org-babel-load-languages
 				 '((shell . t))))
