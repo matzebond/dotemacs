@@ -768,6 +768,8 @@ Use < in visual mode to continuously shift selection
     (setq mu4e-maildir "~/.mail")
     (setq mu4e-get-mail-command "mbsync -a")
     (setq mu4e-change-filenames-when-moving t) ;; needed by mbsync
+    (setq mu4e-attachment-dir  "~/dld")
+    (setq mu4e-view-show-addresses 't)
 
     (setq message-send-mail-function 'smtpmail-send-it
 	  smtpmail-default-smtp-server "posteo.de"
