@@ -1083,7 +1083,8 @@ https://github.com/tuhdo/semantic-refactor
     :custom
     (ccls-args nil)
     (ccls-executable (executable-find "ccls"))
-    (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
+    ;; (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
+    :init
     (projectile-project-root-files-top-down-recurring
      (append '("compile_commands.json" ".ccls")
 	     projectile-project-root-files-top-down-recurring))
