@@ -535,6 +535,10 @@ https://github.com/noctuid/evil-guide
 #+END_SRC
 
 *** TODO view
+    [[info:emacs#View%20Mode][info:emacs#View Mode]]
+    SPC and S-SPC are bound to scrolling intentionally disable anyway?
+    Which buffer are in view mode?
+
 *** message
 #+begin_src emacs-lisp
     (general-define-key
