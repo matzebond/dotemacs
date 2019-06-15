@@ -998,7 +998,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     (add-to-list 'counsel-etags-ignore-directories "build_clang")
     ;; counsel-etags-ignore-filenames supports wildcast
     (add-to-list 'counsel-etags-ignore-filenames "TAGS")
-    (add-to-list 'counsel-etags-ignore-filenames "*.json")))
+    (add-to-list 'counsel-etags-ignore-filenames "*.json"))
 #+end_src
 
 ** Flycheck
