@@ -354,7 +354,10 @@ https://github.com/purcell/exec-path-from-shell
 	       "F r" '(counsel-recentf :which-key "recent")
 	       "r" '(counsel-recentf :which-key "recent")
 	       "SPC" '(counsel-M-x :which-key "M-x"))
-
+    (:keymap global-map
+	     "C-c f" 'counsel-find-file
+	     "C-c r" 'counsel-recentf
+	     "C-x C-r" 'counsel-recentf)
     :config (counsel-mode))
 
   (use-package counsel-tramp
@@ -1238,7 +1241,7 @@ https://commercialhaskell.github.io/intero/
 
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
-    :defer 5
+    :demand
     :general (my-menu-def
 		      "h" '(helpful-at-point :which-key "help")
 		      "H" '(:ignore t :which-key "Help")
@@ -1251,6 +1254,8 @@ https://commercialhaskell.github.io/intero/
     (general-define-key
      :keymaps 'helpful-mode-map
      "SPC" nil
+     "n" nil
+     "p" nil
      "g" nil
      "g r" 'helpful-update
      "q" 'quit-window)
