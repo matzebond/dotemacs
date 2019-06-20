@@ -179,6 +179,8 @@ use a own file for emacs custom definition
     )
 #+END_SRC
 
+https://github.com/purcell/exec-path-from-shell
+
 #+begin_src emacs-lisp
   (use-package exec-path-from-shell
     :demand
@@ -762,6 +764,7 @@ Use < in visual mode to continuously shift selection
 #+END_SRC
 
 * Mail
+** mu4e
 
 #+begin_src emacs-lisp
   (use-package mu4e
@@ -1211,7 +1214,7 @@ https://commercialhaskell.github.io/intero/
     (push "elm-stuff" projectile-globally-ignored-directories))
 #+end_src
 
-** Config & Markup Langs
+** Markup & Config Langs
 
 #+begin_src emacs-lisp
   (use-package yaml-mode
@@ -1227,8 +1230,9 @@ https://commercialhaskell.github.io/intero/
     (add-to-list 'auto-mode-alist '("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode)))
 #+end_src
 
+** Config
+
 * Misc
-https://github.com/purcell/exec-path-from-shell
 ** Packages
 *** Helpful
 
