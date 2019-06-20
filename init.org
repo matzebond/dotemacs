@@ -1267,6 +1267,13 @@ https://commercialhaskell.github.io/intero/
 
 ** Config
 
+When compiling follow the buffer
+TODO even better? got to bottom on error
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'compilation-mode 'follow-mode)
+#+END_SRC
+
 * Misc
 ** Packages
 *** Helpful
