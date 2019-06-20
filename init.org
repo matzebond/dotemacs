@@ -163,10 +163,13 @@ use a own file for emacs custom definition
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :demand
-    :diminish which-key-mode
-    :config (which-key-mode))
+    (use-package which-key
+      :demand
+      :general (my-menu-def
+		 "H K" 'which-key-show-keymap
+		 "H T" 'which-key-show-top-level)
+      :diminish which-key-mode
+      :config (which-key-mode))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -422,7 +425,11 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     :diminish (projectile-mode)
     :general (my-menu-def
 		      "p" 'projectile-find-file
-		      "P" 'projectile-switch-project)
+		      "P" '(nil :which-key "Project")
+		      "P p" 'projectile-switch-project
+		      "P c" 'projectile-compile-project
+		      "P r" 'projectile-run-project
+		      "P t" 'projectile-test-project)
     :config
     (projectile-mode +1)
     (setq projectile-completion-system 'ivy)
@@ -435,7 +442,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     :after (counsel projectile)
     :general (my-menu-def
 		      "p" 'counsel-projectile
-		      "P" 'counsel-projectile-switch-project
+		      "P p" 'counsel-projectile-switch-project
 		      "/" '(counsel-projectile-rg :which-key "search proj"))
     :config (counsel-projectile-mode))
 #+END_SRC
@@ -617,7 +624,7 @@ Use < in visual mode to continuously shift selection
   (use-package org
     :defer 60
     :general (my-menu-def
-	       "o" '(:ignore :which-key "org-outline")
+	       "o" '(:ignore t :which-key "org-outline")
 	       "o" (general-key-dispatch 'counsel-outline
 		     :timeout .33
 		     "a" 'org-agenda
@@ -991,7 +998,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
   (use-package counsel-etags
     :general
     (my-menu-def
-      "t" 'counsel-etags-find-tag-at-point)
+      "t" '(counsel-etags-find-tag-at-point :which-key "etags"))
     :config
     ;; counsel-etags-ignore-directories does NOT support wildcast
     (add-to-list 'counsel-etags-ignore-directories "build_clang")
@@ -1235,12 +1242,13 @@ https://github.com/purcell/exec-path-from-shell
 		      "H f" 'helpful-function
 		      "H k" 'helpful-key
 		      "H s" 'helpful-symbol
-		      "H K" 'helpful-kill-buffers)
+		      "H X" 'helpful-kill-buffers)
     :config
     (general-define-key
      :keymaps 'helpful-mode-map
      "SPC" nil
-     "gr" 'helpful-update
+     "g" nil
+     "g r" 'helpful-update
      "q" 'quit-window)
     (evil-make-overriding-map helpful-mode-map 'normal))
 
