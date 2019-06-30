@@ -737,6 +737,7 @@ Use < in visual mode to continuously shift selection
     (:keymaps 'magit-mode-map
 	      "SPC" nil )
     :config
+    (setq magit-completing-read-function 'ivy-completing-read)
     (setq magit-diff-refine-hunk t))
 
   (use-package evil-magit
@@ -764,6 +765,11 @@ Use < in visual mode to continuously shift selection
   ;;   :ensure t
   ;;   :init (global-git-gutter-fringe+-mode)
   ;;   )
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package orgit
+    :after (org magit))
 #+END_SRC
 
 * Mail
