@@ -500,63 +500,6 @@ https://github.com/noctuid/evil-guide
     )
 #+END_SRC
 
-** Fixing modes
-*** dired
-
-#+BEGIN_SRC emacs-lisp
-  (general-define-key
-   :keymaps 'dired-mode-map
-   "SPC" nil)
-#+END_SRC
-
-*** info
-
-#+BEGIN_SRC emacs-lisp
-  (general-define-key
-   :keymaps 'Info-mode-map
-   "SPC" nil
-   "TAB" 'Info-next-reference-or-link
-   "S-TAB" 'Info-prev-reference-or-link
-   "C-o" 'Info-history-back
-   "C-i" 'Info-history-forward
-   "C-]" 'Info-follow-nearest-node
-
-   "u" 'Info-up
-   "g" nil
-   "gj" 'Info-next
-   "gk" 'Info-prev
-   "gg" 'evil-goto-first-line
-
-   "q" 'Info-exit)
-#+END_SRC
-
-*** help
-
-#+BEGIN_SRC emacs-lisp
-  (general-define-key
-   :keymaps 'help-mode-map
-   "SPC" nil
-
-   "C-o" 'help-go-back
-   "C-i" 'help-go-forward
-   "<" 'help-go-back
-   ">" 'help-go-forward
-   "r" 'help-follow
-
-   "q" 'quit-window)
-#+END_SRC
-
-*** TODO view
-    [[info:emacs#View%20Mode][info:emacs#View Mode]]
-    SPC and S-SPC are bound to scrolling intentionally disable anyway?
-    Which buffer are in view mode?
-
-*** message
-#+begin_src emacs-lisp
-    (general-define-key
-    :keymaps 'message-mode-map
-    "q" 'bury-window)
-#+end_src
 ** Vim goodies
 
 Folding
@@ -1120,6 +1063,99 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     :defer
     ;;:general
   )
+#+END_SRC
+
+* Modes
+** dired
+
+#+BEGIN_SRC emacs-lisp
+  (general-define-key
+   :keymaps 'dired-mode-map
+   "SPC" nil)
+#+END_SRC
+
+** info
+
+#+BEGIN_SRC emacs-lisp
+  (general-define-key
+   :keymaps 'Info-mode-map
+   "SPC" nil
+   "TAB" 'Info-next-reference-or-link
+   "S-TAB" 'Info-prev-reference-or-link
+   "C-o" 'Info-history-back
+   "C-i" 'Info-history-forward
+   "C-]" 'Info-follow-nearest-node
+
+   "h" nil
+   "l" nil
+   "M-h" 'Info-help
+
+   "u" 'Info-up
+   "g" nil
+   "gj" 'Info-next
+   "gk" 'Info-prev
+   "gg" 'evil-goto-first-line
+
+   "q" 'Info-exit)
+
+  (evil-make-overriding-map Info-mode-map 'motion)
+#+END_SRC
+
+** help
+
+#+BEGIN_SRC emacs-lisp
+  (general-define-key
+   :keymaps 'help-mode-map
+   "SPC" nil
+
+   "C-o" 'help-go-back
+   "C-i" 'help-go-forward
+   "<" 'help-go-back
+   ">" 'help-go-forward
+   "r" 'help-follow
+
+   "q" 'quit-window)
+#+END_SRC
+
+** TODO view
+   [[info:emacs#View%20Mode][info:emacs#View Mode]]
+   SPC and S-SPC are bound to scrolling intentionally disable anyway?
+   Which buffer are in view mode?
+
+** message
+
+#+begin_src emacs-lisp
+    (general-define-key
+    :keymaps 'message-mode-map
+    "q" 'bury-window)
+#+end_src
+
+** shell
+
+#+BEGIN_SRC elisp
+  ;; (use-package eshell
+  ;;   :general (:keymaps 'eshell-mode-map
+  ;; 		     "TAB" 'completion-at-point)
+  ;;   )
+
+  (defun setup-eshell ()
+    ;; (define-key eshell-mode-map [remap eshell-pcomplete] 'completion-at-point)
+    (general-define-key :keymaps 'eshell-mode-map
+			[remap eshell-pcomplete] 'completion-at-point
+			"C-r" 'counsel-esh-history))
+
+  (add-hook 'eshell-mode-hook 'setup-eshell)
+
+  (use-package eshell-prompt-extras
+    :config
+    (eshell-prompt-function 'epe-theme-lambda)
+    )
+
+  (use-package esh-autosuggest
+    :hook (eshell-mode . esh-autosuggest-mode)
+    :general (:keymaps 'esh-autosuggest-active-map
+		       "C-e" 'company-complete-selection
+		       "M-e" 'esh-autosuggest-complete-word))
 #+END_SRC
 
 * Programming languages
