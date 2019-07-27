@@ -248,20 +248,22 @@ https://github.com/purcell/exec-path-from-shell
 	      :which-key "last-buffer-other-window")
 
     "B" '(:ignore t :which-key "Buffer")
-    "B m" '((lambda () (interactive (switch-to-buffer "*Messages*")))
+    "B m" '((lambda () (interactive) (switch-to-buffer "*Messages*"))
 	    :which-key "messages")
-    "B M" '((lambda () (interactive (switch-to-buffer-other-window "*Messages*")))
+    "B M" '((lambda () (interactive) (switch-to-buffer-other-window "*Messages*"))
 	    :which-key "messages-in-other")
-    "B s" '((lambda () (interactive (switch-to-buffer "*scratch*")))
+    "B s" '((lambda () (interactive) (switch-to-buffer "*scratch*"))
 	    :which-key "scratch")
-    "B S" '((lambda () (interactive (switch-to-buffer-other-window "*scratch*")))
+    "B S" '((lambda () (interactive) (switch-to-buffer-other-window "*scratch*"))
 	    :which-key "scratch-in-other")
-    "B w" '((lambda () (interactive (switch-to-buffer "*Warnings*")))
+    "B w" '((lambda () (interactive) (switch-to-buffer "*Warnings*"))
 	    :which-key "warnings")
-    "B W" '((lambda () (interactive (switch-to-buffer-other-window "*Warnings*")))
+    "B W" '((lambda () (interactive) (switch-to-buffer-other-window "*Warnings*"))
 	    :which-key "warnings-in-other")
     "B d" 'evil-delete-buffer
+    "B r" 'revert-buffer
     "B q" 'quit-window
+    "B k" 'kill-current-buffer
 
     "w" 'other-window
     "W" '(:ignore t :which-key "Window")
@@ -294,9 +296,9 @@ https://github.com/purcell/exec-path-from-shell
       "b" '(:ignore t :which-key "Buffer")
       "b" (general-key-dispatch 'ivy-switch-buffer
 	    :timeout .33
-	    "m" (lambda () (interactive (switch-to-buffer "*Messages*")))
-	    "s" (lambda () (interactive (switch-to-buffer "*scratch*")))
-	    "w" (lambda () (interactive (switch-to-buffer "*Warnings*")))
+	    "m" (lambda () (interactive) (switch-to-buffer "*Messages*"))
+	    "s" (lambda () (interactive) (switch-to-buffer "*scratch*"))
+	    "w" (lambda () (interactive) (switch-to-buffer "*Warnings*"))
 	    "b" 'ivy-switch-buffer
 	    "d" 'evil-delete-buffer
 	    "q" 'quit-window
@@ -307,7 +309,7 @@ https://github.com/purcell/exec-path-from-shell
 	      "C-h" 'ivy-backward-delete-char
 	      "<escape>" 'minibuffer-keyboard-quit
 	      "C-SPC" 'nil
-	      )
+	      "C-TAB" 'ivy-insert-current)
 
     (:keymaps 'ivy-occur-grep-mode-map
 	      "SPC" nil)
@@ -338,7 +340,9 @@ https://github.com/purcell/exec-path-from-shell
   (use-package ivy-rich
     :demand
     :after (ivy counsel)
-    :config (ivy-rich-mode 1))
+    :config
+    (ivy-rich-mode 1)
+    (setq ivy-rich-parse-remote-buffer nil))
 #+end_src
 
 *** counsel
@@ -1213,8 +1217,8 @@ https://commercialhaskell.github.io/intero/
 
   (use-package haskell-mode
     :defer t
-    :bind (:map haskell-mode-map
-		("C-c C-c" . haskell-compile))
+    :general (:keymaps 'haskell-mode-map
+		       "C-c C-c" 'haskell-compile)
     )
 
   (use-package intero
@@ -1326,10 +1330,10 @@ TODO even better? got to bottom on error
     :general (my-menu-def
 		      "h" '(helpful-at-point :which-key "help")
 		      "H" '(:ignore t :which-key "Help")
+		      "H h" 'helpful-symbol
 		      "H v" 'helpful-variable
-		      "H f" 'helpful-function
+		      "H f" 'helpful-callable
 		      "H k" 'helpful-key
-		      "H s" 'helpful-symbol
 		      "H X" 'helpful-kill-buffers)
     :config
     (general-define-key
@@ -1340,7 +1344,11 @@ TODO even better? got to bottom on error
      "g" nil
      "g r" 'helpful-update
      "q" 'quit-window)
-    (evil-make-overriding-map helpful-mode-map 'normal))
+    (evil-make-overriding-map helpful-mode-map 'normal)
+
+    (setq counsel-describe-function-function #'helpful-callable)
+    (setq counsel-describe-variable-function #'helpful-variable)
+    )
 
 #+END_SRC
 
