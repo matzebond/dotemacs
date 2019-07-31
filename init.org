@@ -1192,6 +1192,18 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 		       "M-e" 'esh-autosuggest-complete-word))
 #+END_SRC
 
+** irc
+
+#+BEGIN_SRC emacs-lisp
+  (use-package erc
+    :commands (erc erc-tls)
+    )
+
+  (setq my-fav-irc '("irc.freenode.net"
+		     "irc.oftc.net"
+		     "irc.mozilla.org"
+		     "irc.gnome.org"))
+#+END_SRC
 * Programming languages
 ** C++
 https://github.com/realgud/realgud
