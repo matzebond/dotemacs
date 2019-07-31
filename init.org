@@ -897,17 +897,38 @@ this or https://github.com/purcell/default-text-scale/blob/master/default-text-s
     (interactive)
     (set-face-attribute 'default nil :height (+ (face-attribute 'default :height) default-text-scale-amount)))
 
-
   (defun default-text-scale-decrease ()
     "Decrease the height of the default face by `default-text-scale-amount'."
     (interactive)
     (set-face-attribute 'default nil :height (- (face-attribute 'default :height) default-text-scale-amount)))
 
+  (defvar default-text-scale-pre (face-attribute 'default :height))
+
   (defun default-text-scale-reset ()
     "Reset the height of the default face."
     (interactive)
-    (set-face-attribute 'default nil :height 130))
+    (set-face-attribute 'default nil :height default-text-scale-pre))
 #+end_src
+
+*** Hydra
+
+#+BEGIN_SRC emacs-lisp
+  (defhydra hydra-zoom ()
+    "
+^Frame zooming^       ^Buffer scaling^
+_+_: zoom in        _i_: scale in
+_-_: zoom out       _d_: scale out
+_=_: zoom reset     _r_: scale reset
+"
+    ("+" default-text-scale-increase nil)
+    ("-" default-text-scale-decrease nil)
+    ("=" default-text-scale-reset nil)
+    ("i" text-scale-increase nil)
+    ("d" text-scale-decrease nil)
+    ("r" (text-scale-increase 0) nil))
+
+  (my-menu-def "T z" #'hydra-zoom/body)
+#+END_SRC
 
 ** Scrolling
 
