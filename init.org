@@ -1406,6 +1406,14 @@ https://github.com/jyp/dante
     (push "elm-stuff" projectile-globally-ignored-directories))
 #+end_src
 
+** Sonic Pi
+
+#+begin_src emacs-lisp
+  (use-package sonic-pi
+    :config
+    (setq sonic-pi-path "/usr/lib/sonic-pi/"))
+#+end_src
+
 ** Markup & Config Langs
 
 #+begin_src emacs-lisp
