@@ -1214,6 +1214,62 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 #+END_SRC
 
 *** TODO auto fill on paste
+** compilation
+When compiling follow the buffer
+TODO even better? got to bottom on error
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'compilation-mode-hook 'follow-mode)
+#+END_SRC
+
+** helpful
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helpful
+    :demand
+    :general
+    (my-menu-def
+      "h" '(helpful-at-point :which-key "help")
+      "H" '(:ignore t :which-key "Help")
+      "H h" 'helpful-symbol
+      "H v" 'helpful-variable
+      "H f" 'helpful-callable
+      "H k" 'helpful-key
+      "H X" 'helpful-kill-buffers)
+
+    :config
+    (general-define-key :keymaps 'helpful-mode-map
+			"SPC" nil
+			"n" nil
+			"p" nil
+			"g" nil
+			"g r" 'helpful-update
+			"q" 'quit-window)
+    (evil-make-overriding-map helpful-mode-map 'normal)
+
+    (setq counsel-describe-function-function #'helpful-callable)
+    (setq counsel-describe-variable-function #'helpful-variable)
+    )
+
+#+END_SRC
+
+** ediff
+
+#+begin_src emacs-lisp
+  (use-package ediff
+      :defer t
+      :after (winner outline)
+      :init
+      (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+      (setq ediff-split-window-function 'split-window-horizontally)
+      (setq ediff-merge-split-window-function 'split-window-horizontally)
+      :config
+      ;; show org ediffs unfolded
+      (add-hook 'ediff-prepare-buffer-hook #'outline-show-all)
+      ;; restore window layout when done
+      (add-hook 'ediff-quit-hook #'winner-undo))
+#+end_src
+
 * Programming languages
 ** C++
 https://github.com/realgud/realgud
@@ -1256,7 +1312,6 @@ https://github.com/tuhdo/semantic-refactor
     ;; (setq company-c-headers-path-system "" )
     )
 
-  (setq tab-width 8) ; or any other preferred value
   ;; (defvaralias 'c-basic-offset 'tab-width)
   (setq-default c-basic-offset 8)
 
@@ -1363,91 +1418,38 @@ https://commercialhaskell.github.io/intero/
     (add-to-list 'auto-mode-alist '("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode)))
 #+end_src
 
-** Config
-
-When compiling follow the buffer
-TODO even better? got to bottom on error
+* Settings
+** indent
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'compilation-mode 'follow-mode)
-#+END_SRC
-
-* Misc
-** Packages
-*** Helpful
-
-#+BEGIN_SRC emacs-lisp
-  (use-package helpful
-    :demand
-    :general (my-menu-def
-		      "h" '(helpful-at-point :which-key "help")
-		      "H" '(:ignore t :which-key "Help")
-		      "H h" 'helpful-symbol
-		      "H v" 'helpful-variable
-		      "H f" 'helpful-callable
-		      "H k" 'helpful-key
-		      "H X" 'helpful-kill-buffers)
-    :config
-    (general-define-key
-     :keymaps 'helpful-mode-map
-     "SPC" nil
-     "n" nil
-     "p" nil
-     "g" nil
-     "g r" 'helpful-update
-     "q" 'quit-window)
-    (evil-make-overriding-map helpful-mode-map 'normal)
-
-    (setq counsel-describe-function-function #'helpful-callable)
-    (setq counsel-describe-variable-function #'helpful-variable)
-    )
-
-#+END_SRC
-
-*** ediff
-
-#+begin_src emacs-lisp
-  (use-package ediff
-      :defer t
-      :after (winner outline)
-      :init
-      (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-      (setq ediff-split-window-function 'split-window-horizontally)
-      (setq ediff-merge-split-window-function 'split-window-horizontally)
-      :config
-      ;; show org ediffs unfolded
-      (add-hook 'ediff-prepare-buffer-hook #'outline-show-all)
-      ;; restore window layout when done
-      (add-hook 'ediff-quit-hook #'winner-undo))
-#+end_src
-
-*** Indent
-
-#+BEGIN_SRC emacs-lisp
+  (setq tab-width 4)
   (use-package clean-aindent-mode
     :config (setq clean-aindent-is-simple-indent t))
 #+END_SRC
 
-** Settings
-#+begin_src emacs-lisp
-  (defalias 'yes-or-no-p 'y-or-n-p)
-#+end_src
-*** follow symlinks
-
-Always follow symlinks to vc controlled sources.
-This happens a lot because my dotfiles are linked by stow.
-#+BEGIN_SRC emacs-lisp
-  (setq vc-follow-symlinks t)
-#+END_SRC
-
-*** PKGBUILD
+** whitespace
+** PKGBUILD
 
 Recognize arch linux pgkbuild files
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("PKGBUILD\\'" . shell-script-mode))
 #+END_SRC
 
-** Functions
+** yes-no
+
+#+begin_src emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+** vc symlinks
+Always follow symlinks to vc controlled sources.
+This happens a lot because my dotfiles are linked by stow.
+
+#+BEGIN_SRC emacs-lisp
+  (setq vc-follow-symlinks t)
+#+END_SRC
+
+* Functions
 
 #+BEGIN_SRC emacs-lisp
   (defun rename-current-file ()
@@ -1495,5 +1497,3 @@ Recognize arch linux pgkbuild files
     ;;  "Q" 'my-norm@q)
 #+END_SRC
 
-* End
-The End
