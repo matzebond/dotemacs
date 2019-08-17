@@ -260,7 +260,8 @@ https://github.com/purcell/exec-path-from-shell
 	    :which-key "warnings")
     "B W" '((lambda () (interactive) (switch-to-buffer-other-window "*Warnings*"))
 	    :which-key "warnings-in-other")
-    "B d" 'evil-delete-buffer
+    "B d" 'kill-this-buffer
+    "B D" 'evil-delete-buffer
     "B r" 'revert-buffer
     "B q" 'quit-window
     "B k" 'kill-current-buffer
@@ -269,18 +270,6 @@ https://github.com/purcell/exec-path-from-shell
     "W" '(:ignore t :which-key "Window")
     "W d" 'delete-window
     "W o" 'delete-other-windows)
-#+end_src
-
-** winner
-   undo and redo for window operations
-
-#+begin_src emacs-lisp
-  (use-package winner
-    :demand
-    :general (my-menu-def
-	       "W u" 'winner-undo
-	       "W r" 'winner-redo)
-    :config (winner-mode 1))
 #+end_src
 
 ** abo-abo
@@ -300,7 +289,7 @@ https://github.com/purcell/exec-path-from-shell
 	    "s" (lambda () (interactive) (switch-to-buffer "*scratch*"))
 	    "w" (lambda () (interactive) (switch-to-buffer "*Warnings*"))
 	    "b" 'ivy-switch-buffer
-	    "d" 'evil-delete-buffer
+	    "d" 'kill-this-buffer
 	    "q" 'quit-window
 	    ))
 
@@ -397,6 +386,18 @@ https://github.com/purcell/exec-path-from-shell
 #+begin_src emacs-lisp
   (use-package hydra
     :defer 15)
+#+end_src
+
+** winner
+   undo and redo for window operations
+
+#+begin_src emacs-lisp
+  (use-package winner
+    :demand
+    :general (my-menu-def
+	       "W u" 'winner-undo
+	       "W r" 'winner-redo)
+    :config (winner-mode 1))
 #+end_src
 
 ** Symbol
