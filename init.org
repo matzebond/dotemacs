@@ -1318,6 +1318,7 @@ https://github.com/tuhdo/semantic-refactor
 #+END_SRC
 
 ** Haskell
+*** Intero
 https://commercialhaskell.github.io/intero/
 
 #+BEGIN_SRC emacs-lisp
@@ -1342,6 +1343,9 @@ https://commercialhaskell.github.io/intero/
 
 
 #+END_SRC
+
+*** TODO Dante
+https://github.com/jyp/dante
 
 ** TODO Pdf/Latex
 
