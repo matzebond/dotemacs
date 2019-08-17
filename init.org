@@ -603,7 +603,6 @@ Use < in visual mode to continuously shift selection
 	     "C-c a" 'org-agenda
 	     "C-c l" 'org-store-link)
     :config
-    (add-hook 'org-mode-hook 'flyspell-mode)
     (setq org-directory "~/org/")
     (setq org-return-follows-link t)
     (setq org-startup-folded t)
@@ -1085,6 +1084,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
 
   (use-package flyspell
+    :hook (text-mode-hook)
     :config
     ;; ommit error messages on spell checking for performance sake
     (setq flyspell-issue-message-flag nil))
@@ -1205,6 +1205,15 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 		     "irc.mozilla.org"
 		     "irc.gnome.org"))
 #+END_SRC
+
+** text-mode
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'text-mode-hook 'auto-fill-mode)
+  (add-hook 'text-mode-hook 'visual-line-mode)
+#+END_SRC
+
+*** TODO auto fill on paste
 * Programming languages
 ** C++
 https://github.com/realgud/realgud
