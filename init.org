@@ -644,6 +644,9 @@ Use < in visual mode to continuously shift selection
 		(evil-org-set-key-theme)))
     (require 'evil-org-agenda)
     (evil-org-agenda-set-keys))
+
+  (use-package htmlize
+    :commands (org-export-dispatch))
 #+END_SRC
 
 ** org-caldav
