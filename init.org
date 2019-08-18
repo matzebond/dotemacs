@@ -1385,27 +1385,53 @@ https://commercialhaskell.github.io/intero/
 https://github.com/jyp/dante
 
 ** TODO Pdf/Latex
+*** AUCTeX
+https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow-with-emacs
 
 #+BEGIN_SRC emacs-lisp
   (use-package auctex
-    :defer t
-    :hook (latex-mode)
-    :config (progn
-	      (setq TeX-parse-self t) ;; enable parse on load
-	      (setq TeX-auto-safe t) ;; enable parse on safe
-	      (setq TeX-safe-query nil)
-	      (setq-default TeX-master nil)
-	      (setq TeX-PDF-mode t)
-	      (add-hook 'TeX-mode-hook 'flyspell-mode)))
-  ;;
-  ;;(use-package auctex-latexmk
-    ;;:after (auctex)
-    ;;:config (progn
-	      ;;(auctex-latexmk-setup)
-	      ;;(setq auctex-latexmk-inherit-TeX-PDF-mode t)))
+    :config
+    (set-fill-column 80)
+    :custom
+    (TeX-auto-save t)
+    (TeX-safe-query nil)
+    (TeX-byte-compile t)
+    (TeX-clean-confirm nil)
+    (TeX-complete-expert-commands t)
+    (TeX-debug-bad-boxes t)
+    (TeX-debug-warnings t)
+    (TeX-electric-escape t)
+    (TeX-electric-math t)
+    (TeX-electric-sub-and-superscript t)
+    (TeX-master 'dwim)
+    (TeX-parse-self t)
+    ;; (TeX-PDF-mode t)
+    ;; (TeX-source-correlate-mode t)
+    ;; (TeX-source-correlate-start-server t)
+    (LaTeX-default-style "scrartcl")
+    (LaTeX-default-options '("version=last" "paper=A4" "parskip=half"))
+    (LaTeX-electric-left-right-brace t)
+    :hook ((LaTeX-mode . LaTeX-math-mode)
+	   (LaTeX-mode . flyspell-mode)
+	   (LaTeX-mode . reftex-mode)
+	   (LaTeX-mode . auto-fill-mode)
+	   (LaTeX-mode . visual-line-mode)))
 
-  ;; (use-package latex-preview-pane
-  ;;   :defer t)
+  (use-package auctex-latexmk
+    :after auctex
+    :config
+    (auctex-latexmk-setup)
+    (setq auctex-latexmk-inherit-TeX-PDF-mode t))
+
+  (use-package latex-preview-pane
+    :defer t)
+
+  ;; Embed prewie images
+  (use-package preview
+    :custom
+    (preview-auto-cache-preamble t)
+    (preview-preserve-counters t)
+    (preview-preseve-indentation t))
 #+END_SRC
 
 *** pdf-tools
@@ -1416,12 +1442,15 @@ https://github.com/jyp/dante
     ;; :pin manual
     ;; :general (:keymaps pdf-view-mode-map
     ;;		     "C-s" 'isearch-forward)
+    :after auctex
     :config
     (pdf-tools-install)
     ;; open pdfs scaled to fit page
     (setq-default pdf-view-display-size 'fit-page)
     ;; automatically annotate highlights
-    (setq pdf-annot-activate-created-annotations t))
+    (setq pdf-annot-activate-created-annotations t)
+    ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
+    (setq TeX-view-program-list '(("pdf-tools" TeX-pdf-tools-sync-view))))
 #+end_src
 
 ** Rust
