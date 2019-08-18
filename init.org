@@ -761,7 +761,9 @@ Use < in visual mode to continuously shift selection
 
     (:keymaps 'mu4e-view-mode-map
 	      "j" nil
-	      "J" 'mu4e~headers-jump-to-maildir)
+	      "J" 'mu4e~headers-jump-to-maildir
+	      "h" nil
+	      "H" 'mu4e-view-toggle-html)
     :config
     (evil-make-overriding-map mu4e-main-mode-map 'normal)
     (evil-set-initial-state 'mu4e-main-mode 'normal)
