@@ -400,6 +400,16 @@ https://github.com/purcell/exec-path-from-shell
     :config (winner-mode 1))
 #+end_src
 
+** link-hint
+
+#+BEGIN_SRC emacs-lisp
+  (use-package link-hint
+    :after avy
+    :general
+    (my-menu-def
+      "l" '(link-hint-open-link :which-key "link-hint")))
+#+END_SRC
+
 ** Symbol
 
 #+begin_src emacs-lisp
