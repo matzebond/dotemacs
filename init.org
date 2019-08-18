@@ -1182,26 +1182,45 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     "q" 'bury-window)
 #+end_src
 
-** shell
+** eshell
 
-#+BEGIN_SRC elisp
-  ;; (use-package eshell
-  ;;   :general (:keymaps 'eshell-mode-map
-  ;; 		     "TAB" 'completion-at-point)
-  ;;   )
+#+BEGIN_SRC emacs-lisp
+  (use-package eshell
+    :after (esh-opt)
+    :commands (eshell eshell-command)
+    ;; :general (:keymaps 'eshell-mode-map
+    ;; 		     "TAB" 'completion-at-point)
+    :config
+    (message "test")
+    ;; (setq pcomplete-ignore-case t)
+    (setq eshell-cmpl-ignore-case t)
+    ;; (setq pcomplete-autolist t)
+    (setq eshell-cmpl-autolist t)
+    (setq pcomplete-cycle-cutoff-length 1)
+    (setq eshell-cmpl-cycle-cutoff-length 1)
+    ;; (general-define-key :keymaps 'eshell-mode-map
+    ;; 		      [remap eshell-pcomplete] 'completion-at-point
+    ;; 		      "C-r" 'counsel-esh-history)
+    )
 
   (defun setup-eshell ()
     ;; (define-key eshell-mode-map [remap eshell-pcomplete] 'completion-at-point)
     (general-define-key :keymaps 'eshell-mode-map
-			[remap eshell-pcomplete] 'completion-at-point
+			;; [remap eshell-pcomplete] 'completion-at-point
 			"C-r" 'counsel-esh-history))
 
   (add-hook 'eshell-mode-hook 'setup-eshell)
+  (remove-hook 'eshell-mode-hook 'setup-eshell)
+
+  (use-package eshell-z
+    :after eshell)
 
   (use-package eshell-prompt-extras
+    ;; :after (eshell)
+    ;; :demand
     :config
-    (eshell-prompt-function 'epe-theme-lambda)
-    )
+    (setq eshell-highlight-prompt nil)
+    (setq eshell-prompt-function 'epe-theme-lambda))
 
   (use-package esh-autosuggest
     :hook (eshell-mode . esh-autosuggest-mode)
