@@ -33,7 +33,7 @@ TODO why are there use-package errors when using byte-compile-file
 #+END_SRC
 
 * Initial Stuff
-
+** Start up
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-message t)
   (setq initial-scratch-message "")
@@ -129,11 +129,14 @@ use a own file for emacs custom definition
 #+END_SRC
 
 ** Basic packages
+*** diminish
 
 #+BEGIN_SRC emacs-lisp
   (use-package diminish
     :demand)
 #+END_SRC
+
+*** general
 
 #+BEGIN_SRC emacs-lisp
   (use-package general
@@ -154,12 +157,14 @@ use a own file for emacs custom definition
     (defconst my-leader-key ",")
     (defconst my-non-normal-leader-key "M-,")
     (general-create-definer my-leader-def
-      :states '(normal)
+      :states '(normal visual)
       :keymaps 'override
       :prefix my-leader-key
       :non-normal-prefix my-non-normal-leader-key)
     )
 #+END_SRC
+
+*** which-key
 
 #+BEGIN_SRC emacs-lisp
     (use-package which-key
@@ -171,12 +176,16 @@ use a own file for emacs custom definition
       :config (which-key-mode))
 #+END_SRC
 
+*** epkg
+
 #+BEGIN_SRC emacs-lisp
   (use-package epkg
     :defer t
     ;; on func epkg-list-packages)
     )
 #+END_SRC
+
+*** exec-path-from-shell
 
 https://github.com/purcell/exec-path-from-shell
 
