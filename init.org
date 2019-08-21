@@ -1316,7 +1316,7 @@ https://github.com/tuhdo/semantic-refactor
   (use-package cc-mode
     :general (my-menu-def
 	       "F o" 'ff-get-other-file
-	       "F O" '(lambda () (interactive) (ff-get-other-file t)))
+	       "F O" '(lambda () (interactive) (ff-get-other-file t))))
 
   (use-package ccls
     :after projectile
