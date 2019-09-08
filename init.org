@@ -1272,10 +1272,9 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 *** TODO fill commands in local menu
 ** compilation
 When compiling follow the buffer
-TODO even better? got to bottom on error
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'compilation-mode-hook 'follow-mode)
+  (setq compilation-scroll-output 'first-error)
 #+END_SRC
 
 ** helpful
