@@ -769,12 +769,15 @@ Use < in visual mode to continuously shift selection
 	      "/" 'mu4e-headers-search
 	      "j" nil
 	      "J" 'mu4e~headers-jump-to-maildir)
-
     (:keymaps 'mu4e-view-mode-map
 	      "j" nil
 	      "J" 'mu4e~headers-jump-to-maildir
 	      "h" nil
-	      "H" 'mu4e-view-toggle-html)
+	      "H" 'mu4e-view-toggle-html
+	      "k" nil ;; mu4e-view-save-url
+	      "y" nil ;; mu4e-select-other-view
+	      "v" nil ;; mu4e-view-verify-msg-popup
+	      )
     :config
     (evil-make-overriding-map mu4e-main-mode-map 'normal)
     (evil-set-initial-state 'mu4e-main-mode 'normal)
