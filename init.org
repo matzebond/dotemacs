@@ -1098,7 +1098,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     ;; you may also need `ispell-extra-args'
     (setq ispell-program-name "aspell")
     ;; (setq-default ispell-local-dictionary "en_US" "de_DE")
-    (setq-default ispell-local-dictionary "en_US")
+    (setq-default ispell-local-dictionary "de_DE")
     (setq ispell-list-command "--list"))
    ((executable-find "hunspell")
     (setq ispell-program-name "hunspell")
@@ -1259,9 +1259,17 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'text-mode-hook 'auto-fill-mode)
   (add-hook 'text-mode-hook 'visual-line-mode)
+  
+  (defun my-text-mode-setup ()
+     (my-leader-def
+       "f" '(:ignore t :which-key "fill")
+       "fr" 'fill-region
+       "fp" 'fill-paragraph))
+  (add-hook 'text-mode-hook 'my-text-mode-setup)
 #+END_SRC
 
 *** TODO auto fill on paste
+*** TODO fill commands in local menu
 ** compilation
 When compiling follow the buffer
 TODO even better? got to bottom on error
