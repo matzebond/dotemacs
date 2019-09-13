@@ -1275,6 +1275,8 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
   (add-hook 'text-mode-hook 'auto-fill-mode)
   (add-hook 'text-mode-hook 'visual-line-mode)
   
+  (setq-default fill-column 80)
+
   (defun my-text-mode-setup ()
      (my-leader-def
        "f" '(:ignore t :which-key "fill")
