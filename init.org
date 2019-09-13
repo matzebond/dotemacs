@@ -268,7 +268,7 @@ https://github.com/purcell/exec-path-from-shell
 	    :which-key "warnings")
     "B W" '((lambda () (interactive) (switch-to-buffer-other-window "*Warnings*"))
 	    :which-key "warnings-in-other")
-    "B d" 'kill-this-buffer
+    "B d" 'kill-current-buffer
     "B D" 'evil-delete-buffer
     "B r" 'revert-buffer
     "B q" 'quit-window
@@ -297,7 +297,7 @@ https://github.com/purcell/exec-path-from-shell
 	    "s" (lambda () (interactive) (switch-to-buffer "*scratch*"))
 	    "w" (lambda () (interactive) (switch-to-buffer "*Warnings*"))
 	    "b" 'ivy-switch-buffer
-	    "d" 'kill-this-buffer
+	    "d" 'kill-current-buffer
 	    "q" 'quit-window
 	    ))
 
@@ -356,8 +356,7 @@ https://github.com/purcell/exec-path-from-shell
 	       "r" '(counsel-recentf :which-key "recent")
 	       "SPC" '(counsel-M-x :which-key "M-x"))
     (:keymap global-map
-	     "C-c f" 'counsel-find-file
-	     "C-c r" 'counsel-recentf
+             "C-x f" 'counsel-find-file ;; replace set-fill-colum
 	     "C-x C-r" 'counsel-recentf)
     :config (counsel-mode))
 
