@@ -78,6 +78,8 @@ After startup reset it to reasonable value
 Bootstrap straight.el
 
 #+BEGIN_SRC emacs-lisp
+  (setq straight-recipes-gnu-elpa-use-mirror t)
+
   (defvar bootstrap-version)
   (let ((bootstrap-file
 	 (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -114,7 +116,7 @@ of handy syntactic sugar and useful features.
   ;; specified using the `:straight' keyword.
   (setq straight-use-package-by-default t)
 
-  (setq use-package-compute-statistics t)
+  ;; (setq use-package-compute-statistics t)
   (setq use-package-verbose t)
 #+END_SRC
 
