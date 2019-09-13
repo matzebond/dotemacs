@@ -1434,28 +1434,37 @@ https://github.com/jyp/dante
 https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow-with-emacs
 
 #+BEGIN_SRC emacs-lisp
-  (use-package auctex
-    :config
-    (set-fill-column 80)
+  (use-package tex
+    :straight auctex
+    :general
+    (:keymaps 'TeX-error-overview-mode-map
+              "j" 'TeX-error-overview-next-error
+              "k" 'TeX-error-overview-previous-error
+	      "h" nil
+	      "l" nil
+	      "q" 'TeX-error-overview-quit)
     :custom
+    (TeX-parse-self t)
     (TeX-auto-save t)
-    (TeX-safe-query nil)
     (TeX-byte-compile t)
     (TeX-clean-confirm nil)
     (TeX-complete-expert-commands t)
     (TeX-debug-bad-boxes t)
     (TeX-debug-warnings t)
-    (TeX-electric-escape t)
-    (TeX-electric-math t)
+    (TeX-electric-escape nil)
+    (TeX-electric-math nil)
     (TeX-electric-sub-and-superscript t)
+    (LaTeX-electric-left-right-brace t)
     (TeX-master 'dwim)
-    (TeX-parse-self t)
     ;; (TeX-PDF-mode t)
     ;; (TeX-source-correlate-mode t)
     ;; (TeX-source-correlate-start-server t)
     (LaTeX-default-style "scrartcl")
     (LaTeX-default-options '("version=last" "paper=A4" "parskip=half"))
-    (LaTeX-electric-left-right-brace t)
+    (TeX-auto-untabify t)
+    :config
+    (set-fill-column 80) ;;TODO do this in hook
+    (evil-make-overriding-map TeX-error-overview-mode-map 'normal)
     :hook ((LaTeX-mode . LaTeX-math-mode)
 	   (LaTeX-mode . flyspell-mode)
 	   (LaTeX-mode . reftex-mode)
@@ -1463,20 +1472,26 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
 	   (LaTeX-mode . visual-line-mode)))
 
   (use-package auctex-latexmk
-    :after auctex
+    :after tex
     :config
     (auctex-latexmk-setup)
     (setq auctex-latexmk-inherit-TeX-PDF-mode t))
+#+END_SRC
 
+*** latex-preview-pane
+
+#+begin_src emacs-lisp
   (use-package latex-preview-pane
-    :defer t)
+    :after tex
+    :config
+    (latex-preview-pane-enable))
 
   ;; Embed prewie images
-  (use-package preview
-    :custom
-    (preview-auto-cache-preamble t)
-    (preview-preserve-counters t)
-    (preview-preseve-indentation t))
+  ;; (use-package preview
+  ;;   :custom
+  ;;   (preview-auto-cache-preamble t)
+  ;;   (preview-preserve-counters t)
+  ;;   (preview-preseve-indentation t))
 #+END_SRC
 
 *** pdf-tools
@@ -1487,9 +1502,9 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     ;; :pin manual
     ;; :general (:keymaps pdf-view-mode-map
     ;;		     "C-s" 'isearch-forward)
-    :after auctex
+    :defer 15
     :config
-    (pdf-tools-install)
+    (pdf-tools-install t)
     ;; open pdfs scaled to fit page
     (setq-default pdf-view-display-size 'fit-page)
     ;; automatically annotate highlights
