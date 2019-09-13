@@ -1101,6 +1101,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 #+END_SRC
 
 ** Spelling
+*** ispell
 
 #+BEGIN_SRC emacs-lisp
   (cond
@@ -1119,15 +1120,19 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     (setq-default ispell-local-dictionary "en_US")
     (setq ispell-local-dictionary-alist
 	  '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))))
-   (t (setq ispell-program-name nil)))
+   (t
+    (message "no ispell program")
+    (setq ispell-program-name nil)))
+#+End_SRC
 
+*** flyspell
 
+#+BEGIN_SRC emacs-lisp
   (use-package flyspell
-    :hook (text-mode-hook)
+    :hook (text-mode-hook . flyspell-mode)
     :config
     ;; ommit error messages on spell checking for performance sake
     (setq flyspell-issue-message-flag nil))
-
 #+End_SRC
 
 * TODO Semantic
