@@ -852,6 +852,14 @@ Use < in visual mode to continuously shift selection
     )
 #+end_src
 
+#+begin_src emacs-lisp
+  (defun maschm/mu4e-make-message-draft ()
+    (interactive)
+    (let* ((msg (mu4e-message-at-point 'noerror))
+	   (docid (mu4e-message-field msg :docid)))
+      (mu4e~proc-move docid nil "+D")))
+#+end_src
+
 ** Additional mu4e packages
 
 #+begin_src emacs-lisp
