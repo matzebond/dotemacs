@@ -793,6 +793,7 @@ Use < in visual mode to continuously shift selection
     ;; 	   ("/uni/Inbox" . ?u)))
 
     (add-hook 'mu4e-view-mode-hook 'visual-line-mode)
+    (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
     (setq shr-color-visible-luminance-min 80) ;; make html background more readable
 
     (setq mail-user-agent 'mu4e-user-agent)
