@@ -442,7 +442,8 @@ https://github.com/purcell/exec-path-from-shell
 	       "S r" 'symbol-overlay-rename
 	       ))
 #+end_src
-
+*** TODO symbol-overlay hydra
+    Or use swiper to got to symbol?
 ** projectile
 
 TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project]] vs projectile
@@ -1352,7 +1353,7 @@ When compiling follow the buffer
 #+end_src
 
 * Programming languages
-** C++
+** C/C++
 https://github.com/realgud/realgud
 https://github.com/tuhdo/semantic-refactor
 
@@ -1565,7 +1566,8 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     :config (setq clean-aindent-is-simple-indent t))
 #+END_SRC
 
-** whitespace
+** TODO whitespace
+** TODO show-parens
 ** PKGBUILD
 
 Recognize arch linux pgkbuild files
