@@ -429,7 +429,7 @@ https://github.com/purcell/exec-path-from-shell
 	       "s" (general-key-dispatch 'symbol-overlay-put
 		     :timeout .33
 		     "n" 'symbol-overlay-jump-next
-		     "p" 'symbol-overlay-jump-previous
+		     "p" 'symbol-overlay-jump-prev
 		     "d" 'symbol-overlay-remove-all
 		     "r" 'symbol-overlay-rename
 		     )
