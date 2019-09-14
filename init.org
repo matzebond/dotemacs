@@ -770,7 +770,10 @@ Use < in visual mode to continuously shift selection
     (:keymaps 'mu4e-headers-mode-map
 	      "/" 'mu4e-headers-search
 	      "j" nil
-	      "J" 'mu4e~headers-jump-to-maildir)
+	      "J" 'mu4e~headers-jump-to-maildir
+	      "g" nil
+	      "g s" 'mu4e-headers-rerun-search
+	      "g r" 'mu4e-update-mail-and-index)
     (:keymaps 'mu4e-view-mode-map
 	      "j" nil
 	      "J" 'mu4e~headers-jump-to-maildir
@@ -1205,9 +1208,9 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 ** message
 
 #+begin_src emacs-lisp
-    (general-define-key
-    :keymaps 'message-mode-map
-    "q" 'bury-window)
+  (general-define-key
+   :keymaps 'message-mode-map
+   "q" 'bury-window)
 #+end_src
 
 ** eshell
