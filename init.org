@@ -545,13 +545,13 @@ Equivalent of ~nnoremap n nzz~
 
 Use < in visual mode to continuously shift selection
 #+begin_src emacs-lisp
-  (defun maschm/visual-restore ()
+  (defun maschm/visual-restore (&rest _)
     "Restore visual selection."
-    (interactive)
     (evil-normal-state)
     (evil-visual-restore))
 
   (advice-add 'evil-shift-right :after #'maschm/visual-restore)
+  ;; (advice-remove 'evil-shift-right #'maschm/visual-restore)
 #+end_src
 
 ** Evil packages
