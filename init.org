@@ -650,9 +650,7 @@ Use < in visual mode to continuously shift selection
     (setq org-outline-path-complete-in-steps nil)
 
     (push '("se" . "src emacs-lisp") org-structure-template-alist)
-    (push '("sp" . "src python") org-structure-template-alist)
-    (org-babel-do-load-languages 'org-babel-load-languages
-				 '((shell . t))))
+    (push '("sp" . "src python") org-structure-template-alist))
 
   (use-package evil-org
     :demand
@@ -668,6 +666,19 @@ Use < in visual mode to continuously shift selection
   (use-package htmlize
     :commands (org-export-dispatch))
 #+END_SRC
+
+** org babel
+
+#+begin_src emacs-lisp
+  (eval-after-load 'org
+    '(prog1
+      (add-to-list 'org-babel-load-languages '(shell . t))
+      (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)))
+
+
+  (use-package ob-async
+    :after ob)
+#+end_src
 
 ** org-caldav
 
