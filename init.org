@@ -1341,7 +1341,8 @@ When compiling follow the buffer
       "H" '(:ignore t :which-key "Help")
       "H h" 'helpful-symbol
       "H v" 'helpful-variable
-      "H f" 'helpful-callable
+      "H f" 'helpful-function
+      "H c" 'helpful-callable
       "H k" 'helpful-key
       "H X" 'helpful-kill-buffers)
 
