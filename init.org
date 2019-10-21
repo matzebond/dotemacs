@@ -581,10 +581,11 @@ Use < in visual mode to continuously shift selection
   (use-package evil-mc
     :demand
     :diminish emc
-    ;; :config
+    :config
     ;; (global-evil-mc-mode 1)
-    ;; (add-hook 'magit-mode-hook #'evil-mc-mode -1))
-    )
+    ;; (add-hook 'magit-mode-hook #'evil-mc-mode -1)
+    (advice-add 'evil-mc-define-vars :after
+		(lambda () (add-to-list 'evil-mc-incompatible-minor-modes 'auto-fill-mode))))
 
   (use-package evil-visualstar
     :demand
