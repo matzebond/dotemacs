@@ -1560,6 +1560,12 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     (push "elm-stuff" projectile-globally-ignored-directories))
 #+end_src
 
+** R
+
+#+begin_src emacs-lisp
+  (use-package ess)
+#+end_src
+
 ** Sonic Pi
 
 #+begin_src emacs-lisp
