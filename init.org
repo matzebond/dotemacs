@@ -1464,13 +1464,6 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
 #+BEGIN_SRC emacs-lisp
   (use-package tex
     :straight auctex
-    :general
-    (:keymaps 'TeX-error-overview-mode-map
-              "j" 'TeX-error-overview-next-error
-              "k" 'TeX-error-overview-previous-error
-	      "h" nil
-	      "l" nil
-	      "q" 'TeX-error-overview-quit)
     :custom
     (TeX-parse-self t)
     (TeX-auto-save t)
@@ -1492,12 +1485,20 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     (TeX-auto-untabify t)
     :config
     (set-fill-column 80) ;;TODO do this in hook
-    (evil-make-overriding-map TeX-error-overview-mode-map 'normal)
-    :hook ((LaTeX-mode . LaTeX-math-mode)
-	   (LaTeX-mode . flyspell-mode)
-	   (LaTeX-mode . reftex-mode)
-	   (LaTeX-mode . auto-fill-mode)
-	   (LaTeX-mode . visual-line-mode)))
+    ;; KEYMAPS
+    ;; (general-define-key :keymaps 'TeX-error-overview-mode-map
+    ;;   "j" 'TeX-error-overview-next-error
+    ;;   "k" 'TeX-error-overview-previous-error
+    ;;   "h" nil
+    ;;   "l" nil
+    ;;   "q" 'TeX-error-overview-quit)
+    ;; (evil-make-overriding-map TeX-error-overview-mode-map 'normal)
+    ;; HOOKS
+    (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
+    (add-hook 'LaTeX-mode-hook #'flyspell-mode)
+    (add-hook 'LaTeX-mode-hook #'reftex-mode)
+    (add-hook 'LaTeX-mode-hook #'auto-fill-mode)
+    (add-hook 'LaTeX-mode-hook #'visual-line-mode))
 
   (use-package auctex-latexmk
     :after tex
