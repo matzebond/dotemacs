@@ -654,10 +654,9 @@ Use < in visual mode to continuously shift selection
     (push '("sp" . "src python") org-structure-template-alist))
 
   (use-package evil-org
-    :demand
     :after (evil org)
+    :hook (org-mode-hook . evil-org-mode)
     :config
-    (add-hook 'org-mode-hook 'evil-org-mode)
     (add-hook 'evil-org-mode-hook
 	      (lambda ()
 		(evil-org-set-key-theme)))
@@ -756,7 +755,6 @@ Use < in visual mode to continuously shift selection
   (use-package magit-todos
     :after magit)
   ;; (use-package git-gutter-fringe+
-  ;;   :ensure t
   ;;   :init (global-git-gutter-fringe+-mode)
   ;;   )
 #+END_SRC
