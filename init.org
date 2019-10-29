@@ -276,6 +276,8 @@ https://github.com/purcell/exec-path-from-shell
     "B q" 'quit-window
     "B k" 'kill-current-buffer
 
+    "d" 'kill-current-buffer
+
     "w" 'other-window
     "W" '(:ignore t :which-key "Window")
     "W d" 'delete-window
@@ -292,16 +294,7 @@ https://github.com/purcell/exec-path-from-shell
     :diminish ivy-mode
     :general
     (my-menu-def
-      "b" '(:ignore t :which-key "Buffer")
-      "b" (general-key-dispatch 'ivy-switch-buffer
-	    :timeout .33
-	    "m" (lambda () (interactive) (switch-to-buffer "*Messages*"))
-	    "s" (lambda () (interactive) (switch-to-buffer "*scratch*"))
-	    "w" (lambda () (interactive) (switch-to-buffer "*Warnings*"))
-	    "b" 'ivy-switch-buffer
-	    "d" 'kill-current-buffer
-	    "q" 'quit-window
-	    ))
+      "b" '(ivy-switch-buffer :which-key "Buffer"))
 
     (:keymaps 'ivy-minibuffer-map
 	      "C-l" 'ivy-alt-done
