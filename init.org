@@ -1155,7 +1155,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
 #+BEGIN_SRC emacs-lisp
   (use-package flyspell
-    :hook (text-mode-hook . flyspell-mode)
+    :hook (text-mode . flyspell-mode)
     :config
     ;; ommit error messages on spell checking for performance sake
     (setq flyspell-issue-message-flag nil))
@@ -1227,11 +1227,11 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
    SPC and S-SPC are bound to scrolling intentionally disable anyway?
    Which buffer are in view mode?
 
-** message
+** messages-buffer
 
 #+begin_src emacs-lisp
   (general-define-key
-   :keymaps 'message-mode-map
+   :keymaps 'messages-buffer-mode-map
    "q" 'bury-window)
 #+end_src
 
@@ -1244,7 +1244,6 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     ;; :general (:keymaps 'eshell-mode-map
     ;; 		     "TAB" 'completion-at-point)
     :config
-    (message "test")
     ;; (setq pcomplete-ignore-case t)
     (setq eshell-cmpl-ignore-case t)
     ;; (setq pcomplete-autolist t)
