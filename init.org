@@ -585,12 +585,14 @@ Use < in visual mode to continuously shift selection
     :config (global-evil-visualstar-mode))
 
   (use-package evil-lion
-    :bind (:map evil-normal-state-map
-		("g l " . evil-lion-left)
-		("g L " . evil-lion-right)
-		:map evil-visual-state-map
-		("g l " . evil-lion-left)
-		("g L " . evil-lion-right)))
+    :demand
+    :general
+    (:keymaps 'evil-normal-state-map
+	      "g l" 'evil-lion-left
+	      "g L" 'evil-lion-right)
+    (:keymaps 'evil-visual-state-map
+	      "g l" 'evil-lion-left
+	      "g L" 'evil-lion-right))
 #+END_SRC
 
 * Org
