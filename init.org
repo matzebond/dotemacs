@@ -353,7 +353,9 @@ https://github.com/purcell/exec-path-from-shell
     (:keymap global-map
              "C-x f" 'counsel-find-file ;; replace set-fill-colum
 	     "C-x C-r" 'counsel-recentf)
-    :config (counsel-mode))
+    :config
+    (counsel-mode)
+    (custom-reevaluate-setting 'ivy-initial-inputs-alist))
 
   (use-package counsel-tramp
     :defer 15
