@@ -526,7 +526,7 @@ https://github.com/noctuid/evil-guide
 Folding
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode 'hs-minor-mode)
+  (add-hook 'prog-mode-hook 'hs-minor-mode)
 #+END_SRC
 
 Equivalent of ~nnoremap n nzz~
@@ -652,7 +652,7 @@ Use < in visual mode to continuously shift selection
 
   (use-package evil-org
     :after (evil org)
-    :hook (org-mode-hook . evil-org-mode)
+    :hook (org-mode . evil-org-mode)
     :config
     (add-hook 'evil-org-mode-hook
 	      (lambda ()
@@ -1043,8 +1043,7 @@ Highlight delimiters such as parentheses, brackets or braces according to their 
 Display line numbers in programming modes
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode 'display-line-numbers-mode)
-
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
 Display '~' on empty lines like in vi (only in programming modes)
