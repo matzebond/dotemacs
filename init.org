@@ -1443,6 +1443,15 @@ https://github.com/tuhdo/semantic-refactor
 
 #+END_SRC
 
+** Python
+
+#+begin_src emacs-lisp
+  (use-package python
+    :mode
+    ("SConstruct" . python-mode)
+    ("SConscript" . python-mode))
+#+end_src
+
 ** Haskell
 *** Intero
 https://commercialhaskell.github.io/intero/
