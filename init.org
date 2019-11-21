@@ -149,7 +149,7 @@ use a own file for emacs custom definition
     (defconst my-menu-key "SPC")
     (defconst my-non-normal-menu-key "M-SPC")
     (general-create-definer my-menu-def
-      :states '(normal insert emacs)
+      :states '(normal motion insert emacs)
       :keymaps 'override
       :prefix my-menu-key
       :non-normal-prefix my-non-normal-menu-key)
@@ -1245,11 +1245,12 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
    Which buffer are in view mode?
 
 ** messages-buffer
+   enable "q" to burry-window in messages-buffer-mode and more generally
+   special mode
 
 #+begin_src emacs-lisp
-  (general-define-key
-   :keymaps 'messages-buffer-mode-map
-   "q" 'bury-window)
+  (evil-set-initial-state 'special-mode 'motion)
+  (evil-set-initial-state 'messages-buffer-mode 'motion)
 #+end_src
 
 ** eshell
