@@ -469,7 +469,13 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 		      "p" 'counsel-projectile
 		      "P p" 'counsel-projectile-switch-project
 		      "/" '(counsel-projectile-rg :which-key "search proj"))
-    :config (counsel-projectile-mode))
+    :config
+    (counsel-projectile-mode)
+    (setq counsel-projectile-rg-initial-input
+	  '(when (evil-visual-state-p)
+	     (buffer-substring-no-properties
+	      (evil-range-beginning (evil-visual-range))
+	      (evil-range-end (evil-visual-range))))))
 #+END_SRC
 
 ** wgrep
