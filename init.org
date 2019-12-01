@@ -795,6 +795,8 @@ Use < in visual mode to continuously shift selection
 	      "k" nil ;; mu4e-view-save-url
 	      "y" nil ;; mu4e-select-other-view
 	      "v" nil ;; mu4e-view-verify-msg-popup
+	      "b" nil ;; mu4e-headers-search-bookmark
+	      "w" nil ;; visual-line-mode
 	      )
     :config
     (evil-make-overriding-map mu4e-main-mode-map 'normal)
