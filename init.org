@@ -277,6 +277,7 @@ https://github.com/purcell/exec-path-from-shell
     "B k" 'kill-current-buffer
 
     "d" 'kill-current-buffer
+    "q" 'evil-window-delete
 
     "w" 'other-window
     "W" '(:ignore t :which-key "Window")
