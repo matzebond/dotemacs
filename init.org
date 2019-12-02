@@ -665,7 +665,9 @@ Use < in visual mode to continuously shift selection
 	      (lambda ()
 		(evil-org-set-key-theme)))
     (require 'evil-org-agenda)
-    (evil-org-agenda-set-keys))
+    (evil-org-agenda-set-keys)
+    :local
+    (evil-org-set-key-theme))
 
   (use-package htmlize
     :commands (org-export-dispatch))
@@ -1414,7 +1416,14 @@ https://github.com/tuhdo/semantic-refactor
   (use-package cc-mode
     :general (my-menu-def
 	       "F o" 'ff-get-other-file
-	       "F O" '(lambda () (interactive) (ff-get-other-file t))))
+	       "F O" '(lambda () (interactive) (ff-get-other-file t)))
+    :config
+    (setq-default c-basic-offset 8)
+    :local
+    (c-mode-common-hook . ((setq-local tab-width 8)))
+    (java-mode-hook . ((setq-local tab-width 4)
+		       (setq-local c-basic-offset 4))))
+    ;; (defvaralias 'c-basic-offset 'tab-width)
 
   (use-package ccls
     :after projectile
@@ -1446,9 +1455,6 @@ https://github.com/tuhdo/semantic-refactor
     (add-to-list 'company-backends 'company-c-headers)
     ;; (setq company-c-headers-path-system "" )
     )
-
-  ;; (defvaralias 'c-basic-offset 'tab-width)
-  (setq-default c-basic-offset 8)
 
 #+END_SRC
 
