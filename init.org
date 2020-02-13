@@ -1609,6 +1609,18 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     (setq sonic-pi-path "/usr/lib/sonic-pi/"))
 #+end_src
 
+** GDScript
+
+#+begin_src emacs-lisp
+  (use-package gdscript
+    :straight (gdscript :type git :host github :repo "GDQuest/emacs-gdscript-mode")
+
+    ;;:config
+    ;;(setq gdscript-tabs-mode t) ;; If true, use tabs for indents. Default: t
+    ;;(setq gdscript-tab-width 4) ;; Controls the width of tab-based indents
+    )
+#+end_src
+
 ** Markup & Config Langs
 
 #+begin_src emacs-lisp
