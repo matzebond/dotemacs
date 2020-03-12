@@ -822,6 +822,8 @@ Use < in visual mode to continuously shift selection
     (setq mu4e-change-filenames-when-moving t) ;; needed by mbsync
     (setq mu4e-attachment-dir  "~/dld")
     (setq mu4e-view-show-addresses 't)
+    (setq mu4e-headers-time-format "%T") ;; like "%H:%M:%S"
+    (setq mu4e-headers-date-format "%F") ;; like "%Y-%m-%d"
 
     (setq message-send-mail-function 'smtpmail-send-it
 	  smtpmail-default-smtp-server "posteo.de"
@@ -843,7 +845,11 @@ Use < in visual mode to continuously shift selection
 	    ,(make-mu4e-bookmark
 	      :name "Last 7 days"
 	      :query "date:7d..now AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\ E-Mail"
-	      :key ?w)))
+	      :key ?w)
+	    ,(make-mu4e-bookmark
+	      :name "Sent"
+	      :query "maildir:/posteo/Sent OR maildir:/uni/Sent"
+	      :key ?s)))
 
     (setq mu4e-user-mail-address-list '("male.schmitt@posteo.de" "uydvo@student.kit.edu"))
     (setq mu4e-contexts
