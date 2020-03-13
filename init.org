@@ -1603,6 +1603,12 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     (push "target" projectile-globally-ignored-directories))
 #+END_SRC
 
+** JS
+
+#+begin_src emacs-lisp
+  (use-package web-mode)
+#+end_src
+
 ** Elm
 
 #+begin_src emacs-lisp
