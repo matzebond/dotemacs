@@ -1196,6 +1196,11 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
   (use-package flyspell
     :hook (text-mode . flyspell-mode)
     :config
+	;; do flyspell-buffer after changing the dictionary
+	(defun flyspell-buffer-after-change-dict (&rest _)
+	  (flyspell-buffer))
+	(advice-add 'ispell-change-dictionary :after #'flyspell-buffer-after-change-dict)
+
     ;; ommit error messages on spell checking for performance sake
     (setq flyspell-issue-message-flag nil))
 #+End_SRC
