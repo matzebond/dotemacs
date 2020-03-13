@@ -743,6 +743,10 @@ Use < in visual mode to continuously shift selection
   (use-package evil-magit
     :demand
     :after (evil magit))
+
+  (defun my-git-commit-mode-setup ()
+    (ispell-change-dictionary "en"))
+  (add-hook 'git-commit-mode-hook 'my-git-commit-mode-setup)
 #+END_SRC
 
 ** Forge
