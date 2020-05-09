@@ -160,7 +160,7 @@ use a own file for emacs custom definition
     (defconst my-non-normal-leader-key "M-,")
     (general-create-definer my-leader-def
       :states '(normal visual)
-      :keymaps 'override
+      :keymaps 'local
       :prefix my-leader-key
       :non-normal-prefix my-non-normal-leader-key)
     )
@@ -289,7 +289,10 @@ https://github.com/purcell/exec-path-from-shell
     "d" 'kill-current-buffer
     "q" 'evil-window-delete
 
+    "x"  (general-simulate-key "C-x")
+
     "w" 'other-window
+    ;; "W"  (general-simulate-key "C-w"))
     "W" '(:ignore t :which-key "Window")
     "W d" 'delete-window
     "W o" 'delete-other-windows)
@@ -362,7 +365,7 @@ https://github.com/purcell/exec-path-from-shell
 	       "r" '(counsel-recentf :which-key "recent")
 	       "SPC" '(counsel-M-x :which-key "M-x"))
     (:keymap global-map
-             "C-x f" 'counsel-find-file ;; replace set-fill-colum
+	     "C-x f" 'counsel-find-file ;; replace set-fill-colum
 	     "C-x C-r" 'counsel-recentf)
     :config
     (counsel-mode)
@@ -375,6 +378,9 @@ https://github.com/purcell/exec-path-from-shell
 	       "F t" 'counsel-tramp)
     :config (setq tramp-default-method "ssh"))
 #+end_src
+
+get back to the local file system when in find-file while using tramp
+use =/ C-j= or =~ //= to get to the local / directory
 
 *** swiper
 
@@ -1354,14 +1360,16 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'text-mode-hook 'auto-fill-mode)
   (add-hook 'text-mode-hook 'visual-line-mode)
-  
+
   (setq-default fill-column 80)
 
   (defun my-text-mode-setup ()
      (my-leader-def
-       "f" '(:ignore t :which-key "fill")
-       "fr" 'fill-region
-       "fp" 'fill-paragraph))
+       :states 'normal
+       "f" '(fill-paragraph :which-key "fill"))
+     (my-leader-def
+       :states 'visual
+       "f" '(fill-region :which-key "fill")))
   (add-hook 'text-mode-hook 'my-text-mode-setup)
 #+END_SRC
 
