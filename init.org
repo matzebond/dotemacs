@@ -671,17 +671,28 @@ Use < in visual mode to continuously shift selection
     (setq org-outline-path-complete-in-steps nil)
 
     (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp"))
-    (add-to-list 'org-structure-template-alist '("sp" . "src python")))
+    (add-to-list 'org-structure-template-alist '("sp" . "src python"))
+    (add-to-list 'org-structure-template-alist '("ss" . "src sh"))
+  :local
+  (org-mode-hook . ((my-leader-def
+		      "n" '(:ignore t :which-key "org narrow")
+		      "ns" 'org-narrow-to-subtree
+		      "nb" 'org-narrow-to-block
+		      "ne" 'org-narrow-to-element
+		      "s" 'org-sparse-tree
+		      "," 'org-edit-special)))
+  (org-src-mode-hook . ((my-leader-def
+			  ;; :keymaps 'org-src-mode-map 
+			  "," 'org-edit-src-exit))))
 
   (use-package evil-org
     :after (evil org)
     :hook (org-mode . evil-org-mode)
     :config
-    (add-hook 'evil-org-mode-hook
-	      (lambda ()
-		(evil-org-set-key-theme)))
     (require 'evil-org-agenda)
-    (evil-org-agenda-set-keys))
+    (evil-org-agenda-set-keys)
+    :local
+    (evil-org-set-key-theme))
 
   (use-package htmlize
     :commands (org-export-dispatch))
@@ -774,15 +785,13 @@ Use < in visual mode to continuously shift selection
 	      "SPC" nil )
     :config
     (setq magit-completing-read-function 'ivy-completing-read)
-    (setq magit-diff-refine-hunk t))
+    (setq magit-diff-refine-hunk t)
+    :local
+    (git-commit-mode-hook . ((ispell-change-dictionary "en"))))
 
   (use-package evil-magit
     :demand
     :after (evil magit))
-
-  (defun my-git-commit-mode-setup ()
-    (ispell-change-dictionary "en"))
-  (add-hook 'git-commit-mode-hook 'my-git-commit-mode-setup)
 #+END_SRC
 
 ** Forge
@@ -1465,16 +1474,30 @@ When compiling follow the buffer
 #+end_src
 
 * Programming languages
+** Lisp
+Use common-lips indent function because elisp is not nice with keywords
+
+#+BEGIN_SRC emacs-lisp
+  ;; (add-hook 'emacs-lisp-mode-hook
+  ;;           (lambda () (setq-local lisp-indent-function #'common-lisp-indent-function)))
+#+END_SRC
+
 ** C/C++
 https://github.com/realgud/realgud
 https://github.com/tuhdo/semantic-refactor
 
 #+BEGIN_SRC emacs-lisp
-
+  ;; (defvaralias 'c-basic-offset 'tab-width)
+  (setq-default c-basic-offset 8)
+  
   (use-package cc-mode
     :general (my-menu-def
 	       "F o" 'ff-get-other-file
-	       "F O" '(lambda () (interactive) (ff-get-other-file t))))
+	       "F O" '(lambda () (interactive) (ff-get-other-file t)))
+    :local
+    (c-mode-common-hook . ((setq-local tab-width 8)))
+    (java-mode-hook . ((setq-local tab-width 4)
+                       (setq-local c-basic-offset 4))))
 
   (use-package ccls
     :after projectile
@@ -1506,9 +1529,6 @@ https://github.com/tuhdo/semantic-refactor
     (add-to-list 'company-backends 'company-c-headers)
     ;; (setq company-c-headers-path-system "" )
     )
-
-  ;; (defvaralias 'c-basic-offset 'tab-width)
-  (setq-default c-basic-offset 8)
 
 #+END_SRC
 
