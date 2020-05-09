@@ -187,6 +187,13 @@ use a own file for emacs custom definition
     )
 #+END_SRC
 
+*** bug hunter
+
+#+begin_src emacs-lisp
+  (use-package bug-hunter
+    :defer 30)
+#+end_src
+
 *** exec-path-from-shell
 
 https://github.com/purcell/exec-path-from-shell
