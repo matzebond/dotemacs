@@ -702,6 +702,26 @@ Use < in visual mode to continuously shift selection
     :after ob)
 #+end_src
 
+** org export
+
+#+begin_src emacs-lisp
+  (eval-after-load 'org
+    '(prog1
+       (setq org-latex-caption-above nil)))
+#+end_src
+
+** org-ref
+#+begin_src emacs-lisp
+  ;; (use-package org-ref
+  ;;   :after org)
+#+end_src
+
+** org-beamer
+
+#+begin_src emacs-lisp
+  (setq org-beamer-frame-default-options "")
+#+end_src
+
 ** org-caldav
 
 #+BEGIN_SRC emacs-lisp
