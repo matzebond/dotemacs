@@ -1370,7 +1370,11 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 When compiling follow the buffer
 
 #+BEGIN_SRC emacs-lisp
-  (setq compilation-scroll-output 'first-error)
+  (setq compilation-scroll-output t)
+  ;; Don't stop on info or warnings.
+  (setq compilation-skip-threshold 2)
+  ;; Stop on the first error.
+  (setq compilation-auto-jump-to-first-error t)
 #+END_SRC
 
 ** helpful
