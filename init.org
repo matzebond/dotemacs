@@ -970,7 +970,30 @@ Use < in visual mode to continuously shift selection
   (use-package mu4e-maildirs-extension
     :after mu4e
     :config
-    (mu4e-maildirs-extension))
+    (setq mu4e-maildirs-extension-toggle-maildir-key (kbd "TAB"))
+    (setq mu4e-maildirs-extension-custom-list '(
+						"/posteo/Drafts"
+						"/posteo/Git"
+						"/posteo/Inbox"
+						"/posteo/Politik"
+						"/posteo/Queue"
+						"/posteo/Sent"
+						"/posteo/Spam"
+						"/posteo/Trash"
+
+						"/uni/Deleted Items"
+						"/uni/Drafts"
+						"/uni/Inbox"
+						"/uni/Junk E-Mail"
+						"/uni/Papierkorb"
+						"/uni/Queue"
+						"/uni/Sent"
+						"/uni/Sent"
+						"/uni/Outbox"
+						"/uni/Trash"))
+
+    (mu4e-maildirs-extension)
+    )
 
   (use-package mu4e-alert
     :after mu4e
