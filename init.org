@@ -584,6 +584,9 @@ Use < in visual mode to continuously shift selection
     :demand
     :config (global-evil-surround-mode 1))
 
+  (use-package evil-numbers
+    :demand)
+
   (use-package evil-matchit
     :demand
     :config (global-evil-matchit-mode 1))
