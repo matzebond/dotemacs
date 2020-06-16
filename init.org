@@ -1,5 +1,6 @@
 #+TITLE: Emacs configuration file
 #+AUTHOR: Matthias Schmitt
+#+LANGUAGE: en
 #+PROPERTY: header-args:emacs-lisp :tangle yes
 #+PROPERTY: header-args :comments both
 
@@ -790,7 +791,7 @@ Use < in visual mode to continuously shift selection
     (setq magit-completing-read-function 'ivy-completing-read)
     (setq magit-diff-refine-hunk t)
     :local
-    (git-commit-mode-hook . ((ispell-change-dictionary "en"))))
+    (git-commit-mode-hook . ((setq-local ispell-local-dictionary "en"))))
 
   (use-package evil-magit
     :demand
@@ -964,7 +965,8 @@ Use < in visual mode to continuously shift selection
 
     (setq mu4e-index-cleanup nil      ;; don't do a full cleanup check
 	  mu4e-index-lazy-check t)    ;; don't consider up-to-date dirs
-    )
+    :local
+    (mu4e-compose-mode-hook . ((setq-local ispell-local-dictionary "de_DE"))))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1260,13 +1262,12 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 *** ispell
 
 #+BEGIN_SRC emacs-lisp
+  (setq ispell-dictionary "en")
+  
   (cond
    ((executable-find "aspell")
     ;; you may also need `ispell-extra-args'
-    (setq ispell-program-name "aspell")
-    ;; (setq-default ispell-local-dictionary "en_US" "de_DE")
-    (setq-default ispell-local-dictionary "de_DE")
-    (setq ispell-list-command "--list"))
+    (setq ispell-program-name "aspell"))
    ((executable-find "hunspell")
     (setq ispell-program-name "hunspell")
 
@@ -1288,8 +1289,8 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     :hook (text-mode . flyspell-mode)
     :config
 	;; do flyspell-buffer after changing the dictionary
-	(defun flyspell-buffer-after-change-dict (&rest _)
-	  (flyspell-buffer))
+	(defun flyspell-buffer-after-change-dict (&rest args)
+	  (if (< (count-words (point-min) (point-max)) 1000) (flyspell-buffer))))
 	(advice-add 'ispell-change-dictionary :after #'flyspell-buffer-after-change-dict)
 
     ;; ommit error messages on spell checking for performance sake
