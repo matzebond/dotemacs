@@ -832,7 +832,9 @@ Use < in visual mode to continuously shift selection
 	       "M u" 'mu4e-update-mail-and-index)
     (:keymaps 'mu4e-main-mode-map
 	      "/" 'mu4e-headers-search
-	      "J" 'mu4e~headers-jump-to-maildir)
+	      "j" nil
+	      "J" 'mu4e~headers-jump-to-maildir
+	      "g r" 'mu4e-update-mail-and-index)
     (:keymaps 'mu4e-headers-mode-map
 	      "/" 'mu4e-headers-search
 	      "j" nil
@@ -850,6 +852,9 @@ Use < in visual mode to continuously shift selection
 	      "v" nil ;; mu4e-view-verify-msg-popup
 	      "b" nil ;; mu4e-headers-search-bookmark
 	      "w" nil ;; visual-line-mode
+	      "g" nil ;; mu4e-view-go-to-url
+	      "0" nil
+	      "z" nil
 	      )
     :config
     (evil-make-overriding-map mu4e-main-mode-map 'normal)
@@ -865,6 +870,7 @@ Use < in visual mode to continuously shift selection
     ;; 	   ("/uni/Inbox" . ?u)))
 
     (add-hook 'mu4e-view-mode-hook 'visual-line-mode)
+    (add-hook 'mu4e-view-mode-hook 'visual-fill-column-mode)
     (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
     (setq shr-color-visible-luminance-min 80) ;; make html background more readable
 
@@ -1401,6 +1407,15 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
        "f" '(fill-region :which-key "fill")))
   (add-hook 'text-mode-hook 'my-text-mode-setup)
 #+END_SRC
+
+*** visual-fill-column
+#+begin_src emacs-lisp
+  (use-package visual-fill-column
+    :config
+    ;; (setq-default split-window-preferred-function 'visual-fill-column-split-window-sensibly)
+    ;; (setq visual-fill-column-fringes-outside-margins nil)
+  )
+#+end_src
 
 *** TODO auto fill on paste
 *** TODO fill commands in local menu
