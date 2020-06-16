@@ -832,7 +832,21 @@ Use < in visual mode to continuously shift selection
     :general (my-menu-def
 	       "m" '(mu4e :which-key "mail")
 	       "M" '(nil :which-key "Mail")
-	       "M u" 'mu4e-update-mail-and-index)
+	       "M u" '(mu4e-update-mail-and-index :which-key "update")
+	       "M g" '(mu4e-headers-search-bookmark :which-key "bookmarks")
+	       "M t" '((lambda () (interactive)
+			 (mu4e-headers-search (mu4e-get-bookmark-query  ?t)))
+		       :which-key "today")
+	       "M w" '((lambda () (interactive)
+			 (mu4e-headers-search (mu4e-get-bookmark-query  ?w)))
+		       :which-key "this week")
+	       "M U" '((lambda () (interactive)
+			 (mu4e-headers-search (mu4e-get-bookmark-query  ?u)))
+		       :which-key "unread")
+	       "M j" '(mu4e~headers-jump-to-maildir :which-key "jump")
+	       "M J" '(mu4e~headers-jump-to-maildir :which-key "jump")
+	       "M c" '(mu4e-compose-new :which-key "compose")
+	       "M C" '(mu4e-compose-new :which-key "compose"))
     (:keymaps 'mu4e-main-mode-map
 	      "/" 'mu4e-headers-search
 	      "j" nil
@@ -896,16 +910,16 @@ Use < in visual mode to continuously shift selection
 
     (setq mu4e-bookmarks
 	  `(,(make-mu4e-bookmark
-	     :name  "Unread messages"
-	     :query "flag:unread AND NOT flag:trashed AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\ E-Mail"
-	     :key ?u)
+	      :name  "Unread messages"
+	      :query "flag:unread AND NOT flag:trashed AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\\ E-Mail"
+	      :key ?u)
 	    ,(make-mu4e-bookmark
 	      :name "Today's messages"
-	      :query "date:today..now AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\ E-Mail"
+	      :query "date:today..now AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\\ E-Mail"
 	      :key ?t)
 	    ,(make-mu4e-bookmark
 	      :name "Last 7 days"
-	      :query "date:7d..now AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\ E-Mail"
+	      :query "date:7d..now AND NOT flag:trashed AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\\ E-Mail"
 	      :key ?w)
 	    ,(make-mu4e-bookmark
 	      :name "Sent"
