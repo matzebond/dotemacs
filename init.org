@@ -1816,29 +1816,25 @@ This happens a lot because my dotfiles are linked by stow.
 #+BEGIN_SRC emacs-lisp
   (defun rename-current-file ()
     "Renames both current buffer and the file it's visiting."
-    (interactive
-     (progn
-       (if (not (buffer-file-name))
-	   (error "Buffer '%s' is not visiting a file!" (buffer-name)))
-       (let ((new-file-name (read-file-name "Rename current file to: " (file-name-directory buffer-file-name)))
-	     )
-	 (message "Current file renamed to %s." new-file-name)
-	 (rename-file buffer-file-name new-file-name)
-	 (rename-buffer new-file-name)
-	 (set-visited-file-name new-file-name)
-	 (set-buffer-modified-p nil)
-	 (setq default-directory (file-name-directory new-file-name))
-	 ))))
+    (interactive)
+    (unless (buffer-file-name)
+      (error "Buffer '%s' is not visiting a file!" (buffer-name)))
+    (let ((new-file-name (read-file-name "Rename current file to: "
+					 (file-name-directory buffer-file-name))))
+      (rename-file buffer-file-name new-file-name)
+      (rename-buffer new-file-name)
+      (set-visited-file-name new-file-name)
+      (set-buffer-modified-p nil)
+      (setq-local default-directory (file-name-directory new-file-name))
+      (message "Current file renamed to %s." new-file-name)))
 
   (defun delete-current-file ()
     "Deletes the current buffer and the file it's visiting."
-    (interactive
-     (progn
-       (if (not (buffer-file-name))
-	   (error "Buffer '%s' is not visiting a file!" (buffer-name)))
-       (delete-file buffer-file-name)
-       (kill-buffer)
-       )))
+    (interactive)
+    (unless (buffer-file-name)
+      (error "Buffer '%s' is not visiting a file!" (buffer-name)))
+    (delete-file buffer-file-name)
+    (kill-buffer))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
