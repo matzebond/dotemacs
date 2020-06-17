@@ -1290,7 +1290,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     :config
 	;; do flyspell-buffer after changing the dictionary
 	(defun flyspell-buffer-after-change-dict (&rest args)
-	  (if (< (count-words (point-min) (point-max)) 1000) (flyspell-buffer))))
+	  (if (< (count-words (point-min) (point-max)) 1000) (flyspell-buffer)))
 	(advice-add 'ispell-change-dictionary :after #'flyspell-buffer-after-change-dict)
 
     ;; ommit error messages on spell checking for performance sake
@@ -1299,7 +1299,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
 * TODO Semantic
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package srefactor
     :defer
     ;;:general
