@@ -293,7 +293,7 @@ https://github.com/purcell/exec-path-from-shell
     "x"  (general-simulate-key "C-x")
 
     "w" 'other-window
-    ;; "W"  (general-simulate-key "C-w"))
+    ;; "W"  (general-simulate-key "C-w")
     "W" '(:ignore t :which-key "Window")
     "W d" 'delete-window
     "W o" 'delete-other-windows)
@@ -303,13 +303,26 @@ https://github.com/purcell/exec-path-from-shell
 [[http://oremacs.com/swiper/][ivy & swiper manual]]
 *** ivy
 
+‘M-o’      (‘ivy-dispatching-done’)
+‘C-M-j’    (‘ivy-immediate-done’)
+‘M-j’      (‘ivy-yank-word’)
+‘C-r’      (‘ivy-reverse-i-search’)
+‘M-w’      (‘ivy-kill-ring-save’)
+‘C-c C-o’  (‘ivy-occur’)
+‘M-r’      (‘ivy-toggle-regexp-quote’)
+‘~~’       (local home directory)
+
 #+begin_src emacs-lisp
   (use-package ivy
     :demand
     :diminish ivy-mode
     :general
     (my-menu-def
-      "b" '(ivy-switch-buffer :which-key "Buffer"))
+      "b" '(ivy-switch-buffer :which-key "Buffer")
+      "W p" '(nil :which-key "ivy-view")
+      "W pu" 'ivy-push-view
+      "W po" 'ivy-pop-view
+      "W w" 'ivy-switch-view)
 
     (:keymaps 'ivy-minibuffer-map
 	      "C-l" 'ivy-alt-done
@@ -327,7 +340,19 @@ https://github.com/purcell/exec-path-from-shell
     (setq ivy-count-format "(%d/%d) ")
     (setq enable-recursive-minibuffers t)
     (setq ivy-extra-directories nil)
-    (setq ivy-wrap t))
+    (setq ivy-wrap t)
+
+    (defun maschm/ivy-append-action (x)
+      (with-ivy-window 
+	(progn
+	  (evil-append 0)
+	  (insert x)
+	  (evil-normal-state))))
+
+    (ivy-set-actions
+     t '(("i" #[257 "\211;\203	\0\211\202\0\211@c\207" [] 2 "\n\n(fn X)"] "insert")
+	 ("w" #[257 "\300;\203\n\0\202\f\0@!\207" [kill-new] 3 "\n\n(fn X)"] "copy")
+	 ("a" maschm/ivy-append-action "append"))))
 
   (use-package ivy-hydra
     :defer 15
