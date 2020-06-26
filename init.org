@@ -1746,9 +1746,12 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
 #+end_src
 
 ** Rust
+   https://github.com/brotzeit/rustic
+   rustic focuses on integration to many emacs packages and rust-mode wants to
+   be light weight.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package rust-mode
+  (use-package rustic
     :mode "\\.rs\\'"
     :config
     (push "target" projectile-globally-ignored-directories))
