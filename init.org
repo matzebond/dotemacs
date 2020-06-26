@@ -706,17 +706,20 @@ Use < in visual mode to continuously shift selection
     (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp"))
     (add-to-list 'org-structure-template-alist '("sp" . "src python"))
     (add-to-list 'org-structure-template-alist '("ss" . "src sh"))
-  :local
-  (org-mode-hook . ((my-leader-def
-		      "n" '(:ignore t :which-key "org narrow")
-		      "ns" 'org-narrow-to-subtree
-		      "nb" 'org-narrow-to-block
-		      "ne" 'org-narrow-to-element
-		      "s" 'org-sparse-tree
-		      "," 'org-edit-special)))
-  (org-src-mode-hook . ((my-leader-def
-			  ;; :keymaps 'org-src-mode-map 
-			  "," 'org-edit-src-exit))))
+
+    :local
+    (org-mode-hook . ((my-leader-def
+			"n" '(:ignore t :which-key "org narrow")
+			"ns" 'org-narrow-to-subtree
+			"nb" 'org-narrow-to-block
+			"ne" 'org-narrow-to-element
+			"s" 'org-sparse-tree
+			"p" 'org-toggle-pretty-entities
+			"i" 'org-toggle-inline-images
+			"," 'org-edit-special)))
+    (org-src-mode-hook . ((my-leader-def
+			    ;; :keymaps 'org-src-mode-map 
+			    "," 'org-edit-src-exit))))
 
   (use-package evil-org
     :after (evil org)
@@ -788,6 +791,7 @@ Use < in visual mode to continuously shift selection
     :after (org)
     :defer 15
     :general (my-menu-def
+               "O b" 'org-brain-goto
 	       "O v" 'org-brain-visualize)
     :init
     (setq org-brain-path "~/org/brain")
