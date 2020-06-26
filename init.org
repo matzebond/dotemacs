@@ -651,6 +651,10 @@ Use < in visual mode to continuously shift selection
     (:keymaps 'evil-visual-state-map
 	      "g l" 'evil-lion-left
 	      "g L" 'evil-lion-right))
+
+  (use-package evil-exchange
+    :config
+    (evil-exchange-install))
 #+END_SRC
 
 * Org
