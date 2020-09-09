@@ -8,31 +8,31 @@ This is my emacs configuration file in literate style as an org mode file.
 
 * Preface
 
-We automatically reload the configuration after changes to the 'init.org' file.
+We automatically reload the configuration after changes to the =init.org= file.
 
 ** Tangle
 
 #+BEGIN_SRC emacs-lisp
-  (setq user-emacs-directory "~/.emacs.d/")
+  ;; -*- lexical-binding: t; -*-
+  ;; (setq user-emacs-directory "~/.emacs.d/")
 #+END_SRC
-
-TODO why are there use-package errors when using byte-compile-file
 
 #+BEGIN_SRC emacs-lisp
   (defun tangle-init ()
     "If the current buffer is 'init.org' the code-blocks are
     tangled, and the tangled file is compiled."
     (when (equal (buffer-file-name)
-		 (expand-file-name "init.org" user-emacs-directory))
+         (expand-file-name "init.org" user-emacs-directory))
       ;; Avoid running hooks when tangling.
       (let ((prog-mode-hook nil))
-	(org-babel-tangle)
-	;; (byte-compile-file (expand-file-name "init.el" user-emacs-directory))
-	)))
+        (org-babel-tangle)
+        ;; (byte-compile-file (expand-file-name "init.el" user-emacs-directory))
+        )))
 
   (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
 
+*** TODO why are there use-package errors when using byte-compile-file
 * Initial Stuff
 ** Start up
 #+BEGIN_SRC emacs-lisp
@@ -54,23 +54,14 @@ TODO why are there use-package errors when using byte-compile-file
 
 ** Garbage Collection
 
-Disabling GC (by setting `gc-cons-threshold' to a very large value)
-during startup is said to improve startup time by reducing the number of GC runs.
+In =early-init.el= `gc-cons-threshold' is set to a high value
+this should improve startup time by reducing the number of GC runs.
 After startup reset it to reasonable value
 
 #+BEGIN_SRC emacs-lisp
   ;; (message (format "%s - %s" gc-cons-threshold gc-cons-percentage))
   (setq garbage-collection-messages t)
 
-  (setq gc-cons-threshold 402653184) ;;gc-cons-percentage 0.6)
-  (add-hook 'after-init-hook (lambda ()
-			       (run-with-idle-timer
-				  10
-				  nil
-				  (lambda ()
-				    (interactive)
-				    (message "Reset gc threshold after init and idle")
-				    (setq gc-cons-threshold 50000000)))))
   (add-hook 'focus-out-hook 'garbage-collect)
 #+END_SRC
 
