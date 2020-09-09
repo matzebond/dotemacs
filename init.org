@@ -484,7 +484,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     :diminish (projectile-mode)
     :general (my-menu-def
 		      "p" 'projectile-find-file
-		      "P" '(nil :which-key "Project")
+		      "P" '(:ignore t :which-key "Project")
 		      "P p" 'projectile-switch-project
 		      "P c" 'projectile-compile-project
 		      "P r" 'projectile-run-project
@@ -519,6 +519,8 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
   :defer 5)
 #+END_SRC
 
+** TODO pair programming
+   https://github.com/tjim/lockstep
 * Evil
 ** evil-mode
 
@@ -601,7 +603,7 @@ Use < in visual mode to continuously shift selection
 	  (evil-visual-restore))))
 
   (advice-add 'evil-shift-right :after #'maschm/visual-restore-after-shift)
-  (advice-remove 'evil-shift-right #'maschm/visual-restore-after-shift)
+  ;; (advice-remove 'evil-shift-right #'maschm/visual-restore-after-shift)
 #+end_src
 
 ** Evil packages
@@ -666,22 +668,22 @@ Use < in visual mode to continuously shift selection
   (use-package org
     :defer 60
     :general (my-menu-def
-	       "o" '(:ignore t :which-key "org-outline")
-	       "o" (general-key-dispatch 'counsel-outline
-		     :timeout .33
-		     "a" 'org-agenda
-		     "c" 'org-capture)
+           "o" '(:ignore t :which-key "org-outline")
+           "o" (general-key-dispatch 'counsel-outline
+             :timeout .33
+             "a" 'org-agenda
+             "c" 'org-capture)
 
-	       "O" '(nil :which-key "org")
-	       "O a" 'org-agenda
-	       "O c" 'org-capture
-	       "O l" 'org-insert-link
-	       "O L" 'org-store-link)
+           "O" '(:ignore t :which-key "org")
+           "O a" 'org-agenda
+           "O c" 'org-capture
+           "O l" 'org-insert-link
+           "O L" 'org-store-link)
 
     (:keymap global-map
-	     "C-c c" 'org-capture
-	     "C-c a" 'org-agenda
-	     "C-c l" 'org-store-link)
+         "C-c c" 'org-capture
+         "C-c a" 'org-agenda
+         "C-c l" 'org-store-link)
     :config
     (setq org-directory "~/org/")
     (setq org-return-follows-link t)
@@ -690,21 +692,21 @@ Use < in visual mode to continuously shift selection
 
     (setq org-default-notes-file (expand-file-name "inbox.org" org-directory))
     (setq org-agenda-files '("~/org/inbox.org"
-			     "~/org/gtd.org"
-			     "~/org/tickler.org"))
+                 "~/org/gtd.org"
+                 "~/org/tickler.org"))
     (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
     (setq org-capture-templates '(("t" "Todo [inbox]" entry
-				   (file+headline "~/org/inbox.org" "Tasks")
-				   "* TODO %i%?")
-				  ("m" "Mail Todo [inbox]" entry
-				   (file+headline "~/org/inbox.org" "Tasks")
-				   "* TODO %i%?\n%a\n")
-				  ("T" "Tickler" entry
-				   (file+headline "~/org/tickler.org" "Tickler")
-				   "* %i%? \n %U")))
+                                   (file+headline "~/org/inbox.org" "Tasks")
+                                   "* TODO %i%?")
+                                  ("m" "Mail Todo [inbox]" entry
+                                   (file+headline "~/org/inbox.org" "Tasks")
+                                   "* TODO %i%?\n%a\n")
+                                  ("T" "Tickler" entry
+                                   (file+headline "~/org/tickler.org" "Tickler")
+                                   "* %i%? \n %U")))
     (setq org-refile-targets '(("~/org/gtd.org" :maxlevel . 3)
-			       ("~/org/someday.org" :level . 1)
-			       ("~/org/tickler.org" :maxlevel . 2)))
+                               ("~/org/someday.org" :level . 1)
+                               ("~/org/tickler.org" :maxlevel . 2)))
     (setq org-tag-alist '(("@home" . "h") ("@uni" . "u") ("@work" . "w")))
     (setq org-refile-use-outline-path 'file)
     (setq org-outline-path-complete-in-steps nil)
@@ -759,11 +761,12 @@ Use < in visual mode to continuously shift selection
 
 #+begin_src emacs-lisp
   (eval-after-load 'org
-    '(prog1
+    '(progn
        (setq org-latex-caption-above nil)))
 #+end_src
 
-** org-ref
+** TODO org-ref
+
 #+begin_src emacs-lisp
   ;; (use-package org-ref
   ;;   :after org)
@@ -804,10 +807,10 @@ Use < in visual mode to continuously shift selection
     :config
     (setq org-id-track-globally t)
     (evil-set-initial-state 'org-brain-visualize-mode 'emacs)
-    (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
+    (setq org-id-locations-file (expand-file-name ".org-id-locations" user-emacs-directory))
     (push '("b" "Brain" plain (function org-brain-goto-end)
-	    "* %i%?" :empty-lines 1)
-	  org-capture-templates)
+            "* %i%?" :empty-lines 1)
+          org-capture-templates)
     (setq org-brain-visualize-default-choices 'all)
     (setq org-brain-title-max-length 0))
 #+end_src
@@ -819,7 +822,7 @@ Use < in visual mode to continuously shift selection
   (use-package magit
     :defer 30
     :general (my-menu-def
-	       "g" '(nil :which-key "git/vc")
+	       "g" '(:ignore t :which-key "git/vc")
 	       "g s" 'magit-status
 	       "g b" 'magit-blame
 	       "g d" 'magit-diff-buffer-file
@@ -871,7 +874,7 @@ Use < in visual mode to continuously shift selection
     :defer 15
     :general (my-menu-def
 	       "m" '(mu4e :which-key "mail")
-	       "M" '(nil :which-key "Mail")
+	       "M" '(:ignore t :which-key "Mail")
 	       "M u" '(mu4e-update-mail-and-index :which-key "update")
 	       "M g" '(mu4e-headers-search-bookmark :which-key "bookmarks")
 	       "M t" '((lambda () (interactive)
@@ -1144,8 +1147,8 @@ _=_: zoom reset     _r_: scale reset
     ("i" text-scale-increase nil)
     ("d" text-scale-decrease nil)
     ("r" (text-scale-increase 0) nil))
-
-  (my-menu-def "T z" #'hydra-zoom/body)
+    
+  (my-menu-def "T z" '(hydra-zoom/body :which-key "Zooming/Scaling"))
 #+END_SRC
 
 ** Scrolling
@@ -1174,9 +1177,6 @@ https://github.com/emacs-dashboard/emacs-dashboard
 Turn off mouse interface early in startup to avoid momentary display.
 
 #+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
   (tooltip-mode -1)
 #+END_SRC
 
@@ -1238,7 +1238,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     :defer 30)
 
   (use-package company-prescient
-    :after (company))
+    :hook (company-mode . company-prescient-mode))
 
   (use-package pos-tip
     :defer 30)
@@ -1336,7 +1336,8 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     (setq flyspell-issue-message-flag nil))
 #+End_SRC
 
-* TODO Semantic
+* Semantic
+** TODO srefactor
 
 #+BEGIN_SRC emacs-lisp :tangle no
   (use-package srefactor
@@ -1546,10 +1547,10 @@ When compiling follow the buffer
     (evil-make-overriding-map helpful-mode-map 'normal)
 
     (setq counsel-describe-function-function #'helpful-callable)
-    (setq counsel-describe-variable-function #'helpful-variable)
-    )
-
+    (setq counsel-describe-variable-function #'helpful-variable))
 #+END_SRC
+
+*** TODO think at point in org-mode src environment
 
 ** ediff
 
@@ -1568,6 +1569,9 @@ When compiling follow the buffer
       (add-hook 'ediff-quit-hook #'winner-undo))
 #+end_src
 
+*** TODO look at linediff
+    https://github.com/rgrinberg/evil-quick-diff
+    
 * Programming languages
 ** Lisp
 Use common-lips indent function because elisp is not nice with keywords
@@ -1577,14 +1581,19 @@ Use common-lips indent function because elisp is not nice with keywords
   ;;           (lambda () (setq-local lisp-indent-function #'common-lisp-indent-function)))
 #+END_SRC
 
+*** TODO Common Lisp
+    https://common-lisp.net/project/slime/
+
+*** TODO Closure
+    https://cider.mx/
+
 ** C/C++
 https://github.com/realgud/realgud
 https://github.com/tuhdo/semantic-refactor
 
 #+BEGIN_SRC emacs-lisp
-  ;; (defvaralias 'c-basic-offset 'tab-width)
   (setq-default c-basic-offset 8)
-  
+
   (use-package cc-mode
     :general (my-menu-def
 	       "F o" 'ff-get-other-file
@@ -1663,8 +1672,10 @@ https://commercialhaskell.github.io/intero/
 
 #+END_SRC
 
-*** TODO Dante
+*** Dante
 https://github.com/jyp/dante
+
+fork of intero
 
 ** TODO Pdf/Latex
 *** AUCTeX
