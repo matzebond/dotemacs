@@ -562,6 +562,17 @@ https://github.com/noctuid/evil-guide
 #+END_SRC
 
 ** Vim goodies
+*** visual line
+
+#+begin_src emacs-lisp
+  (general-mmap
+    "j" 'evil-next-visual-line
+    "k" 'evil-previous-visual-line)
+  (general-mmap
+    "gj" 'evil-next-line
+    "gk" 'evil-previous-line)
+#+end_src
+
 *** Folding
 
 #+BEGIN_SRC emacs-lisp
