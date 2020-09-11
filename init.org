@@ -1,30 +1,28 @@
 #+TITLE: Emacs configuration file
 #+AUTHOR: Matthias Schmitt
 #+LANGUAGE: en
-#+PROPERTY: header-args:emacs-lisp :tangle yes
-#+PROPERTY: header-args :comments both
+#+PROPERTY: header-args:emacs-lisp :tangle yes :comments link
+
 
 This is my emacs configuration file in literate style as an org mode file.
 
 * Preface
 
-We automatically reload the configuration after changes to the =init.org= file.
+#+BEGIN_SRC emacs-lisp :shebang ";; -*- lexical-binding: t; -*-"
+#+END_SRC
 
 ** Tangle
-
-#+BEGIN_SRC emacs-lisp
-  ;; -*- lexical-binding: t; -*-
-  ;; (setq user-emacs-directory "~/.emacs.d/")
-#+END_SRC
+   
+Automatically reload the configuration after changes to the =init.org= file.
 
 #+BEGIN_SRC emacs-lisp
   (defun tangle-init ()
     "If the current buffer is 'init.org' the code-blocks are
-    tangled, and the tangled file is compiled."
+  tangled, and the tangled file is compiled."
+    (interactive)
     (when (equal (buffer-file-name)
-         (expand-file-name "init.org" user-emacs-directory))
-      ;; Avoid running hooks when tangling.
-      (let ((prog-mode-hook nil))
+                 (expand-file-name "init.org" user-emacs-directory))
+      (let ((prog-mode-hook nil)) ;; Avoid running hooks when tangling.
         (org-babel-tangle)
         ;; (byte-compile-file (expand-file-name "init.el" user-emacs-directory))
         )))
