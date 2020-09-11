@@ -1852,20 +1852,47 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
 #+end_src
 
 ** Markup & Config Langs
+*** yaml
 
 #+begin_src emacs-lisp
   (use-package yaml-mode
     :mode ("\\.yml\\'"))
+#+end_src
 
+*** toml
+
+#+begin_src emacs-lisp
   (use-package toml-mode
     :mode ("\\.toml\\'"))
+#+end_src
 
+*** markdown
+
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :hook (markdown-mode . visual-line-mode))
+#+end_src
+
+*** systemd
+
+#+begin_src emacs-lisp
   (use-package systemd)
+#+end_src
 
+*** nginx
+
+#+begin_src emacs-lisp
   (use-package nginx-mode
     :init
     (add-to-list 'auto-mode-alist '("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode)))
 #+end_src
+
+*** PKGBUILD
+
+Recognize arch linux pgkbuild files
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("PKGBUILD\\'" . shell-script-mode))
+#+END_SRC
 
 * Settings
 ** indent
@@ -1878,13 +1905,6 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
 
 ** TODO whitespace
 ** TODO show-parens
-** PKGBUILD
-
-Recognize arch linux pgkbuild files
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'auto-mode-alist '("PKGBUILD\\'" . shell-script-mode))
-#+END_SRC
-
 ** yes-no
 
 #+begin_src emacs-lisp
