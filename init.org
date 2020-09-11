@@ -1921,6 +1921,7 @@ This happens a lot because my dotfiles are linked by stow.
 
 * Functions
 
+** current-file
 #+BEGIN_SRC emacs-lisp
   (defun rename-current-file ()
     "Renames both current buffer and the file it's visiting."
@@ -1945,21 +1946,26 @@ This happens a lot because my dotfiles are linked by stow.
     (kill-buffer))
 #+END_SRC
 
+** macro execute
 #+BEGIN_SRC emacs-lisp
-    ;; alternative command version
-    (defun my-norm@q ()
-      "Apply macro in q register on selected lines."
-      (interactive)
-      (evil-ex-normal (region-beginning) (region-end) "@q"))
+  ;; alternative command version
+  (defun maschm/q ()
+    "Apply macro in q register on selected lines."
+    (interactive)
+    (if (evil-visual-state-p)
+        (evil-ex-normal (region-beginning) (region-end) "@q")
+      (evil-execute-macro 1 (evil-get-register ?q))))
 
+  (general-define-key
+   :states '(normal)
+   "Q" 'maschm/q)
+#+END_SRC
+
+** dir-local reload
+#+BEGIN_SRC emacs-lisp
   (defun reload-dir-locals-for-current-buffer ()
     "reload dir locals for the current buffer"
     (interactive)
     (let ((enable-local-variables :all))
       (hack-dir-local-variables-non-file-buffer)))
-
-    ;; (general-define-key
-    ;;  :states '(visual global)
-    ;;  "Q" 'my-norm@q)
 #+END_SRC
-
