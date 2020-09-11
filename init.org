@@ -139,8 +139,8 @@ use a own file for emacs custom definition
     (defconst my-menu-key "SPC")
     (defconst my-non-normal-menu-key "M-SPC")
     (general-create-definer my-menu-def
-      :states '(normal motion insert emacs)
       :keymaps 'override
+      :states '(motion insert emacs)
       :prefix my-menu-key
       :non-normal-prefix my-non-normal-menu-key)
     (my-menu-def
@@ -149,23 +149,26 @@ use a own file for emacs custom definition
     (defconst my-leader-key ",")
     (defconst my-non-normal-leader-key "M-,")
     (general-create-definer my-leader-def
-      :states '(normal visual)
       :keymaps 'local
+      :states nil
       :prefix my-leader-key
       :non-normal-prefix my-non-normal-leader-key)
-    )
+    (general-mmap
+      "," nil ;evil-repeat-find-char-reverse
+      ))
 #+END_SRC
 
 *** which-key
 
 #+BEGIN_SRC emacs-lisp
-    (use-package which-key
-      :demand
-      :general (my-menu-def
-		 "H K" 'which-key-show-keymap
-		 "H T" 'which-key-show-top-level)
-      :diminish which-key-mode
-      :config (which-key-mode))
+  (use-package which-key
+    :demand
+    :general
+    (my-menu-def
+      "H K" 'which-key-show-keymap
+      "H T" 'which-key-show-top-level)
+    :diminish which-key-mode
+    :config (which-key-mode))
 #+END_SRC
 
 *** epkg
@@ -308,20 +311,25 @@ https://github.com/purcell/exec-path-from-shell
     :general
     (my-menu-def
       "b" '(ivy-switch-buffer :which-key "Buffer")
-      "W p" '(nil :which-key "ivy-view")
+      "W p" '(:ignore t :which-key "ivy-view")
       "W pu" 'ivy-push-view
       "W po" 'ivy-pop-view
       "W w" 'ivy-switch-view)
 
-    (:keymaps 'ivy-minibuffer-map
-	      "C-l" 'ivy-alt-done
-	      "C-h" 'ivy-backward-delete-char
-	      "<escape>" 'minibuffer-keyboard-quit
-	      "C-SPC" 'nil
-	      "C-TAB" 'ivy-insert-current)
+    (general-def
+      :keymaps 'ivy-minibuffer-map
+      "C-l" 'ivy-alt-done
+      "C-h" 'ivy-backward-delete-char
+      "<escape>" 'minibuffer-keyboard-quit
+      "C-RET" 'ivy-immediate-done
+      "<C-return>" 'ivy-immediate-done
+      "C-SPC" 'nil
+      "C-TAB" 'ivy-insert-current
+      "<C-tab>" 'ivy-insert-current)
 
-    (:keymaps 'ivy-occur-grep-mode-map
-	      "SPC" nil)
+    (general-def
+      :keymaps 'ivy-occur-grep-mode-map
+      "SPC" nil)
 
     :config
     (ivy-mode 1)
@@ -366,22 +374,27 @@ https://github.com/purcell/exec-path-from-shell
     (setq ivy-rich-parse-remote-buffer nil))
 #+end_src
 
+**** TODO fix ivy-occur
+dired keymap is set to overriding and no ivy-occur cmd can be used
+
 *** counsel
 
 #+begin_src emacs-lisp
   (use-package counsel
     :demand
     :diminish counsel-mode
-    :general (my-menu-def
-	       "f" '(:ignore t :which-key "File")
-	       "f" 'counsel-find-file
-	       "F" '(:ignore t :which-key "File")
-	       "F r" '(counsel-recentf :which-key "recent")
-	       "r" '(counsel-recentf :which-key "recent")
-	       "SPC" '(counsel-M-x :which-key "M-x"))
-    (:keymap global-map
-	     "C-x f" 'counsel-find-file ;; replace set-fill-colum
-	     "C-x C-r" 'counsel-recentf)
+    :general
+    (my-menu-def
+      "f" '(:ignore t :which-key "File")
+      "f" 'counsel-find-file
+      "F" '(:ignore t :which-key "File")
+      "F r" '(counsel-recentf :which-key "recent")
+      "r" '(counsel-recentf :which-key "recent")
+      "SPC" '(counsel-M-x :which-key "M-x"))
+    (general-def
+      :keymaps 'global
+      "C-x f" 'counsel-find-file ;; replace set-fill-colum
+      "C-x C-r" 'counsel-recentf)
     :config
     (counsel-mode)
     (custom-reevaluate-setting 'ivy-initial-inputs-alist))
@@ -389,9 +402,11 @@ https://github.com/purcell/exec-path-from-shell
   (use-package counsel-tramp
     :defer 15
     :after counsel
-    :general (my-menu-def
-	       "F t" 'counsel-tramp)
-    :config (setq tramp-default-method "ssh"))
+    :general
+    (my-menu-def
+      "F t" 'counsel-tramp)
+    :config
+    (setq tramp-default-method "ssh"))
 #+end_src
 
 get back to the local file system when in find-file while using tramp
@@ -402,8 +417,11 @@ use =/ C-j= or =~ //= to get to the local / directory
 #+begin_src emacs-lisp
   (use-package swiper
     :defer 15
-    :general (:states 'normal
-		      "C-s" 'swiper))
+    :general
+    (general-def
+      :keymaps 'global
+      :states 'motion
+      "C-s" 'swiper))
 #+end_src
 
 *** avy
@@ -412,9 +430,10 @@ use =/ C-j= or =~ //= to get to the local / directory
   (use-package avy
     :defer 15
     :commands (avy-goto-char-2 avy-goto-char-timer avy-goto-line)
-    :general (:states 'normal
-		      "g t" 'avy-goto-char-2
-		      ))
+    :general
+    (general-def
+      :states 'motion
+      "g t" 'avy-goto-char-2))
 #+end_src
 
 *** hydra
@@ -430,9 +449,10 @@ use =/ C-j= or =~ //= to get to the local / directory
 #+begin_src emacs-lisp
   (use-package winner
     :demand
-    :general (my-menu-def
-	       "W u" 'winner-undo
-	       "W r" 'winner-redo)
+    :general
+    (my-menu-def
+      "W u" 'winner-undo
+      "W r" 'winner-redo)
     :config (winner-mode 1))
 #+end_src
 
@@ -451,23 +471,22 @@ use =/ C-j= or =~ //= to get to the local / directory
 #+begin_src emacs-lisp
   (use-package symbol-overlay
     :defer 15
-    :general (my-menu-def
-	       "s" '(:ignore t :which-key "Symbol")
-	       "s" (general-key-dispatch 'symbol-overlay-put
-		     :timeout .33
-		     "n" 'symbol-overlay-jump-next
-		     "p" 'symbol-overlay-jump-prev
-		     "d" 'symbol-overlay-remove-all
-		     "r" 'symbol-overlay-rename
-		     )
+    :general
+    (my-menu-def
+      "s" '(:ignore t :which-key "Symbol")
+      "s" (general-key-dispatch 'symbol-overlay-put
+            :timeout .33
+            "n" 'symbol-overlay-jump-next
+            "p" 'symbol-overlay-jump-prev
+            "d" 'symbol-overlay-remove-all
+            "r" 'symbol-overlay-rename)
 
-	       "S" '(:ignore t :which-key "Symbol")
-	       "S s" 'symbol-overlay-mode
-	       "S n" 'symbol-overlay-jump-next
-	       "S p" 'symbol-overlay-jump-prev
-	       "S d" 'symbol-overlay-remove-all
-	       "S r" 'symbol-overlay-rename
-	       ))
+      "S" '(:ignore t :which-key "Symbol")
+      "S s" 'symbol-overlay-mode
+      "S n" 'symbol-overlay-jump-next
+      "S p" 'symbol-overlay-jump-prev
+      "S d" 'symbol-overlay-remove-all
+      "S r" 'symbol-overlay-rename))
 #+end_src
 *** TODO symbol-overlay hydra
     Or use swiper to got to symbol?
@@ -480,13 +499,14 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
   (use-package projectile
     :demand
     :diminish (projectile-mode)
-    :general (my-menu-def
-		      "p" 'projectile-find-file
-		      "P" '(:ignore t :which-key "Project")
-		      "P p" 'projectile-switch-project
-		      "P c" 'projectile-compile-project
-		      "P r" 'projectile-run-project
-		      "P t" 'projectile-test-project)
+    :general
+    (my-menu-def
+      "p" 'projectile-find-file
+      "P" '(:ignore t :which-key "Project")
+      "P p" 'projectile-switch-project
+      "P c" 'projectile-compile-project
+      "P r" 'projectile-run-project
+      "P t" 'projectile-test-project)
     :config
     (projectile-mode +1)
     (setq projectile-completion-system 'ivy)
@@ -497,10 +517,11 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
   (use-package counsel-projectile
     :demand
     :after (counsel projectile)
-    :general (my-menu-def
-		      "p" 'counsel-projectile
-		      "P p" 'counsel-projectile-switch-project
-		      "/" '(counsel-projectile-rg :which-key "search proj"))
+    :general
+    (my-menu-def
+      "p" 'counsel-projectile
+      "P p" 'counsel-projectile-switch-project
+      "/" '(counsel-projectile-rg :which-key "search proj"))
     :config
     (counsel-projectile-mode)
     (setq counsel-projectile-rg-initial-input
@@ -520,21 +541,26 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 ** TODO pair programming
    https://github.com/tjim/lockstep
 * Evil
-** evil-mode
-
-https://github.com/emacs-evil/evil-collection
-
-https://github.com/noctuid/evil-guide
+** undo-tree
 
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
     :demand
     :diminish undo-tree-mode
-    :general (:states 'normal
-		      "U" 'undo-tree-visualize)
+    :general
+    (general-def
+      :states 'normal
+      "U" 'undo-tree-visualize)
     :config
     (global-undo-tree-mode +1))
+#+end_src
 
+** evil-mode
+https://github.com/emacs-evil/evil-collection
+
+https://github.com/noctuid/evil-guide
+
+#+begin_src emacs-lisp
   (use-package evil
     :demand
     :init
@@ -645,14 +671,11 @@ Use < in visual mode to continuously shift selection
     :config (global-evil-visualstar-mode))
 
   (use-package evil-lion
-    :demand
     :general
-    (:keymaps 'evil-normal-state-map
-	      "g l" 'evil-lion-left
-	      "g L" 'evil-lion-right)
-    (:keymaps 'evil-visual-state-map
-	      "g l" 'evil-lion-left
-	      "g L" 'evil-lion-right))
+    (general-def
+      :keymaps 'normal
+      "g l" 'evil-lion-left
+      "g L" 'evil-lion-right))
 
   (use-package evil-exchange
     :config
@@ -665,24 +688,46 @@ Use < in visual mode to continuously shift selection
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :defer 60
-    :general (my-menu-def
-           "o" '(:ignore t :which-key "org-outline")
-           "o" (general-key-dispatch 'counsel-outline
-             :timeout .33
-             "a" 'org-agenda
-             "c" 'org-capture)
+    :general
+    (my-menu-def
+      "o" '(:ignore t :which-key "org-outline")
+      "o" (general-key-dispatch 'counsel-outline
+            :timeout .33
+            "a" 'org-agenda
+            "c" 'org-capture)
 
-           "O" '(:ignore t :which-key "org")
-           "O a" 'org-agenda
-           "O c" 'org-capture
-           "O l" 'org-insert-link
-           "O L" 'org-store-link)
+      "O" '(:ignore t :which-key "org")
+      "O a" 'org-agenda
+      "O c" 'org-capture
+      "O l" 'org-insert-link
+      "O L" 'org-store-link
+      "O T" '(org-timer-set-timer :which-key "timer"))
 
-    (:keymap global-map
-         "C-c c" 'org-capture
-         "C-c a" 'org-agenda
-         "C-c l" 'org-store-link)
+    (general-def
+      :keymaps 'global
+      "C-c c" 'org-capture
+      "C-c a" 'org-agenda
+      "C-c l" 'org-store-link)
+
     :config
+    (my-leader-def
+      :keymaps 'org-mode-map
+      "n" '(:ignore t :which-key "org narrow")
+      "ns" 'org-narrow-to-subtree
+      "nb" 'org-narrow-to-block
+      "ne" 'org-narrow-to-element
+      "s" 'org-sparse-tree
+      "t" 'org-insert-structure-template
+      "T" '(:ignore t :which-key "toogle")
+      "Tp" 'org-toggle-pretty-entities
+      "Ti" 'org-toggle-inline-images
+      "Tl" 'org-latex-preview
+      "," 'org-edit-special)
+
+    (my-leader-def
+      :keymaps 'org-src-mode-map 
+      "," 'org-edit-src-exit)
+
     (setq org-directory "~/org/")
     (setq org-return-follows-link t)
     (setq org-startup-folded t)
@@ -712,20 +757,7 @@ Use < in visual mode to continuously shift selection
     (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp"))
     (add-to-list 'org-structure-template-alist '("sp" . "src python"))
     (add-to-list 'org-structure-template-alist '("ss" . "src sh"))
-
-    :local
-    (org-mode-hook . ((my-leader-def
-			"n" '(:ignore t :which-key "org narrow")
-			"ns" 'org-narrow-to-subtree
-			"nb" 'org-narrow-to-block
-			"ne" 'org-narrow-to-element
-			"s" 'org-sparse-tree
-			"p" 'org-toggle-pretty-entities
-			"i" 'org-toggle-inline-images
-			"," 'org-edit-special)))
-    (org-src-mode-hook . ((my-leader-def
-			    ;; :keymaps 'org-src-mode-map 
-			    "," 'org-edit-src-exit))))
+    )
 
   (use-package evil-org
     :after (evil org)
@@ -797,9 +829,10 @@ Use < in visual mode to continuously shift selection
   (use-package org-brain
     :after (org)
     :defer 15
-    :general (my-menu-def
-               "O b" 'org-brain-goto
-	       "O v" 'org-brain-visualize)
+    :general
+    (my-menu-def
+      "O b" 'org-brain-goto
+      "O v" 'org-brain-visualize)
     :init
     (setq org-brain-path "~/org/brain")
     :config
@@ -819,14 +852,16 @@ Use < in visual mode to continuously shift selection
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :defer 30
-    :general (my-menu-def
-	       "g" '(:ignore t :which-key "git/vc")
-	       "g s" 'magit-status
-	       "g b" 'magit-blame
-	       "g d" 'magit-diff-buffer-file
-	       "g l" 'magit-log-buffer-file)
-    (:keymaps 'magit-mode-map
-	      "SPC" nil )
+    :general
+    (my-menu-def
+      "g" '(:ignore t :which-key "git/vc")
+      "g s" 'magit-status
+      "g b" 'magit-blame
+      "g d" 'magit-diff-buffer-file
+      "g l" 'magit-log-buffer-file)
+    (general-def
+      :keymaps 'magit-mode-map
+      "SPC" nil)
     :config
     (setq magit-completing-read-function 'ivy-completing-read)
     (setq magit-diff-refine-hunk t)
@@ -870,51 +905,52 @@ Use < in visual mode to continuously shift selection
 #+begin_src emacs-lisp
   (use-package mu4e
     :defer 15
-    :general (my-menu-def
-	       "m" '(mu4e :which-key "mail")
-	       "M" '(:ignore t :which-key "Mail")
-	       "M u" '(mu4e-update-mail-and-index :which-key "update")
-	       "M g" '(mu4e-headers-search-bookmark :which-key "bookmarks")
-	       "M t" '((lambda () (interactive)
-			 (mu4e-headers-search (mu4e-get-bookmark-query  ?t)))
-		       :which-key "today")
-	       "M w" '((lambda () (interactive)
-			 (mu4e-headers-search (mu4e-get-bookmark-query  ?w)))
-		       :which-key "this week")
-	       "M U" '((lambda () (interactive)
-			 (mu4e-headers-search (mu4e-get-bookmark-query  ?u)))
-		       :which-key "unread")
-	       "M j" '(mu4e~headers-jump-to-maildir :which-key "jump")
-	       "M J" '(mu4e~headers-jump-to-maildir :which-key "jump")
-	       "M c" '(mu4e-compose-new :which-key "compose")
-	       "M C" '(mu4e-compose-new :which-key "compose"))
-    (:keymaps 'mu4e-main-mode-map
-	      "/" 'mu4e-headers-search
-	      "j" nil
-	      "J" 'mu4e~headers-jump-to-maildir
-	      "g r" 'mu4e-update-mail-and-index)
-    (:keymaps 'mu4e-headers-mode-map
-	      "/" 'mu4e-headers-search
-	      "j" nil
-	      "J" 'mu4e~headers-jump-to-maildir
-	      "g" nil
-	      "g s" 'mu4e-headers-rerun-search
-	      "g r" 'mu4e-update-mail-and-index)
-    (:keymaps 'mu4e-view-mode-map
-	      "j" nil
-	      "J" 'mu4e~headers-jump-to-maildir
-	      "h" nil
-	      "H" 'mu4e-view-toggle-html
-	      "k" nil ;; mu4e-view-save-url
-	      "y" nil ;; mu4e-select-other-view
-	      "v" nil ;; mu4e-view-verify-msg-popup
-	      "b" nil ;; mu4e-headers-search-bookmark
-	      "w" nil ;; visual-line-mode
-	      "g" nil ;; mu4e-view-go-to-url
-	      "0" nil
-	      "z" nil
-	      )
+    :general
+    (my-menu-def
+      "m" '(mu4e :which-key "mail")
+      "M" '(:ignore t :which-key "Mail")
+      "M u" '(mu4e-update-mail-and-index :which-key "update")
+      "M g" '(mu4e-headers-search-bookmark :which-key "bookmarks")
+      "M t" '((lambda () (interactive) (mu4e-headers-search (mu4e-get-bookmark-query  ?t)))
+              :which-key "today")
+      "M w" '((lambda () (interactive) (mu4e-headers-search (mu4e-get-bookmark-query  ?w)))
+              :which-key "this week")
+      "M U" '((lambda () (interactive) (mu4e-headers-search (mu4e-get-bookmark-query  ?u)))
+              :which-key "unread")
+      "M j" '(mu4e~headers-jump-to-maildir :which-key "jump")
+      "M J" '(mu4e~headers-jump-to-maildir :which-key "jump")
+      "M c" '(mu4e-compose-new :which-key "compose")
+      "M C" '(mu4e-compose-new :which-key "compose"))
     :config
+    (general-def
+      :keymaps 'mu4e-main-mode-map
+      "/" 'mu4e-headers-search
+      "j" nil
+      "J" 'mu4e~headers-jump-to-maildir
+      "g r" 'mu4e-update-mail-and-index)
+    (general-def
+      :keymaps 'mu4e-headers-mode-map
+      "/" 'mu4e-headers-search
+      "j" nil
+      "J" 'mu4e~headers-jump-to-maildir
+      "g" nil
+      "g s" 'mu4e-headers-rerun-search
+      "g r" 'mu4e-update-mail-and-index)
+    (general-def
+      :keymaps 'mu4e-view-mode-map
+      "j" nil
+      "J" 'mu4e~headers-jump-to-maildir
+      "h" nil
+      "H" 'mu4e-view-toggle-html
+      "k" nil ;; mu4e-view-save-url
+      "y" nil ;; mu4e-select-other-view
+      "v" nil ;; mu4e-view-verify-msg-popup
+      "b" nil ;; mu4e-headers-search-bookmark
+      "w" nil ;; visual-line-mode
+      "g" nil ;; mu4e-view-go-to-url
+      "0" nil
+      "z" nil)
+
     (evil-make-overriding-map mu4e-main-mode-map 'normal)
     (evil-set-initial-state 'mu4e-main-mode 'normal)
     (evil-make-overriding-map mu4e-headers-mode-map 'normal)
@@ -1267,14 +1303,14 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :defer 30
-    :general (my-menu-def
-	       "e" '(:ignore t :which-key "Errors")
-	       "e e" 'flycheck-buffer
-	       "e b" 'flycheck-buffer
-	       "e c" 'flycheck-compile
-	       "e n" 'flycheck-next-error
-	       "e p" 'flycheck-prev-error))
-
+    :general
+    (my-menu-def
+      "e" '(:ignore t :which-key "Errors")
+      "e e" 'flycheck-buffer
+      "e b" 'flycheck-buffer
+      "e c" 'flycheck-compile
+      "e n" 'flycheck-next-error
+      "e p" 'flycheck-prev-error))
 #+END_SRC
 
 ** LSP
@@ -1416,28 +1452,19 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
   (use-package eshell
     :after (esh-opt)
     :commands (eshell eshell-command)
-    ;; :general (:keymaps 'eshell-mode-map
-    ;; 		     "TAB" 'completion-at-point)
     :config
+    ;; (general-define-key
+    ;;  :keymaps 'eshell-mode-map
+    ;;  [remap eshell-pcomplete] 'completion-at-point
+    ;;  "TAB" 'completion-at-point)
+    ;;  "C-r" 'counsel-esh-history)
+
     ;; (setq pcomplete-ignore-case t)
     (setq eshell-cmpl-ignore-case t)
     ;; (setq pcomplete-autolist t)
     (setq eshell-cmpl-autolist t)
     (setq pcomplete-cycle-cutoff-length 1)
-    (setq eshell-cmpl-cycle-cutoff-length 1)
-    ;; (general-define-key :keymaps 'eshell-mode-map
-    ;; 		      [remap eshell-pcomplete] 'completion-at-point
-    ;; 		      "C-r" 'counsel-esh-history)
-    )
-
-  (defun setup-eshell ()
-    ;; (define-key eshell-mode-map [remap eshell-pcomplete] 'completion-at-point)
-    (general-define-key :keymaps 'eshell-mode-map
-			;; [remap eshell-pcomplete] 'completion-at-point
-			"C-r" 'counsel-esh-history))
-
-  (add-hook 'eshell-mode-hook 'setup-eshell)
-  (remove-hook 'eshell-mode-hook 'setup-eshell)
+    (setq eshell-cmpl-cycle-cutoff-length 1))
 
   (use-package eshell-z
     :after eshell)
@@ -1451,9 +1478,11 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
   (use-package esh-autosuggest
     :hook (eshell-mode . esh-autosuggest-mode)
-    :general (:keymaps 'esh-autosuggest-active-map
-		       "C-e" 'company-complete-selection
-		       "M-e" 'esh-autosuggest-complete-word))
+    :general
+    (general-def
+      :keymaps 'esh-autosuggest-active-map
+      "C-e" 'company-complete-selection
+      "M-e" 'esh-autosuggest-complete-word))
 #+END_SRC
 
 ** irc
@@ -1477,13 +1506,17 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
   (setq-default fill-column 80)
 
-  (defun my-text-mode-setup ()
-     (my-leader-def
-       :states 'normal
-       "f" '(fill-paragraph :which-key "fill"))
-     (my-leader-def
-       :states 'visual
-       "f" '(fill-region :which-key "fill")))
+  (my-leader-def
+    :keymaps 'text-mode-map
+    :states 'normal
+    "f" '(fill-paragraph :which-key "fill"))
+
+  (my-leader-def
+    :keymaps 'text-mode-map
+    :states 'visual
+    "f" '(fill-region :which-key "fill"))
+
+  (defun my-text-mode-setup () ())
   (add-hook 'text-mode-hook 'my-text-mode-setup)
 #+END_SRC
 
@@ -1535,13 +1568,14 @@ When compiling follow the buffer
       "H X" 'helpful-kill-buffers)
 
     :config
-    (general-define-key :keymaps 'helpful-mode-map
-			"SPC" nil
-			"n" nil
-			"p" nil
-			"g" nil
-			"g r" 'helpful-update
-			"q" 'quit-window)
+    (general-def
+      :keymaps 'helpful-mode-map
+      "SPC" nil
+      "n" nil
+      "p" nil
+      "g" nil
+      "g r" 'helpful-update
+      "q" 'quit-window)
     (evil-make-overriding-map helpful-mode-map 'normal)
 
     (setq counsel-describe-function-function #'helpful-callable)
@@ -1593,9 +1627,10 @@ https://github.com/tuhdo/semantic-refactor
   (setq-default c-basic-offset 8)
 
   (use-package cc-mode
-    :general (my-menu-def
-	       "F o" 'ff-get-other-file
-	       "F O" '(lambda () (interactive) (ff-get-other-file t)))
+    :general
+    (my-menu-def
+      "F o" 'ff-get-other-file
+      "F O" '(lambda () (interactive) (ff-get-other-file t)))
     :local
     (c-mode-common-hook . ((setq-local tab-width 8)))
     (java-mode-hook . ((setq-local tab-width 4)
@@ -1648,11 +1683,11 @@ https://github.com/tuhdo/semantic-refactor
 https://commercialhaskell.github.io/intero/
 
 #+BEGIN_SRC emacs-lisp
-
   (use-package haskell-mode
-    :defer t
-    :general (:keymaps 'haskell-mode-map
-		       "C-c C-c" 'haskell-compile)
+    :config
+    (general-def
+      :keymaps 'haskell-mode-map
+      "C-c C-c" 'haskell-compile)
     )
 
   (use-package intero
