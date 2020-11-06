@@ -150,7 +150,7 @@ use a own file for emacs custom definition
     (defconst my-non-normal-leader-key "M-,")
     (general-create-definer my-leader-def
       :keymaps 'local
-      :states nil
+      :states '(motion insert)
       :prefix my-leader-key
       :non-normal-prefix my-non-normal-leader-key)
     (general-mmap
@@ -735,6 +735,7 @@ Use < in visual mode to continuously shift selection
 
     (my-leader-def
       :keymaps 'org-src-mode-map 
+      :states nil
       "," 'org-edit-src-exit)
 
     (setq org-directory "~/org/")
