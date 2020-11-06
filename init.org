@@ -1392,11 +1392,44 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
 * Modes
 ** dired
+https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-collection-dired.el
+
+#+BEGIN_SRC emacs-lisp
+  (my-menu-def
+    "D" '(dired-jump :which-key "dired"))
+
+  (general-define-key
+   :keymaps 'global
+   "C-c d" 'dired-jump
+   "C-c D" 'dired)
+
+
+  (general-define-key
+   :keymaps 'dired-mode-map
+   "SPC" nil
+   "I" 'wdired-change-to-wdired-mode
+   "g" nil
+   "g r" 'revert-buffer
+   "g j" 'dired-next-dirline
+   "g k" 'dired-prev-dirline)
+
+  (setq dired-listing-switches "--group-directories-first -al")
+#+END_SRC
+
+*** wdired
 
 #+BEGIN_SRC emacs-lisp
   (general-define-key
-   :keymaps 'dired-mode-map
-   "SPC" nil)
+   :keymaps 'wdired-mode-map
+   [remap evil-write] 'wdired-finish-edit)
+
+  (general-define-key
+   :keymaps 'wdired-mode-map
+   :mode 'normal
+   "ESC" 'wdired-exit
+   "<escape>" 'wdired-exit)
+
+  ;; (evil-make-overriding-map wdired-mode-map 'normal)
 #+END_SRC
 
 ** info
