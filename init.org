@@ -204,31 +204,30 @@ https://github.com/purcell/exec-path-from-shell
 ** Backup
 
 #+BEGIN_SRC emacs-lisp
-  (defvar --backup-directory (expand-file-name ".cache/backups" user-emacs-directory))
-  (if (not (file-exists-p --backup-directory))
-      (make-directory --backup-directory t))
-  (setq backup-directory-alist `(("." . ,--backup-directory)))
-  (setq make-backup-files t               ; backup of a file the first time it is saved.
-	backup-by-copying t               ; don't clobber symlinks
-	version-control t                 ; version numbers for backup files
-	delete-old-versions t             ; delete excess backup files silently
-	;; delete-by-moving-to-trash t
-	kept-old-versions 6               ; oldest versions to keep when a new numbered backup is made (default: 2)
-	kept-new-versions 9               ; newest versions to keep when a new numbered backup is made (default: 2)
-	auto-save-default t               ; auto-save every buffer that visits a file
-	auto-save-timeout 20              ; number of seconds idle time before auto-save (default: 30)
-	auto-save-interval 200            ; number of keystrokes between auto-saves (default: 300)
-	)
+  (defvar user-backup-directory (expand-file-name ".cache/backups" user-emacs-directory))
+  (make-directory user-backup-directory 'noerror)
+  (setq backup-directory-alist `(("." . ,user-backup-directory)))
+  (setq make-backup-files t      ; backup of a file the first time it is saved.
+        backup-by-copying t      ; don't clobber symlinks
+        version-control t        ; version numbers for backup files
+        delete-old-versions t    ; delete excess backup files silently
+        ;; delete-by-moving-to-tr
+        kept-old-versions 6      ; oldest versions to keep when a new numbered backup is made (default: 2)
+        kept-new-versions 9      ; newest versions to keep when a new numbered backup is made (default: 2)
+        auto-save-default t      ; auto-save every buffer that visits a file
+        auto-save-timeout 20     ; number of seconds idle time before auto-save (default: 30)
+        auto-save-interval 200   ; number of keystrokes between auto-saves (default: 300)
+    )
 #+END_SRC
 
 ** Undo history
 
 #+BEGIN_SRC emacs-lisp
-  (defvar --undo-directory (expand-file-name ".cache/undo" user-emacs-directory))
-  (if (not (file-exists-p --undo-directory))
-      (make-directory --undo-directory t))
+  (defvar user-undo-directory (expand-file-name ".cache/undo" user-emacs-directory))
+  (make-directory user-undo-directory 'noerror)
   (setq undo-tree-auto-save-history t)
-  (setq undo-tree-history-directory-alist `(("." . ,--undo-directory)))
+  (setq undo-tree-history-directory-alist `(("." . ,user-undo-directory)))
+  (setq undo-tree-history-directory-alist (list (cons "." user-undo-directory)))
 #+END_SRC
 
 ** File history
@@ -239,11 +238,12 @@ https://github.com/purcell/exec-path-from-shell
 #+end_src
 
 *** recentf
+
 #+begin_src emacs-lisp
   (recentf-mode 1)
   (setq recentf-max-menu-items 200 ;; MRU configs
-	recentf-max-saved-items 200
-	recentf-exclude '("recentf" "autoload" "emacs-customizations.el"))
+        recentf-max-saved-items 200
+        recentf-exclude '("recentf" "autoload" "emacs-customizations.el"))
 #+end_src
 
 ** Lockfile
@@ -343,15 +343,15 @@ https://github.com/purcell/exec-path-from-shell
 
     (defun maschm/ivy-append-action (x)
       (with-ivy-window 
-	(progn
-	  (evil-append 0)
-	  (insert x)
-	  (evil-normal-state))))
+        (progn
+          (evil-append 0)
+          (insert x)
+          (evil-normal-state))))
 
     (ivy-set-actions
      t '(("i" #[257 "\211;\203	\0\211\202\0\211@c\207" [] 2 "\n\n(fn X)"] "insert")
-	 ("w" #[257 "\300;\203\n\0\202\f\0@!\207" [kill-new] 3 "\n\n(fn X)"] "copy")
-	 ("a" maschm/ivy-append-action "append"))))
+         ("w" #[257 "\300;\203\n\0\202\f\0@!\207" [kill-new] 3 "\n\n(fn X)"] "copy")
+         ("a" maschm/ivy-append-action "append"))))
 
   (use-package ivy-hydra
     :defer 15
@@ -527,10 +527,10 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     :config
     (counsel-projectile-mode)
     (setq counsel-projectile-rg-initial-input
-	  '(when (evil-visual-state-p)
-	     (buffer-substring-no-properties
-	      (evil-range-beginning (evil-visual-range))
-	      (evil-range-end (evil-visual-range))))))
+          '(when (evil-visual-state-p)
+             (buffer-substring-no-properties
+              (evil-range-beginning (evil-visual-range))
+              (evil-range-end (evil-visual-range))))))
 #+END_SRC
 
 ** wgrep
@@ -572,16 +572,10 @@ https://github.com/noctuid/evil-guide
     (setq evil-want-Y-yank-to-eol t)
     :config
     (evil-mode 1)
-    (cl-loop for (mode . state) in '((haskell-interactive-mode . emacs)
-				     (haskell-error-mode . emacs)
-				     (term-mode . emacs)
-				     (messages-mode . normal)
-				     (compilation-mode . motion)
-				     )
-	     do (evil-set-initial-state mode state))
-    ;; (cl-loop for map in '(helpful-mode-map
-    ;;			  )
-    ;;	     do (evil-make-overriding-map map))
+    (cl-loop for (mode . state) in
+             '((term-mode . emacs)
+               (compilation-mode . motion))
+             do (evil-set-initial-state mode state))
     (evil-set-command-property 'evil-yank :move-point t)
     (setq evil-echo-state nil)
     (setq evil-ex-substitute-global t)
@@ -673,7 +667,8 @@ Use < in visual mode to continuously shift selection
     ;; (global-evil-mc-mode 1)
     ;; (add-hook 'magit-mode-hook #'evil-mc-mode -1)
     (advice-add 'evil-mc-define-vars :after
-		(lambda () (add-to-list 'evil-mc-incompatible-minor-modes 'auto-fill-mode))))
+                (lambda ()
+                  (add-to-list 'evil-mc-incompatible-minor-modes 'auto-fill-mode))))
 
   (use-package evil-visualstar
     :demand
@@ -745,8 +740,8 @@ Use < in visual mode to continuously shift selection
 
     (setq org-default-notes-file (expand-file-name "inbox.org" org-directory))
     (setq org-agenda-files '("~/org/inbox.org"
-                 "~/org/gtd.org"
-                 "~/org/tickler.org"))
+                             "~/org/gtd.org"
+                             "~/org/tickler.org"))
     (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
     (setq org-capture-templates '(("t" "Todo [inbox]" entry
                                    (file+headline "~/org/inbox.org" "Tasks")
@@ -1371,10 +1366,10 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
   (use-package flyspell
     :hook (text-mode . flyspell-mode)
     :config
-	;; do flyspell-buffer after changing the dictionary
-	(defun flyspell-buffer-after-change-dict (&rest args)
-	  (if (< (count-words (point-min) (point-max)) 1000) (flyspell-buffer)))
-	(advice-add 'ispell-change-dictionary :after #'flyspell-buffer-after-change-dict)
+    ;; do flyspell-buffer after changing the dictionary
+    (defun flyspell-buffer-after-change-dict (&rest args)
+      (if (< (count-words (point-min) (point-max)) 1000) (flyspell-buffer)))
+    (advice-add 'ispell-change-dictionary :after #'flyspell-buffer-after-change-dict)
 
     ;; ommit error messages on spell checking for performance sake
     (setq flyspell-issue-message-flag nil))
@@ -1443,7 +1438,8 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
 ** TODO view
    [[info:emacs#View%20Mode][info:emacs#View Mode]]
-   SPC and S-SPC are bound to scrolling intentionally disable anyway?
+   SPC and S-SPC are bound to scrolling.
+   Intentionally disable anyway?
    Which buffer are in view mode?
 
 ** messages-buffer
@@ -1653,8 +1649,8 @@ https://github.com/tuhdo/semantic-refactor
     (ccls-executable (executable-find "ccls"))
     :init
     (setq projectile-project-root-files-top-down-recurring
-	  (append '("compile_commands.json" ".ccls")
-		  projectile-project-root-files-top-down-recurring))
+      (append '("compile_commands.json" ".ccls")
+          projectile-project-root-files-top-down-recurring))
     :config
     (setq lsp-prefer-flymake nil)
     (push ".ccls-cache" projectile-globally-ignored-directories)
