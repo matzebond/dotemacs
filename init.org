@@ -762,7 +762,14 @@ Use < in visual mode to continuously shift selection
 
     (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp"))
     (add-to-list 'org-structure-template-alist '("sp" . "src python"))
+    (add-to-list 'org-structure-template-alist '("sr" . "src R"))
+    (add-to-list 'org-structure-template-alist '("sj" . "src julia"))
+    (add-to-list 'org-structure-template-alist '("sl" . "src latex"))
     (add-to-list 'org-structure-template-alist '("ss" . "src sh"))
+    (add-to-list 'org-structure-template-alist '("sg" . "src gnuplot"))
+    (add-to-list 'org-structure-template-alist '("su" . "src plantuml"))
+    (add-to-list 'org-structure-template-alist '("sd" . "src dot"))
+
     )
 
   (use-package evil-org
@@ -782,12 +789,23 @@ Use < in visual mode to continuously shift selection
 
 #+begin_src emacs-lisp
   (eval-after-load 'org
-    '(prog1
-      (add-to-list 'org-babel-load-languages '(shell . t))
-      (add-to-list 'org-babel-load-languages '(python . t))
-      (add-to-list 'org-babel-load-languages '(gnuplot . t))
+    '(progn
+       (setq org-ditaa-jar-path (expand-file-name
+                                 "straight/repos/org/contrib/scripts/ditaa.jar"
+                                 user-emacs-directory))
+       (setq org-plantuml-jar-path (expand-file-name "plantuml.jar" user-emacs-directory))
 
-      (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)))
+       ;;(require 'gnuplot)
+       (add-to-list 'org-babel-load-languages '(shell . t))
+       (add-to-list 'org-babel-load-languages '(python . t))
+       (add-to-list 'org-babel-load-languages '(R . t))
+       (add-to-list 'org-babel-load-languages '(ditaa . t))
+       (add-to-list 'org-babel-load-languages '(dot . t))
+       (add-to-list 'org-babel-load-languages '(gnuplot . t))
+       (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+       (add-to-list 'org-babel-load-languages '(plantuml . t))
+
+       (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)))
 
   (use-package ob-async
     :after ob)
@@ -1943,6 +1961,21 @@ Recognize arch linux pgkbuild files
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("PKGBUILD\\'" . shell-script-mode))
 #+END_SRC
+
+*** dot
+
+#+begin_src emacs-lisp
+  (use-package graphviz-dot-mode)
+#+end_src
+
+** PlantUML
+
+#+begin_src emacs-lisp
+  (use-package plantuml-mode
+    :config
+    (setq plantuml-jar-path (expand-file-name "plantuml.jar" user-emacs-directory))
+    (setq plantuml-default-exec-mode 'jar))
+#+end_src
 
 * Settings
 ** indent
