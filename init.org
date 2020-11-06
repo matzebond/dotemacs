@@ -247,11 +247,12 @@ https://github.com/purcell/exec-path-from-shell
 #+end_src
 
 ** Lockfile
+
 #+begin_src emacs-lisp
   (setq create-lockfiles nil)
 #+end_src
 
-* Navigation
+* Navigation & Search
 ** Buffer & Window menu
 
 #+BEGIN_SRC emacs-lisp
@@ -320,6 +321,7 @@ https://github.com/purcell/exec-path-from-shell
       :keymaps 'ivy-minibuffer-map
       "C-l" 'ivy-alt-done
       "C-h" 'ivy-backward-delete-char
+      "ESC" 'minibuffer-keyboard-quit
       "<escape>" 'minibuffer-keyboard-quit
       "C-RET" 'ivy-immediate-done
       "<C-return>" 'ivy-immediate-done
@@ -584,6 +586,13 @@ https://github.com/noctuid/evil-guide
     (setq evil-echo-state nil)
     (setq evil-ex-substitute-global t)
     (setq evil-vsplit-window-right t)
+
+    (general-mmap
+      "SPC" nil
+      "RET" nil
+      "TAB" 'evil-jump-forward  ; "TAB" is "C-i" which is the tab-key in terminal mode
+                                ; use "<tab>" to bind to only the tab-key in gui mode
+      )
     )
 #+END_SRC
 
@@ -1395,11 +1404,10 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
   (general-define-key
    :keymaps 'Info-mode-map
    "SPC" nil
-   "TAB" 'Info-next-reference-or-link
-   "S-TAB" 'Info-prev-reference-or-link
+   "<tab>" 'Info-next-reference-or-link
+   "S-<tab>" 'Info-prev-reference-or-link
    "C-o" 'Info-history-back
    "C-i" 'Info-history-forward
-   "C-]" 'Info-follow-nearest-node
 
    "h" nil
    "l" nil
