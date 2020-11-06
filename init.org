@@ -435,7 +435,8 @@ use =/ C-j= or =~ //= to get to the local / directory
     :general
     (general-def
       :states 'motion
-      "g t" 'avy-goto-char-2))
+      "g O" 'avy-goto-char-2
+      "g o" 'avy-goto-char-timer))
 #+end_src
 
 *** hydra
@@ -935,6 +936,7 @@ Use < in visual mode to continuously shift selection
       "g r" 'mu4e-update-mail-and-index)
     (general-def
       :keymaps 'mu4e-headers-mode-map
+      "SPC" nil
       "/" 'mu4e-headers-search
       "j" nil
       "J" 'mu4e~headers-jump-to-maildir
@@ -943,10 +945,13 @@ Use < in visual mode to continuously shift selection
       "g r" 'mu4e-update-mail-and-index)
     (general-def
       :keymaps 'mu4e-view-mode-map
+      "SPC" nil
       "j" nil
       "J" 'mu4e~headers-jump-to-maildir
       "h" nil
       "H" 'mu4e-view-toggle-html
+      "g" nil
+      "g r" 'mu4e-update-mail-and-index
       "k" nil ;; mu4e-view-save-url
       "y" nil ;; mu4e-select-other-view
       "v" nil ;; mu4e-view-verify-msg-popup
@@ -1408,6 +1413,8 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
    "h" nil
    "l" nil
    "M-h" 'Info-help
+   "w" nil
+   "b" nil
 
    "u" 'Info-up
    "g" nil
@@ -1461,6 +1468,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     ;; (general-define-key
     ;;  :keymaps 'eshell-mode-map
     ;;  [remap eshell-pcomplete] 'completion-at-point
+    ;;  "<tab>" 'completion-at-point)
     ;;  "TAB" 'completion-at-point)
     ;;  "C-r" 'counsel-esh-history)
 
@@ -1570,7 +1578,11 @@ When compiling follow the buffer
       "H f" 'helpful-function
       "H c" 'helpful-callable
       "H k" 'helpful-key
-      "H X" 'helpful-kill-buffers)
+      "H X" 'helpful-kill-buffers
+      "H i" 'info
+      "H m" 'describe-mode
+      "H V" 'counsel-set-variable
+      "H U" 'counsel-unicode-char)
 
     :config
     (general-def
