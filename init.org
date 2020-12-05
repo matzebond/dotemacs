@@ -1240,7 +1240,9 @@ this or https://github.com/purcell/default-text-scale/blob/master/default-text-s
     (interactive)
     (set-face-attribute 'default nil :height (- (face-attribute 'default :height) default-text-scale-amount)))
 
-  (defvar default-text-scale-pre (face-attribute 'default :height))
+  (defvar default-text-scale-pre nil)
+  (general-after-gui
+    (setq default-text-scale-pre (face-attribute 'default :height)))
 
   (defun default-text-scale-reset ()
     "Reset the height of the default face."
