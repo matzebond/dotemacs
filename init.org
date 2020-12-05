@@ -1271,6 +1271,15 @@ _=_: zoom reset     _r_: scale reset
 #+END_SRC
 
 ** Scrolling
+from https://github.com/DiegoVicen/my-emacs#Fix-scroll
+
+#+begin_src emacs-lisp
+  (setq scroll-step 1
+        scroll-conservatively 10000
+        mouse-wheel-scroll-amount '(1 ((shift) . 1))
+        mouse-wheel-progressive-speed nil
+        mouse-wheel-follow-mouse 't)
+#+end_src
 
 ** Dashboard
 
