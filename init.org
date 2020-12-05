@@ -744,6 +744,7 @@ Use < in visual mode to continuously shift selection
       "ns" 'org-narrow-to-subtree
       "nb" 'org-narrow-to-block
       "ne" 'org-narrow-to-element
+      "nn" 'org-toggle-narrow-to-subtree
       "s" 'org-sparse-tree
       "t" 'org-insert-structure-template
       "T" '(:ignore t :which-key "toogle")
@@ -872,6 +873,15 @@ Use < in visual mode to continuously shift selection
 
 #+begin_src emacs-lisp
   (setq org-beamer-frame-default-options "")
+#+end_src
+
+** org-reveal
+
+#+begin_src emacs-lisp
+  (use-package ox-reveal
+    :defer 20
+    :config
+    (setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js"))
 #+end_src
 
 ** org-caldav
