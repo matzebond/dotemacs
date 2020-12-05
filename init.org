@@ -1664,7 +1664,13 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 ** prog-mode
 
 #+begin_src emacs-lisp
+  (defun comment-auto-fill ()
+    (setq-local comment-auto-fill-only-comments t)
+    (auto-fill-mode 1))
+
   (defun my-prog-mode-setup ()
+    (electric-pair-local-mode)
+    (comment-auto-fill)
     (setq-local ispell-local-dictionary "en_US"))
 
   (add-hook 'prog-mode-hook 'my-prog-mode-setup)
