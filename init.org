@@ -1704,6 +1704,15 @@ When compiling follow the buffer
     "gr" 'recompile)
 #+END_SRC
 
+** image
+
+#+begin_src emacs-lisp
+  (eval-after-load 'evil
+    '(eval-after-load 'image-mode
+       '(progn
+          (evil-make-overriding-map image-mode-map 'normal))))
+#+end_src
+
 ** helpful
 
 #+BEGIN_SRC emacs-lisp
