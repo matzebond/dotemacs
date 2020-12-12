@@ -1845,8 +1845,14 @@ https://github.com/tuhdo/semantic-refactor
     ("SConscript" . python-mode))
 #+end_src
 
-** Haskell
+** TODO Haskell
 *** Intero
+    intero project has reached the end of its life cycle. city_sunrise
+
+    I will not be maintaining it any longer.
+    Minimal pull requests will be accepted for a few months.
+    After which, I will archive the project.
+
 https://commercialhaskell.github.io/intero/
 
 #+BEGIN_SRC emacs-lisp
@@ -1855,21 +1861,11 @@ https://commercialhaskell.github.io/intero/
     (general-def
       :keymaps 'haskell-mode-map
       "C-c C-c" 'haskell-compile)
-    )
+    (evil-set-initial-state 'interactive-haskell-mode 'emacs)
+    (evil-set-initial-state 'haskell-error-mode 'emacs))
 
   (use-package intero
-    :hook (haskell-mode . intero-mode)
-    )
-
-
-  ;; (use-package haskell-process
-  ;;   :after haskell-mode)
-
-  ;; (use-package haskell-interactive-mode
-  ;;   :after haskell-mode
-  ;;   :contig (add-hook 'haskell-mode-hook 'interactive-haskell-mode))
-
-
+    :hook (haskell-mode . intero-mode))
 #+END_SRC
 
 *** Dante
@@ -1974,10 +1970,17 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     (push "target" projectile-globally-ignored-directories))
 #+END_SRC
 
-** JS
+** TODO JS
+https://github.com/NicolasPetton/Indium
 
 #+begin_src emacs-lisp
   (use-package web-mode)
+#+end_src
+
+** TODO Typescript
+
+#+begin_src emacs-lisp
+
 #+end_src
 
 ** Elm
@@ -1990,10 +1993,32 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     (push "elm-stuff" projectile-globally-ignored-directories))
 #+end_src
 
+** PHP
+
+#+begin_src emacs-lisp
+  (use-package php-mode
+    :mode ("\\.php\\'"))
+#+end_src
+
 ** R
 
 #+begin_src emacs-lisp
   (use-package ess)
+#+end_src
+
+** Julia
+
+#+begin_src emacs-lisp
+  (use-package julia-mode)
+
+  (use-package julia-snail
+    :hook (julia-mode . julia-snail-mode))
+#+end_src
+
+** Erlang
+
+#+begin_src emacs-lisp
+  (use-package erlang)
 #+end_src
 
 ** Sonic Pi
@@ -2074,6 +2099,25 @@ Recognize arch linux pgkbuild files
     :config
     (setq plantuml-jar-path (expand-file-name "plantuml.jar" user-emacs-directory))
     (setq plantuml-default-exec-mode 'jar))
+#+end_src
+
+** Docker
+
+#+begin_src emacs-lisp
+  (use-package dockerfile-mode)
+
+
+  (use-package docker-tramp
+    :config
+    (setq docker-tramp-user "root"))
+#+end_src
+
+** mediawiki
+
+#+begin_src emacs-lisp
+  (use-package mediawiki
+    :config
+    (add-to-list 'mediawiki-site-alist '("Fachschaft" "https://wiki.fsmi.uni-karlsruhe.de/" "username" "password" nil "Main Page")))
 #+end_src
 
 * Settings
