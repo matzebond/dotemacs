@@ -401,7 +401,14 @@ dired keymap is set to overriding and no ivy-occur cmd can be used
       "C-x C-r" 'counsel-recentf)
     :config
     (counsel-mode)
-    (custom-reevaluate-setting 'ivy-initial-inputs-alist))
+    (custom-reevaluate-setting 'ivy-initial-inputs-alist)
+
+    (defun maschm/counsel-helpful-action (x)
+      (helpful-symbol (intern x)))
+
+    (ivy-set-actions
+     'counsel-M-x '(("d" counsel--find-symbol "definition")
+                    ("h" maschm/counsel-helpful-action "help"))))
 
   (use-package counsel-tramp
     :defer 15
@@ -540,6 +547,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     (my-menu-def
       "p" 'counsel-projectile
       "P p" 'counsel-projectile-switch-project
+      "P b" 'counsel-projectile-switch-to-buffer
       "/" '(counsel-projectile-rg :which-key "search proj"))
     :config
     (counsel-projectile-mode)
