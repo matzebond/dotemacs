@@ -1291,7 +1291,7 @@ https://github.com/emacs-dashboard/emacs-dashboard
     :general
     (:keymaps 'dashboard-mode-map
               "SPC" nil
-	      "DEL" nil)
+              "DEL" nil)
     :config
     (evil-make-overriding-map dashboard-mode-map 'normal)
     (evil-set-initial-state 'dashboard-mode 'normal)
@@ -1492,12 +1492,23 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    :keymaps 'dired-mode-map
    "SPC" nil
    "I" 'wdired-change-to-wdired-mode
+   "j" 'dired-next-line
+   "k" 'dired-previous-line
+   "h" 'dired-up-directory
+   "l" 'dired-find-file
+   "<normal-state> j" nil
+   "<normal-state> k" nil
+   "<normal-state> h" nil
+   "<normal-state> l" nil
+   "<normal-state> r" nil
+   "y" 'dired-copy-filename-as-kill
+   "w" 'dired-show-file-type
    "g" nil
    "g r" 'revert-buffer
    "g j" 'dired-next-dirline
    "g k" 'dired-prev-dirline)
 
-  (setq dired-listing-switches "--group-directories-first -al")
+  (setq dired-listing-switches "--group-directories-first -alh")
 #+END_SRC
 
 *** wdired
@@ -1534,6 +1545,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    "b" nil
 
    "u" 'Info-up
+   "H" 'Info-up
    "g" nil
    "gj" 'Info-next
    "gk" 'Info-prev
@@ -1685,6 +1697,11 @@ When compiling follow the buffer
   (setq compilation-skip-threshold 2)
   ;; Stop on the first error.
   (setq compilation-auto-jump-to-first-error t)
+
+  (general-def
+    :keymaps 'compilation-mode-map
+    "g" nil
+    "gr" 'recompile)
 #+END_SRC
 
 ** helpful
@@ -1703,8 +1720,10 @@ When compiling follow the buffer
       "H k" 'helpful-key
       "H X" 'helpful-kill-buffers
       "H i" 'info
+      "H I" 'counsel-info-lookup-symbol
       "H m" 'describe-mode
       "H V" 'counsel-set-variable
+      "H F" 'counsel-faces
       "H U" 'counsel-unicode-char)
 
     :config
@@ -1744,6 +1763,14 @@ When compiling follow the buffer
 *** TODO look at linediff
     https://github.com/rgrinberg/evil-quick-diff
     
+** calendar
+
+#+begin_src emacs-lisp
+  (use-package calendar
+    :custom
+    (calendar-week-start-day 1))
+#+end_src
+
 * Programming languages
 ** Lisp
 Use common-lips indent function because elisp is not nice with keywords
