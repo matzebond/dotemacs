@@ -12,7 +12,7 @@ This is my emacs configuration file in literate style as an org mode file.
 #+END_SRC
 
 ** Tangle
-   
+
 Automatically reload the configuration after changes to the =init.org= file.
 
 #+BEGIN_SRC emacs-lisp
@@ -42,12 +42,12 @@ Automatically reload the configuration after changes to the =init.org= file.
 
 #+begin_src emacs-lisp
   (add-hook 'emacs-startup-hook
-	    (lambda ()
-	      (message "Emacs ready in %s with %d garbage collections."
-		       (format "%.2f seconds"
-			       (float-time
-				(time-subtract after-init-time before-init-time)))
-		       gcs-done)))
+            (lambda ()
+              (message "Emacs ready in %s with %d garbage collections."
+                       (format "%.2f seconds"
+                               (float-time
+                                (time-subtract after-init-time before-init-time)))
+                       gcs-done)))
 #+end_src
 
 ** Garbage Collection
@@ -72,15 +72,15 @@ Bootstrap straight.el
 
   (defvar bootstrap-version)
   (let ((bootstrap-file
-	 (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-	(bootstrap-version 5))
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
-	  (url-retrieve-synchronously
-	   "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-	   'silent 'inhibit-cookies)
-	(goto-char (point-max))
-	(eval-print-last-sexp)))
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 #+END_SRC
 
@@ -241,8 +241,8 @@ https://github.com/purcell/exec-path-from-shell
 
 #+begin_src emacs-lisp
   (recentf-mode 1)
-  (setq recentf-max-menu-items 200 ;; MRU configs
-        recentf-max-saved-items 200
+  (setq recentf-max-menu-items 2048 ;; MRU configs
+        recentf-max-saved-items 2048
         recentf-exclude '("recentf" "autoload" "emacs-customizations.el"))
 #+end_src
 
@@ -263,17 +263,17 @@ https://github.com/purcell/exec-path-from-shell
 
     "B" '(:ignore t :which-key "Buffer")
     "B m" '((lambda () (interactive) (switch-to-buffer "*Messages*"))
-	    :which-key "messages")
+        :which-key "messages")
     "B M" '((lambda () (interactive) (switch-to-buffer-other-window "*Messages*"))
-	    :which-key "messages-in-other")
+        :which-key "messages-in-other")
     "B s" '((lambda () (interactive) (switch-to-buffer "*scratch*"))
-	    :which-key "scratch")
+        :which-key "scratch")
     "B S" '((lambda () (interactive) (switch-to-buffer-other-window "*scratch*"))
-	    :which-key "scratch-in-other")
+        :which-key "scratch-in-other")
     "B w" '((lambda () (interactive) (switch-to-buffer "*Warnings*"))
-	    :which-key "warnings")
+        :which-key "warnings")
     "B W" '((lambda () (interactive) (switch-to-buffer-other-window "*Warnings*"))
-	    :which-key "warnings-in-other")
+        :which-key "warnings-in-other")
     "B d" 'kill-current-buffer
     "B D" 'evil-delete-buffer
     "B r" 'revert-buffer
@@ -344,7 +344,7 @@ https://github.com/purcell/exec-path-from-shell
     (setq ivy-wrap t)
 
     (defun maschm/ivy-append-action (x)
-      (with-ivy-window 
+      (with-ivy-window
         (progn
           (evil-append 0)
           (insert x)
@@ -657,9 +657,9 @@ Use < in visual mode to continuously shift selection
   (defun maschm/visual-restore-after-shift (&rest _)
     "Restore visual selection."
     (if (evil-visual-state-p)
-	(progn
-	  (evil-normal-state)
-	  (evil-visual-restore))))
+    (progn
+      (evil-normal-state)
+      (evil-visual-restore))))
 
   (advice-add 'evil-shift-right :after #'maschm/visual-restore-after-shift)
   ;; (advice-remove 'evil-shift-right #'maschm/visual-restore-after-shift)
@@ -762,7 +762,7 @@ Use < in visual mode to continuously shift selection
       "," 'org-edit-special)
 
     (my-leader-def
-      :keymaps 'org-src-mode-map 
+      :keymaps 'org-src-mode-map
       :states nil
       "," 'org-edit-src-exit)
 
@@ -947,12 +947,12 @@ Use < in visual mode to continuously shift selection
     :defer 15
     :config
     (setq org-caldav-url "https://posteo.de:8443/calendars/male.schmitt"
-	  org-caldav-calendar-id "default"
-	  org-caldav-inbox "~/org/cal.org"
-	  org-caldav-files '("~/org/tickler.org")
-	  org-caldav-save-directory "~/org"
-	  org-icalendar-timezone "Europe/Berlin"
-	  org-caldav-delete-calendar-entries 'ask))
+      org-caldav-calendar-id "default"
+      org-caldav-inbox "~/org/cal.org"
+      org-caldav-files '("~/org/tickler.org")
+      org-caldav-save-directory "~/org"
+      org-icalendar-timezone "Europe/Berlin"
+      org-caldav-delete-calendar-entries 'ask))
 #+END_SRC
 
 ** org-brain
@@ -1095,10 +1095,9 @@ Use < in visual mode to continuously shift selection
     (evil-set-initial-state 'mu4e-view-mode 'normal)
     (setq mu4e-completing-read-function 'ivy-completing-read)
 
-    ;; (setq mu4e-maildir-shortcuts
-    ;; 	'( ("/posteo/Inbox" . ?p)
-    ;; 	   ("/uni/Inbox" . ?u)))
-
+    (setq mu4e-view-show-addresses 't)
+    (setq mu4e-headers-time-format "%T") ;; like "%H:%M:%S"
+    (setq mu4e-headers-date-format "%F") ;; like "%Y-%m-%d"
     (add-hook 'mu4e-view-mode-hook 'visual-line-mode)
     (add-hook 'mu4e-view-mode-hook 'visual-fill-column-mode)
     (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
@@ -1110,17 +1109,10 @@ Use < in visual mode to continuously shift selection
     (setq quick-get-mail-command "mbsync posteo:INBOX uni:INBOX")
     (setq mu4e-change-filenames-when-moving t) ;; needed by mbsync
     (setq mu4e-attachment-dir  "~/dld")
-    (setq mu4e-view-show-addresses 't)
-    (setq mu4e-headers-time-format "%T") ;; like "%H:%M:%S"
-    (setq mu4e-headers-date-format "%F") ;; like "%Y-%m-%d"
 
     (setq message-send-mail-function 'smtpmail-send-it
-          smtpmail-default-smtp-server "posteo.de"
-          smtpmail-smtp-server "posteo.de"
-          smtpmail-stream-type 'starttls
-          smtpmail-smtp-service 587
-          smtpmail-debug-info t
-          smtpmail-debug-verbose t)
+      smtpmail-debug-info t
+      smtpmail-debug-verbose t)
 
     (setq mu4e-user-mail-address-list '("male.schmitt@posteo.de" "uydvo@student.kit.edu"))
     (setq mu4e-contexts
@@ -1129,54 +1121,58 @@ Use < in visual mode to continuously shift selection
            :enter-func (lambda () (mu4e-message "Entering posteo context"))
            :leave-func (lambda () (mu4e-message "Leaving posteo context"))
            :match-func (lambda (msg)
-                 (when msg
-                   (string-match-p "^/posteo" (mu4e-message-field msg :maildir))))
-           :vars '( ( user-mail-address  . "male.schmitt@posteo.de"  )
-            ( user-full-name     . "Matthias Schmitt" )
-            ( mu4e-sent-folder   . "/posteo/Sent")
-            ( mu4e-drafts-folder . "/posteo/Drafts")
-            ( mu4e-trash-folder  . "/posteo/Trash")
-            ( mu4e-refile-folder . "/posteo/Archive")
-            ( smtpmail-smtp-server . "posteo.de"))
-           )
+                         (when msg
+                           (string-match-p "^/posteo" (mu4e-message-field msg :maildir))))
+           :vars '((user-mail-address     . "male.schmitt@posteo.de")
+                   (user-full-name        . "Matthias Schmitt")
+                   (mu4e-sent-folder      . "/posteo/Sent")
+                   (mu4e-drafts-folder    . "/posteo/Drafts")
+                   (mu4e-trash-folder     . "/posteo/Trash")
+                   (mu4e-refile-folder    . "/posteo/Archive")
+                   (smtpmail-smtp-server  . "posteo.de")
+                   (smtpmail-smtp-service . 465)
+                   (smtpmail-stream-type  . ssl)))
          ,(make-mu4e-context
            :name "uni"
            :enter-func (lambda () (mu4e-message "Entering uni context"))
            :leave-func (lambda () (mu4e-message "Leaving uni context"))
            :match-func (lambda (msg)
-                 (when msg
-                   (string-match-p "^/uni" (mu4e-message-field msg :maildir))))
-           :vars '( ( user-mail-address  . "uydvo@student.kit.edu"  )
-            ( user-full-name     . "Matthias Schmitt" )
-            ( mu4e-sent-folder   . "/uni/Sent")
-            ( mu4e-drafts-folder . "/uni/Drafts")
-            ( mu4e-trash-folder  . "/uni/Trash")
-            ( mu4e-refile-folder . "/uni/Archives")
-            ( smtpmail-smtp-server . "smtp.kit.edu"))
-           )))
+                         (when msg
+                           (string-match-p "^/uni" (mu4e-message-field msg :maildir))))
+           :vars '((user-mail-address     . "uydvo@student.kit.edu")
+                   (user-full-name        . "Matthias Schmitt")
+                   (mu4e-sent-folder      . "/uni/Sent")
+                   (mu4e-drafts-folder    . "/uni/Drafts")
+                   (mu4e-trash-folder     . "/uni/Trash")
+                   (mu4e-refile-folder    . "/uni/Archives")
+                   (smtpmail-smtp-server  . "smtp.kit.edu")
+                   (smtpmail-smtp-service . 587)
+                   (smtpmail-stream-type  . starttls))
+       )))
     (setq mu4e-context-policy 'ask-if-none)
     (setq mu4e-compose-context-policy 'ask)
+    (setq mu4e-compose-format-flowed t)
     (setq message-kill-buffer-on-exit t)
     (setq mu4e-confirm-quit nil)
 
-    (setq mu4e-index-cleanup nil      ;; don't do a full cleanup check
-          mu4e-index-lazy-check t)    ;; don't consider up-to-date dirs
+    (setq mu4e-index-cleanup nil)     ;; don't do a full cleanup check
+    (setq mu4e-index-lazy-check t)    ;; don't consider up-to-date dirs
+
+    ;; (setq mu4e-maildir-shortcuts
+    ;;  '( ("/posteo/Inbox" . ?p)
+    ;;     ("/uni/Inbox" . ?u)))
 
     (setq mu4e-bookmarks
-      `(,(make-mu4e-bookmark
-          :name  "Unread messages"
+     '((:name  "Unread messages"
           :query "flag:unread AND NOT flag:trashed AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\\ E-Mail"
           :key ?u)
-        ,(make-mu4e-bookmark
-          :name "Today's messages"
+      (:name "Today's messages"
           :query "date:today..now AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\\ E-Mail"
           :key ?t)
-        ,(make-mu4e-bookmark
-          :name "Last 7 days"
+      (:name "Last 7 days"
           :query "date:7d..now AND NOT flag:trashed AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\\ E-Mail"
           :key ?w)
-        ,(make-mu4e-bookmark
-          :name "Sent"
+      (:name "Sent"
           :query "maildir:/posteo/Sent OR maildir:/uni/Sent"
           :key ?s)))
 
@@ -1202,29 +1198,27 @@ Use < in visual mode to continuously shift selection
     :after mu4e
     :config
     (setq mu4e-maildirs-extension-toggle-maildir-key (kbd "TAB"))
-    (setq mu4e-maildirs-extension-custom-list '(
-						"/posteo/Drafts"
-						"/posteo/Git"
-						"/posteo/Inbox"
-						"/posteo/Politik"
-						"/posteo/Queue"
-						"/posteo/Sent"
-						"/posteo/Spam"
-						"/posteo/Trash"
+    (setq mu4e-maildirs-extension-custom-list
+          '("/posteo/Drafts"
+            "/posteo/Git"
+            "/posteo/Inbox"
+            "/posteo/Politik"
+            "/posteo/Queue"
+            "/posteo/Sent"
+            "/posteo/Spam"
+            "/posteo/Trash"
 
-						"/uni/Deleted Items"
-						"/uni/Drafts"
-						"/uni/Inbox"
-						"/uni/Junk E-Mail"
-						"/uni/Papierkorb"
-						"/uni/Queue"
-						"/uni/Sent"
-						"/uni/Sent"
-						"/uni/Outbox"
-						"/uni/Trash"))
-
-    (mu4e-maildirs-extension)
-    )
+            "/uni/Deleted Items"
+            "/uni/Drafts"
+            "/uni/Inbox"
+            "/uni/Junk E-Mail"
+            "/uni/Papierkorb"
+            "/uni/Queue"
+            "/uni/Sent"
+            "/uni/Sent"
+            "/uni/Outbox"
+            "/uni/Trash"))
+    (mu4e-maildirs-extension))
 
   (use-package mu4e-alert
     :after mu4e
@@ -1322,7 +1316,7 @@ _=_: zoom reset     _r_: scale reset
     ("i" text-scale-increase nil)
     ("d" text-scale-decrease nil)
     ("r" (text-scale-increase 0) nil))
-    
+
   (my-menu-def "T z" '(hydra-zoom/body :which-key "Zooming/Scaling"))
 #+END_SRC
 
@@ -1486,7 +1480,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
 #+BEGIN_SRC emacs-lisp
   (setq ispell-dictionary "en")
-  
+
   (cond
    ((executable-find "aspell")
     ;; you may also need `ispell-extra-args'
@@ -1499,7 +1493,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     ;; if we use different dictionary
     (setq-default ispell-local-dictionary "en_US")
     (setq ispell-local-dictionary-alist
-	  '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))))
+      '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))))
    (t
     (message "no ispell program")
     (setq ispell-program-name nil)))
@@ -1691,9 +1685,9 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     )
 
   (setq my-fav-irc '("irc.freenode.net"
-		     "irc.oftc.net"
-		     "irc.mozilla.org"
-		     "irc.gnome.org"))
+                     "irc.oftc.net"
+                     "irc.mozilla.org"
+                     "irc.gnome.org"))
 #+END_SRC
 
 ** text-mode
@@ -1827,7 +1821,7 @@ When compiling follow the buffer
 
 *** TODO look at linediff
     https://github.com/rgrinberg/evil-quick-diff
-    
+
 ** calendar
 
 #+begin_src emacs-lisp
@@ -2242,8 +2236,9 @@ This happens a lot because my dotfiles are linked by stow.
     (interactive)
     (unless (buffer-file-name)
       (error "Buffer '%s' is not visiting a file!" (buffer-name)))
-    (let ((new-file-name (read-file-name "Rename current file to: "
-					 (file-name-directory buffer-file-name))))
+    (let ((new-file-name
+           (read-file-name "Rename current file to: "
+                           (file-name-directory buffer-file-name))))
       (rename-file buffer-file-name new-file-name)
       (rename-buffer new-file-name)
       (set-visited-file-name new-file-name)
