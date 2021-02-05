@@ -2186,10 +2186,24 @@ Recognize arch linux pgkbuild files
 #+end_src
 
 * Settings
-** indent
+** editorconfig
+
+#+begin_src emacs-lisp
+  (use-package editorconfig
+    :hook (prog-mode . editorconfig-mode-apply)
+    :config
+    (editorconfig-mode 1))
+#+end_src
+
+** TODO indent
 
 #+BEGIN_SRC emacs-lisp
-  (setq tab-width 4)
+  (setq-default tab-width 4)
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-always-indent nil)
+  (setq-default electric-indent-inhibit t)
+
+;; ignored when using evil-mode ?
   (use-package clean-aindent-mode
     :config (setq clean-aindent-is-simple-indent t))
 #+END_SRC
@@ -2200,6 +2214,15 @@ Recognize arch linux pgkbuild files
 
 #+begin_src emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
+  (setq use-dialog-box nil)
+#+end_src
+
+** kill buffer with process
+
+#+begin_src emacs-lisp
+  (setq kill-buffer-query-functions
+        (remq 'process-kill-buffer-query-function
+              kill-buffer-query-functions))
 #+end_src
 
 ** vc symlinks
