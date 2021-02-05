@@ -819,8 +819,14 @@ Use < in visual mode to continuously shift selection
             ("R" "\\mathbb{R}" t "R" "[R]" "[R]" "ℝ")
             ("U" "\\mathbb{U}" t "U" "[U]" "[U]" "𝕌")
             ("Z" "\\mathbb{Z}" t "Z" "[Z]" "[Z]" "ℤ")
-            ("sqrt" "\\sqrt{\\,}" t "&radic;" "[square root]" "[square root]" "√")))
-    )
+            ("sqrt" "\\sqrt{\\,}" t "&radic;" "[square root]" "[square root]" "√")
+            ("etal" "et~al.~" nil "et al." "et al." "et al." "et al.")
+            ("eg" "e.g.\\ " nil "e.g." "e.g." "e.g." "e.g.")
+            ("ie" "i.e.,\\ " nil "i.e." "i.e." "i.e." "i.e.")))
+
+    (straight-use-package 'org-plus-contrib)
+    (require 'ox-extra)
+    (ox-extras-activate '(ignore-headlines)))
 
   (use-package evil-org
     :after (evil org)
@@ -836,7 +842,7 @@ Use < in visual mode to continuously shift selection
     :defer 20)
 #+END_SRC
 
-** org babel
+** org babel & export
 
 #+begin_src emacs-lisp
   (eval-after-load 'org
@@ -858,8 +864,50 @@ Use < in visual mode to continuously shift selection
 
        (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)))
 
+
+  (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
+  (setq org-latex-caption-above nil)
+  (setq org-latex-prefer-user-labels t)
+  (with-eval-after-load 'ox-latex
+    (add-to-list 'org-latex-classes
+                 '("letter"
+                   "\\documentclass{letter}"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+    (add-to-list 'org-latex-classes
+                 '("ieee"
+                   "\\documentclass{IEEEtran}"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
   (use-package ob-async
     :after ob)
+
+  ;; (use-package ox-latex
+  ;;   :defer
+  ;;   :config
+  (with-eval-after-load 'ox-latex
+    (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
+    (setq org-latex-caption-above nil)
+    (setq org-latex-prefer-user-labels t)
+    ;; (add-to-list 'org-latex-classes
+    ;;              '("letter"
+    ;;                "\\documentclass{letter}"
+    ;;                ("\\section{%s}" . "\\section*{%s}")
+    ;;                ("\\subsection{%s}" . "\\subsection*{%s}")
+    ;;                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+    (add-to-list 'org-latex-classes
+                 '("ieee"
+                   "\\documentclass[11pt]{IEEEtran}"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 #+end_src
 
 ** org export
