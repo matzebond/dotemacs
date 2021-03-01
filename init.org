@@ -1968,6 +1968,33 @@ https://github.com/tuhdo/semantic-refactor
 
 #+END_SRC
 
+*** CMake
+
+#+begin_src emacs-lisp
+  (use-package cmake-mode)
+
+  (use-package cmake-font-lock
+    :hook (cmake-mode-hook . cmake-font-lock-activate))
+
+  (use-package cmake-project
+    :disabled
+    :init
+    (defun maybe-cmake-project-mo    de ()
+           (if (or (file-exists-p "CMakeLists.txt")
+                   (file-exists-p
+                    (expand-file-name "CMakeLists.txt" (car (project-roots (project-current))))))
+               (cmake-project-mode)))
+
+    (add-hook 'c-mode-hook 'maybe-cmake-project-mode)
+    (add-hook 'c++-mode-hook 'maybe-cmake-project-mode))
+#+end_src
+
+*** format
+
+#+begin_src emacs-lisp
+  (use-package clang-format+)
+#+end_src
+
 ** Python
 
 #+begin_src emacs-lisp
