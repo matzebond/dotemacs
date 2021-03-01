@@ -1977,6 +1977,15 @@ https://github.com/tuhdo/semantic-refactor
     ("SConscript" . python-mode))
 #+end_src
 
+#+begin_src emacs-lisp
+  (use-package jupyter
+    :after ob
+    :config
+    (add-to-list 'org-babel-load-languages '(jupyter . t) t)
+    (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
+    (setq org-babel-jupyter-resource-directory "/tmp/emacs-jupyter"))
+#+end_src
+
 ** TODO Haskell
 *** Intero
     intero project has reached the end of its life cycle. city_sunrise
