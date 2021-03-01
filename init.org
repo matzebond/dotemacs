@@ -1524,6 +1524,19 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
   )
 #+END_SRC
 
+** tree-sitter
+
+#+begin_src emacs-lisp
+  (use-package tree-sitter)
+
+  (use-package tree-sitter-langs
+    :after (tree-sitter)
+    :custom
+    (tree-sitter-load-path (list (expand-file-name
+                                  "straight/build/tree-sitter-langs/bin"
+                                  user-emacs-directory))))
+#+end_src
+
 * Modes
 ** text-mode
 
