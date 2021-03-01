@@ -909,19 +909,92 @@ Use < in visual mode to continuously shift selection
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 #+end_src
 
-** org export
+** TODO org-ref & bibtex
 
 #+begin_src emacs-lisp
-  (eval-after-load 'org
-    '(progn
-       (setq org-latex-caption-above nil)))
+  (use-package bibtex-completion
+    :defer 20
+    :config
+    (setq bibtex-completion-bibliography '("~/zotero.bib"))
+    (setq bibtex-completion-pdf-field "File")
+    (setq bibtex-completion-notes-path "~/org/notes/")
+
+    (setq bibtex-completion-notes-template-multiple-files
+          (concat
+           "#+TITLE: ${title}\n"
+           "#+ROAM_KEY: cite:${=key=}\n"
+           "* TODO Notes\n"
+           ":PROPERTIES:\n"
+           ":Custom_ID: ${=key=}\n"
+           ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
+           ":AUTHOR: ${author-abbrev}\n"
+           ":JOURNAL: ${journaltitle}\n"
+           ":DATE: ${date}\n"
+           ":YEAR: ${year}\n"
+           ":DOI: ${doi}\n"
+           ":URL: ${url}\n"
+           ":END:\n\n"
+           ))
+
+    (defun bibtex-completion-open-pdf-external (keys &optional fallback-action)
+      (let ((bibtex-completion-pdf-open-function
+             (lambda (fpath) (start-process "evince" "*helm-bibtex-evince*" "/usr/bin/evince" fpath))))
+        (bibtex-completion-open-pdf keys fallback-action)))
+    )
+
+  (use-package ivy-bibtex
+    :after (ivy bibtex-completion)
+    :config
+    (ivy-bibtex-ivify-action bibtex-completion-open-pdf-external
+                             ivy-bibtex-open-pdf-external)
+    (ivy-add-actions
+     'ivy-bibtex
+     '(("P" ivy-bibtex-open-pdf-external "Open PDF file in external viewer (if present)")))
+    )
+
+  (use-package org-ref
+    :after (org ivy-bibtex)
+    :init
+    ;; (setq org-ref-completion-library 'org-ref-ivy-cite-completion)
+    (setq org-ref-completion-library 'org-ref-ivy-cite)
+
+    :config
+    (setq-default reftex-default-bibliography bibtex-completion-bibliography)
+    (setq org-ref-default-bibliography bibtex-completion-bibliography)
+
+    (setq org-ref-default-ref-type "autoref")
+
+    (defun maschm/org-ref-open-pdf-at-point ()
+      "Open the pdf for bibtex key under point if it exists."
+      (interactive)
+      (let* ((results (org-ref-get-bibtex-key-and-file))
+             (key (car results))
+             (pdf-file (car (bibtex-completion-find-pdf key))))
+        (if (file-exists-p pdf-file)
+            (org-open-file pdf-file)
+          (message "No PDF found for %s" key))))
+
+    (setq org-ref-open-pdf-function 'maschm/org-ref-open-pdf-at-point)
+    (setq org-ref-notes-function 'org-ref-notes-function-many-files)
+    (setq org-ref-notes-directory bibtex-completion-notes-path)
+    )
 #+end_src
 
-** TODO org-ref
+** org-download
 
 #+begin_src emacs-lisp
-  ;; (use-package org-ref
-  ;;   :after org)
+  (use-package org-download
+    :after (org)
+    :commands (org-download-screenshot org-download-yank)
+    ;; :general
+    ;; (my-leader-def
+    ;;   :keymaps 'org-mode-map
+    ;;   "I" 'org-download-screenshot
+    ;;   "y" 'org-download-yank)
+    :config
+    (org-download-enable)
+    (setq org-download-screenshot-method "xclip -selection clipboard -t image/png -o > %s")
+    )
 #+end_src
 
 ** org-beamer
@@ -975,6 +1048,58 @@ Use < in visual mode to continuously shift selection
           org-capture-templates)
     (setq org-brain-visualize-default-choices 'all)
     (setq org-brain-title-max-length 0))
+#+end_src
+
+** org-roam
+
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :hook
+    (after-init . org-roam-mode)
+    :custom
+    (org-roam-directory (expand-file-name "~/org/roam/"))
+    :general
+    (my-menu-def
+      "O r" 'org-roam
+      "O f" 'org-roam-find-file
+      "O i" 'org-roam-insert)
+    :config
+    (my-leader-def
+      "i" 'org-roam-insert))
+    ;; :map org-roam-mode-map
+    ;; (("C-c n l" . org-roam)
+    ;;  ("C-c n f" . org-roam-find-file)
+    ;;  ("C-c n j" . org-roam-jump-to-index)
+    ;;  ("C-c n b" . org-roam-switch-to-buffer)
+    ;;  ("C-c n g" . org-roam-graph))
+    ;; :map org-mode-map
+    ;; (("C-c n i" . org-roam-insert))
+
+  (use-package org-roam-bibtex
+    :after (org-roam ivy-bibtex)
+    :disabled
+    :hook (org-roam-mode . org-roam-bibtex-mode)
+    :config
+    (setq orb-preformat-keywords
+     '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
+    (setq orb-templates
+          '(("r" "ref" plain (function org-roam-capture--get-point)
+             ""
+             :file-name "${slug}"
+             :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
+  - tags ::
+  - keywords :: ${keywords}
+  \n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")%\n  :NOTER_PAGE: \n  :END:\n\n"
+             :unnarrowed t))))
+#+end_src
+
+** org-noter
+
+#+begin_src emacs-lisp
+  (use-package org-noter
+    :after (:any org pdf-view)
+    :config
+    (setq org-noter-notes-window-location 'other-frame))
 #+end_src
 
 * Git
