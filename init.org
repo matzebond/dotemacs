@@ -803,6 +803,7 @@ Use < in visual mode to continuously shift selection
     (add-to-list 'org-structure-template-alist '("sg" . "src gnuplot"))
     (add-to-list 'org-structure-template-alist '("su" . "src plantuml"))
     (add-to-list 'org-structure-template-alist '("sd" . "src dot"))
+    (add-to-list 'org-structure-template-alist '("sy" . "src jupyter-python"))
 
     ;; (require 'org-tempo)
     ;;(add-to-list 'org-tempo-keywords-alist '("B" . "beamer"))
@@ -856,44 +857,33 @@ Use < in visual mode to continuously shift selection
        (add-to-list 'org-babel-load-languages '(shell . t))
        (add-to-list 'org-babel-load-languages '(python . t))
        (add-to-list 'org-babel-load-languages '(R . t))
+       (add-to-list 'org-babel-load-languages '(latex . t))
        (add-to-list 'org-babel-load-languages '(ditaa . t))
        (add-to-list 'org-babel-load-languages '(dot . t))
        (add-to-list 'org-babel-load-languages '(gnuplot . t))
        (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
        (add-to-list 'org-babel-load-languages '(plantuml . t))
 
+
        (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)))
 
 
-  (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
-  (setq org-latex-caption-above nil)
-  (setq org-latex-prefer-user-labels t)
-  (with-eval-after-load 'ox-latex
-    (add-to-list 'org-latex-classes
-                 '("letter"
-                   "\\documentclass{letter}"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-    (add-to-list 'org-latex-classes
-                 '("ieee"
-                   "\\documentclass{IEEEtran}"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
-
   (use-package ob-async
-    :after ob)
+    :after ob
+    :config
+    (setq ob-async-no-async-languages-alist '("jupyter-python" "jupyter-julia")))
 
   ;; (use-package ox-latex
   ;;   :defer
   ;;   :config
   (with-eval-after-load 'ox-latex
-    (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
+    ;; TODO might be less flexible to just use latexmk org-latex-compiler is ignored
+    (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf -outdir=%o %f"))
     (setq org-latex-caption-above nil)
     (setq org-latex-prefer-user-labels t)
+    (add-to-list 'org-latex-packages-alist '("" "tikz" t))
+    ;; (setq org-preview-latex-default-process
+
     ;; (add-to-list 'org-latex-classes
     ;;              '("letter"
     ;;                "\\documentclass{letter}"
@@ -2082,7 +2072,6 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     (LaTeX-default-options '("version=last" "paper=A4" "parskip=half"))
     (TeX-auto-untabify t)
     :config
-    (set-fill-column 80) ;;TODO do this in hook
     ;; KEYMAPS
     ;; (general-define-key :keymaps 'TeX-error-overview-mode-map
     ;;   "j" 'TeX-error-overview-next-error
@@ -2096,13 +2085,23 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     (add-hook 'LaTeX-mode-hook #'flyspell-mode)
     (add-hook 'LaTeX-mode-hook #'reftex-mode)
     (add-hook 'LaTeX-mode-hook #'auto-fill-mode)
-    (add-hook 'LaTeX-mode-hook #'visual-line-mode))
+    (add-hook 'LaTeX-mode-hook #'visual-line-mode)
+    :local
+    (LaTeX-mode-hook . ((set-fill-column 80))))
+
+  ;; (load "auctex.el" nil t t)
 
   (use-package auctex-latexmk
     :after tex
     :config
     (auctex-latexmk-setup)
     (setq auctex-latexmk-inherit-TeX-PDF-mode t))
+
+  (use-package company-auctex
+    :after tex
+    :config
+    (add-hook 'LaTeX-mode-hook 'company-mode)
+    (company-auctex-init))
 #+END_SRC
 
 *** latex-preview-pane
@@ -2127,16 +2126,20 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
   (use-package pdf-tools
     ;; manually update
     ;; :pin manual
-    ;; :general (:keymaps pdf-view-mode-map
-    ;;		     "C-s" 'isearch-forward)
     :defer 15
     :config
+    (general-def
+      :keymaps 'pdf-view-mode-map
+      ;; "C-s" 'isearch-forward
+      "SPC" nil)
+
     (pdf-tools-install t)
     ;; open pdfs scaled to fit page
     (setq-default pdf-view-display-size 'fit-page)
     ;; automatically annotate highlights
     (setq pdf-annot-activate-created-annotations t)
     ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
+    (add-to-list 'revert-without-query "\.pdf$")
     (setq TeX-view-program-list '(("pdf-tools" TeX-pdf-tools-sync-view))))
 #+end_src
 
