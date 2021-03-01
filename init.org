@@ -2106,9 +2106,31 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
 
 #+BEGIN_SRC emacs-lisp
   (use-package rustic
-    :mode "\\.rs\\'"
+    :mode ("\\.rs\\'" . rustic-mode)
     :config
-    (push "target" projectile-globally-ignored-directories))
+    (push "target" projectile-globally-ignored-directories)
+
+    (evil-set-initial-state 'rustic-popup-mode 'emacs)
+
+    (my-menu-def
+      :keymaps 'rustic-mode-map
+      "P c" 'rustic-cargo-build
+      "P r" 'rustic-cargo-run)
+
+    (my-leader-def
+      :keymaps 'rustic-mode-map
+      "," 'rustic-popup
+      "c" 'rustic-cargo-build
+      "r" 'rustic-cargo-run)
+
+    (general-def
+      :keymaps 'rustic-compilation-mode-map
+      "g" nil
+      "g r" 'rustic-recompile)
+    (evil-make-overriding-map rustic-compilation-mode-map 'motion)
+
+    :local
+    (add-hook 'compilation-mode-hook #'rustic-compilation-mode 0 t))
 #+END_SRC
 
 ** TODO JS
