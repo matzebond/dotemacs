@@ -2178,6 +2178,15 @@ https://github.com/NicolasPetton/Indium
     :hook (julia-mode . julia-snail-mode))
 #+end_src
 
+** Dart
+
+#+begin_src emacs-lisp
+  (use-package dart-mode)
+
+  (use-package lsp-dart
+    :hook (dart-mode . lsp))
+#+end_src
+
 ** Erlang
 
 #+begin_src emacs-lisp
