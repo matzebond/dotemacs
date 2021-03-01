@@ -1525,6 +1525,64 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 #+END_SRC
 
 * Modes
+** text-mode
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'text-mode-hook 'auto-fill-mode)
+  (add-hook 'text-mode-hook 'visual-line-mode)
+
+  (setq-default fill-column 80)
+
+  (my-leader-def
+    :keymaps 'text-mode-map
+    :states 'normal
+    "f" '(fill-paragraph :which-key "fill"))
+
+  (my-leader-def
+    :keymaps 'text-mode-map
+    :states 'visual
+    "f" '(fill-region :which-key "fill"))
+
+  (defun my-text-mode-setup () ())
+  (add-hook 'text-mode-hook 'my-text-mode-setup)
+#+END_SRC
+
+*** visual-fill-column
+#+begin_src emacs-lisp
+  (use-package visual-fill-column
+    :config
+    ;; (setq-default split-window-preferred-function 'visual-fill-column-split-window-sensibly)
+    ;; (setq visual-fill-column-fringes-outside-margins nil)
+  )
+#+end_src
+
+*** TODO auto fill on paste
+*** TODO fill commands in local menu
+** prog-mode
+
+#+begin_src emacs-lisp
+  (defun comment-auto-fill ()
+    (setq-local comment-auto-fill-only-comments t)
+    (auto-fill-mode 1))
+
+  (defun my-prog-mode-setup ()
+    (electric-pair-local-mode)
+    (comment-auto-fill)
+    (setq-local ispell-local-dictionary "en_US"))
+
+  (add-hook 'prog-mode-hook 'my-prog-mode-setup)
+#+end_src
+
+** special-mode
+#+begin_src emacs-lisp
+  (general-def
+    :keymaps 'special-mode-map
+    "q" nil
+    "SPC" nil
+    "S-SPC" nil
+    "DEL" nil)
+#+end_src
+
 ** dired
 https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-collection-dired.el
 
@@ -1558,7 +1616,8 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    "g j" 'dired-next-dirline
    "g k" 'dired-prev-dirline)
 
-  (setq dired-listing-switches "--group-directories-first -alh")
+  (setq dired-listing-switches "-v --group-directories-first -alh")
+  (setq dired-dwim-target t)
 #+END_SRC
 
 *** wdired
@@ -1622,6 +1681,45 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    "q" 'quit-window)
 #+END_SRC
 
+** helpful
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helpful
+    :demand
+    :general
+    (my-menu-def
+      "h" '(helpful-at-point :which-key "help")
+      "H" '(:ignore t :which-key "Help")
+      "H h" 'helpful-symbol
+      "H v" 'helpful-variable
+      "H f" 'helpful-function
+      "H c" 'helpful-callable
+      "H k" 'helpful-key
+      "H X" 'helpful-kill-buffers
+      "H i" 'info
+      "H I" 'counsel-info-lookup-symbol
+      "H m" 'describe-mode
+      "H V" 'counsel-set-variable
+      "H F" 'counsel-faces
+      "H U" 'counsel-unicode-char)
+
+    :config
+    (general-def
+      :keymaps 'helpful-mode-map
+      "SPC" nil
+      "n" nil
+      "p" nil
+      "g" nil
+      "g r" 'helpful-update
+      "q" 'quit-window)
+    (evil-make-overriding-map helpful-mode-map 'normal)
+
+    (setq counsel-describe-function-function #'helpful-callable)
+    (setq counsel-describe-variable-function #'helpful-variable))
+#+END_SRC
+
+*** TODO think at point in org-mode src environment
+
 ** TODO view
    [[info:emacs#View%20Mode][info:emacs#View Mode]]
    SPC and S-SPC are bound to scrolling.
@@ -1635,6 +1733,8 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 #+begin_src emacs-lisp
   (evil-set-initial-state 'special-mode 'motion)
   (evil-set-initial-state 'messages-buffer-mode 'motion)
+  (with-current-buffer "*Messages*"
+    (evil-motion-state))
 #+end_src
 
 ** eshell
@@ -1677,6 +1777,12 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
       "M-e" 'esh-autosuggest-complete-word))
 #+END_SRC
 
+** shell
+
+#+begin_src emacs-lisp
+  (use-package vterm)
+#+end_src
+
 ** irc
 
 #+BEGIN_SRC emacs-lisp
@@ -1689,54 +1795,6 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
                      "irc.mozilla.org"
                      "irc.gnome.org"))
 #+END_SRC
-
-** text-mode
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'text-mode-hook 'auto-fill-mode)
-  (add-hook 'text-mode-hook 'visual-line-mode)
-
-  (setq-default fill-column 80)
-
-  (my-leader-def
-    :keymaps 'text-mode-map
-    :states 'normal
-    "f" '(fill-paragraph :which-key "fill"))
-
-  (my-leader-def
-    :keymaps 'text-mode-map
-    :states 'visual
-    "f" '(fill-region :which-key "fill"))
-
-  (defun my-text-mode-setup () ())
-  (add-hook 'text-mode-hook 'my-text-mode-setup)
-#+END_SRC
-
-*** visual-fill-column
-#+begin_src emacs-lisp
-  (use-package visual-fill-column
-    :config
-    ;; (setq-default split-window-preferred-function 'visual-fill-column-split-window-sensibly)
-    ;; (setq visual-fill-column-fringes-outside-margins nil)
-  )
-#+end_src
-
-*** TODO auto fill on paste
-*** TODO fill commands in local menu
-** prog-mode
-
-#+begin_src emacs-lisp
-  (defun comment-auto-fill ()
-    (setq-local comment-auto-fill-only-comments t)
-    (auto-fill-mode 1))
-
-  (defun my-prog-mode-setup ()
-    (electric-pair-local-mode)
-    (comment-auto-fill)
-    (setq-local ispell-local-dictionary "en_US"))
-
-  (add-hook 'prog-mode-hook 'my-prog-mode-setup)
-#+end_src
 
 ** compilation
 When compiling follow the buffer
@@ -1760,47 +1818,25 @@ When compiling follow the buffer
   (eval-after-load 'evil
     '(eval-after-load 'image-mode
        '(progn
+          (general-define-key
+            :keymaps 'image-mode-map
+            "q" 'kill-current-buffer
+            "SPC" nil)
           (evil-make-overriding-map image-mode-map 'normal))))
+
+  ;; (use-package image-mode
+  ;;   :after evi   l
+  ;;   :init
+  ;;   (general-define-key
+  ;;    :keymaps 'image-mode-map
+  ;;    "SPC" nil
+  ;;    "q" nil)
+  ;;   :config
+  ;;   (evil-make-overriding-map image-mode-map 'motion))
 #+end_src
 
-** helpful
-
-#+BEGIN_SRC emacs-lisp
-  (use-package helpful
-    :demand
-    :general
-    (my-menu-def
-      "h" '(helpful-at-point :which-key "help")
-      "H" '(:ignore t :which-key "Help")
-      "H h" 'helpful-symbol
-      "H v" 'helpful-variable
-      "H f" 'helpful-function
-      "H c" 'helpful-callable
-      "H k" 'helpful-key
-      "H X" 'helpful-kill-buffers
-      "H i" 'info
-      "H I" 'counsel-info-lookup-symbol
-      "H m" 'describe-mode
-      "H V" 'counsel-set-variable
-      "H F" 'counsel-faces
-      "H U" 'counsel-unicode-char)
-
-    :config
-    (general-def
-      :keymaps 'helpful-mode-map
-      "SPC" nil
-      "n" nil
-      "p" nil
-      "g" nil
-      "g r" 'helpful-update
-      "q" 'quit-window)
-    (evil-make-overriding-map helpful-mode-map 'normal)
-
-    (setq counsel-describe-function-function #'helpful-callable)
-    (setq counsel-describe-variable-function #'helpful-variable))
-#+END_SRC
-
-*** TODO think at point in org-mode src environment
+*** TODO fix image-mode bindings
+    image mode map is defined with =make-composed-keymap=
 
 ** ediff
 
@@ -1828,6 +1864,30 @@ When compiling follow the buffer
   (use-package calendar
     :custom
     (calendar-week-start-day 1))
+#+end_src
+
+** drawing
+*** dot
+
+#+begin_src emacs-lisp
+  (use-package graphviz-dot-mode)
+#+end_src
+
+*** PlantUML
+
+#+begin_src emacs-lisp
+  (use-package plantuml-mode
+    :config
+    (setq plantuml-jar-path (expand-file-name "plantuml.jar" user-emacs-directory))
+    (setq plantuml-default-exec-mode 'jar))
+#+end_src
+
+** mediawiki
+
+#+begin_src emacs-lisp
+  (use-package mediawiki
+    :config
+    (add-to-list 'mediawiki-site-alist '("Fachschaft" "https://wiki.fsmi.uni-karlsruhe.de/" "username" "password" nil "Main Page")))
 #+end_src
 
 * Programming languages
@@ -2124,7 +2184,19 @@ https://github.com/NicolasPetton/Indium
     :hook (markdown-mode . visual-line-mode))
 #+end_src
 
+** system & config
 *** systemd
+*** Docker
+
+#+begin_src emacs-lisp
+  (use-package dockerfile-mode)
+
+
+  (use-package docker-tramp
+    :config
+    (setq docker-tramp-user "root"))
+#+end_src
+
 
 #+begin_src emacs-lisp
   (use-package systemd)
@@ -2144,40 +2216,6 @@ Recognize arch linux pgkbuild files
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("PKGBUILD\\'" . shell-script-mode))
 #+END_SRC
-
-*** dot
-
-#+begin_src emacs-lisp
-  (use-package graphviz-dot-mode)
-#+end_src
-
-** PlantUML
-
-#+begin_src emacs-lisp
-  (use-package plantuml-mode
-    :config
-    (setq plantuml-jar-path (expand-file-name "plantuml.jar" user-emacs-directory))
-    (setq plantuml-default-exec-mode 'jar))
-#+end_src
-
-** Docker
-
-#+begin_src emacs-lisp
-  (use-package dockerfile-mode)
-
-
-  (use-package docker-tramp
-    :config
-    (setq docker-tramp-user "root"))
-#+end_src
-
-** mediawiki
-
-#+begin_src emacs-lisp
-  (use-package mediawiki
-    :config
-    (add-to-list 'mediawiki-site-alist '("Fachschaft" "https://wiki.fsmi.uni-karlsruhe.de/" "username" "password" nil "Main Page")))
-#+end_src
 
 * Settings
 ** editorconfig
