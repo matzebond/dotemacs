@@ -3,7 +3,6 @@
 #+LANGUAGE: en
 #+PROPERTY: header-args:emacs-lisp :tangle yes :comments link
 
-
 This is my emacs configuration file in literate style as an org mode file.
 
 * Preface
@@ -257,9 +256,11 @@ https://github.com/purcell/exec-path-from-shell
 
 #+BEGIN_SRC emacs-lisp
   (my-menu-def
-    "TAB" '(mode-line-other-buffer :which-key "last-buffer")
-    "M-TAB" '((lambda () (interactive (switch-to-buffer-other-window (other-buffer))))
-	      :which-key "last-buffer-other-window")
+    "<tab>" '(mode-line-other-buffer :which-key "last-buffer")
+    "<M-tab>" '((lambda ()
+                  (interactive)
+                  (switch-to-buffer-other-window (other-buffer)))
+                :which-key "last-buffer-other-window")
 
     "B" '(:ignore t :which-key "Buffer")
     "B m" '((lambda () (interactive) (switch-to-buffer "*Messages*"))
@@ -321,7 +322,7 @@ https://github.com/purcell/exec-path-from-shell
       :keymaps 'ivy-minibuffer-map
       "C-l" 'ivy-alt-done
       "C-h" 'ivy-backward-delete-char
-      "ESC" 'minibuffer-keyboard-quit
+      ;; "ESC" 'minibuffer-keyboard-quit
       "<escape>" 'minibuffer-keyboard-quit
       "C-RET" 'ivy-immediate-done
       "<C-return>" 'ivy-immediate-done
@@ -547,7 +548,9 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     (my-menu-def
       "p" 'counsel-projectile
       "P p" 'counsel-projectile-switch-project
+      "P f" 'counsel-projectile-find-file
       "P b" 'counsel-projectile-switch-to-buffer
+      "P /" '(counsel-projectile-rg :which-key "search proj")
       "/" '(counsel-projectile-rg :which-key "search proj"))
     :config
     (counsel-projectile-mode)
