@@ -1754,31 +1754,40 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 
 #+BEGIN_SRC emacs-lisp
   (use-package eshell
-    :after (esh-opt)
+    :after esh-opt
     :commands (eshell eshell-command)
     :config
-    ;; (general-define-key
-    ;;  :keymaps 'eshell-mode-map
-    ;;  [remap eshell-pcomplete] 'completion-at-point
-    ;;  "<tab>" 'completion-at-point)
-    ;;  "TAB" 'completion-at-point)
-    ;;  "C-r" 'counsel-esh-history)
-
     ;; (setq pcomplete-ignore-case t)
     (setq eshell-cmpl-ignore-case t)
     ;; (setq pcomplete-autolist t)
     (setq eshell-cmpl-autolist t)
     (setq pcomplete-cycle-cutoff-length 1)
-    (setq eshell-cmpl-cycle-cutoff-length 1))
+    (setq eshell-cmpl-cycle-cutoff-length 1)
+    :local
+    (general-define-key
+     :keymaps 'eshell-mode-map
+     "C-r" 'counsel-esh-history)
+    (general-define-key
+     :keymaps 'eshell-mode-map
+     :mode 'motion
+     "g j" 'eshell-next-prompt
+     "g k" 'eshell-previous-prompt
+     "0" 'eshell-bol)
+    (evil-make-overriding-map eshell-mode-map 'normal))
+    ;;  [remap eshell-pcomplete] 'completion-at-point
+    ;;  "<tab>" 'completion-at-point)
+    ;;  "TAB" 'completion-at-point)
+
 
   (use-package eshell-z
     :after eshell)
 
   (use-package eshell-prompt-extras
-    ;; :after (eshell)
-    ;; :demand
+    :after eshell
+    :demand
     :config
     (setq eshell-highlight-prompt nil)
+    (epe-theme-lambda) ;;to set eshell-prompt-regex
     (setq eshell-prompt-function 'epe-theme-lambda))
 
   (use-package esh-autosuggest
@@ -1788,6 +1797,11 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
       :keymaps 'esh-autosuggest-active-map
       "C-e" 'company-complete-selection
       "M-e" 'esh-autosuggest-complete-word))
+
+  (use-package eshell-syntax-highlighting
+    :after esh-mod
+    :config
+    (eshell-syntax-highlighting-global-mode +1))
 #+END_SRC
 
 ** shell
