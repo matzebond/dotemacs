@@ -1460,13 +1460,23 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
-    ;; :disabled
-    ;; :hook (prog-mode . lsp)
+    :init
+    ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+    (setq lsp-keymap-prefix "C-c l")
+    :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+           (rust-mode . lsp)
+           ;; if you want which-key integration
+           (lsp-mode . lsp-enable-which-key-integration))
     :commands lsp)
 
+  (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+
   (use-package lsp-ui
-    :after (lsp-mode)
-    :commands lsp-ui-mode)
+    :disabled
+    :commands lsp-ui-mode
+    :config
+    (setq lsp-ui-doc-enable nil))
+
 
   (use-package company-lsp
     :after (company lsp-mode)
@@ -2371,8 +2381,44 @@ This happens a lot because my dotfiles are linked by stow.
   (setq vc-follow-symlinks t)
 #+END_SRC
 
-* Functions
+** sudo-edit
 
+#+begin_src emacs-lisp
+  (use-package sudo-edit
+    :general
+    (my-menu-def
+      "F s" 'sudo-edit-find-file))
+#+end_src
+
+** atomic-chrome
+Edit textareas of the browser in emacs
+
+#+begin_src emacs-lisp
+  (use-package atomic-chrome
+    :defer 20
+    :config
+    (atomic-chrome-start-server))
+#+end_src
+
+** auth-sources
+
+#+begin_src emacs-lisp
+  (setq auth-sources '("~/.authinfo.gpg"))
+
+  (defun maschm/auth-source-get-secret (user host port)
+    (let* ((found (nth 0 (auth-source-search
+                          :max 1
+                          :user user
+                          :host host
+                          :port port
+                          :require '(:secret))))
+           (secret (plist-get found :secret)))
+      (if (functionp secret)
+          (funcall secret)
+        secret)))
+#+end_src
+
+* Functions
 ** current-file
 #+BEGIN_SRC emacs-lisp
   (defun rename-current-file ()
