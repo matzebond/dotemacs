@@ -764,8 +764,14 @@ Use < in visual mode to continuously shift selection
       "Tl" 'org-latex-preview
       "," 'org-edit-special)
 
+    (general-def
+      :keymaps 'org-src-mode-map
+      :states 'insert
+      "," 'self-insert-command)
+
     (my-leader-def
       :keymaps 'org-src-mode-map
+      ;; evil state mode bindings are only active after the first mode change
       :states nil
       "," 'org-edit-src-exit)
 
