@@ -534,9 +534,11 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
       "P c" 'projectile-compile-project
       "P r" 'projectile-run-project
       "P t" 'projectile-test-project)
+    :custom
+    (projectile-indexing-method 'native)
     :config
     (projectile-mode +1)
-    (setq projectile-completion-system 'ivy)
+    ;; (setq projectile-completion-system 'ivy)
     (setq projectile-generic-command "fd -H --ignore-file .projectile -t f -0")
     ;; (setq projectile-indexing-method 'turbo-alien)
     (setq projectile-project-search-path '("~/proj/")))
