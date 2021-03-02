@@ -278,9 +278,10 @@ https://github.com/purcell/exec-path-from-shell
     "B D" 'evil-delete-buffer
     "B r" 'revert-buffer
     "B q" 'quit-window
-    "B k" 'kill-current-buffer
+    "B k" 'bury-buffer
 
     "d" 'kill-current-buffer
+    "k" 'bury-buffer
     "q" 'evil-window-delete
 
     "x"  (general-simulate-key "C-x")
