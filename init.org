@@ -433,21 +433,13 @@ use =/ C-j= or =~ //= to get to the local / directory
     (general-def
       :keymaps 'global
       :states 'motion
-      "C-s" 'maschm/evil-swiper
-      "C-*" 'maschm/evil-swiper-thing-at-point))
-
+      "C-s" 'maschm/evil-swiper))
 
   (defun maschm/evil-swiper ()
     (interactive)
     (if (region-active-p)
       (swiper (buffer-substring (region-beginning) (region-end)))
       (swiper)))
-
-  (defun maschm/evil-swiper-thing-at-point ()
-    (interactive)
-    (if (region-active-p)
-      (swiper (buffer-substring (region-beginning) (region-end)))
-      (swiper-thing-at-point)))
 #+end_src
 
 *** avy
