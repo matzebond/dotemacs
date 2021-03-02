@@ -856,7 +856,7 @@ Use < in visual mode to continuously shift selection
     :defer 20)
 #+END_SRC
 
-** org babel & export
+** org babel
 
 #+begin_src emacs-lisp
   (eval-after-load 'org
@@ -885,24 +885,41 @@ Use < in visual mode to continuously shift selection
     :after ob
     :config
     (setq ob-async-no-async-languages-alist '("jupyter-python" "jupyter-julia")))
-
+#+end_src
+    
+** org export
+   
+#+begin_src emacs-lisp
   ;; (use-package ox-latex
   ;;   :defer
   ;;   :config
+
+
   (with-eval-after-load 'ox-latex
     ;; TODO might be less flexible to just use latexmk org-latex-compiler is ignored
     (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf -outdir=%o %f"))
     (setq org-latex-caption-above nil)
     (setq org-latex-prefer-user-labels t)
     (add-to-list 'org-latex-packages-alist '("" "tikz" t))
-    ;; (setq org-preview-latex-default-process
+    ;; Danger this will need to be updates if upstream changes this variable
+    (setq org-latex-default-packages-alist
+          '(("AUTO" "inputenc" t ("pdflatex"))
+            ("T1" "fontenc" t ("pdflatex"))
+            ("" "graphicx" t)
+            ("" "grffile" t)
+            ("" "longtable" nil)
+            ("" "wrapfig" nil)
+            ("" "rotating" nil)
+            ("normalem" "ulem" t)
+            ("" "amsmath" t)
+            ("" "textcomp" t)
+            ("" "amssymb" t)
+            ("" "capt-of" nil)
+            ;; ("" "titletoc" nil)
+            ("" "hyperref" nil)))
 
-    ;; (add-to-list 'org-latex-classes
-    ;;              '("letter"
-    ;;                "\\documentclass{letter}"
-    ;;                ("\\section{%s}" . "\\section*{%s}")
-    ;;                ("\\subsection{%s}" . "\\subsection*{%s}")
-    ;;                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+    ;; (setq org-preview-latex-default-process)
+
     (add-to-list 'org-latex-classes
                  '("ieee"
                    "\\documentclass[11pt]{IEEEtran}"
@@ -910,7 +927,15 @@ Use < in visual mode to continuously shift selection
                    ("\\subsection{%s}" . "\\subsection*{%s}")
                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+    (require 'ox-beamer)
+    (setq org-beamer-frame-default-options "")
+    (add-to-list 'org-latex-classes
+                 '(("sdqbeamer" "\\documentclass[presentation]{sdqbeamer}"
+                    ("\\section{%s}" . "\\section*{%s}")
+                    ("\\subsection{%s}" . "\\subsection*{%s}")
+                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))))
 #+end_src
 
 ** TODO org-ref & bibtex
@@ -999,12 +1024,6 @@ Use < in visual mode to continuously shift selection
     (org-download-enable)
     (setq org-download-screenshot-method "xclip -selection clipboard -t image/png -o > %s")
     )
-#+end_src
-
-** org-beamer
-
-#+begin_src emacs-lisp
-  (setq org-beamer-frame-default-options "")
 #+end_src
 
 ** org-reveal
@@ -2237,6 +2256,10 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     :local
     (LaTeX-mode-hook . ((set-fill-column 80))))
 
+
+  (use-package bibtex
+    :custom
+    (bibtex-dialect 'biblatex))
   ;; (load "auctex.el" nil t t)
 
   (use-package auctex-latexmk
