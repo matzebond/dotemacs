@@ -190,11 +190,11 @@ use a own file for emacs custom definition
 #+end_src
 
 *** exec-path-from-shell
-
 https://github.com/purcell/exec-path-from-shell
 
 #+begin_src emacs-lisp
   (use-package exec-path-from-shell
+    :if (daemonp)
     :demand
     :config
     (add-to-list 'exec-path-from-shell-variables '"MOZ_ENABLE_WAYLAND")
@@ -519,7 +519,6 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 #+BEGIN_SRC emacs-lisp
 
   (use-package projectile
-    :demand
     :diminish (projectile-mode)
     :general
     (my-menu-def
@@ -539,7 +538,6 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     (setq projectile-project-search-path '("~/proj/")))
 
   (use-package counsel-projectile
-    :demand
     :after (counsel projectile)
     :general
     (my-menu-def
@@ -671,13 +669,23 @@ Use < in visual mode to continuously shift selection
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-commentary
-    :demand
-    :diminish (evil-commentary-mode)
-    :config (evil-commentary-mode))
+    :general
+    (general-nmap
+      "gc" 'evil-commentary
+      "gy" 'evil-commentary-yank)
+    (general-def
+      :keymaps 'evil-outer-text-objects-map
+      "u" 'evil-commentary/a-comment-block))
 
   (use-package evil-surround
-    :demand
-    :config (global-evil-surround-mode 1))
+    :general
+    (general-def
+      :states 'operator
+      "s" 'evil-surround-edit
+      "S" 'evil-Surround-edit)
+    (general-vmap
+      "S" 'evil-surround-region
+      "gS" 'evil-Surround-region))
 
   (use-package evil-numbers
     :demand)
@@ -725,7 +733,8 @@ Use < in visual mode to continuously shift selection
 
 #+BEGIN_SRC emacs-lisp
   (use-package org
-    :defer 60
+    :straight (org-plus-contrib :includes (org))
+    :defer 10
     :general
     (my-menu-def
       "o" '(:ignore t :which-key "org-outline")
@@ -833,7 +842,6 @@ Use < in visual mode to continuously shift selection
             ("eg" "e.g.\\ " nil "e.g." "e.g." "e.g." "e.g.")
             ("ie" "i.e.,\\ " nil "i.e." "i.e." "i.e." "i.e.")))
 
-    (straight-use-package 'org-plus-contrib)
     (require 'ox-extra)
     (ox-extras-activate '(ignore-headlines)))
 
@@ -1139,11 +1147,11 @@ Use < in visual mode to continuously shift selection
     :config
     (setq magit-completing-read-function 'ivy-completing-read)
     (setq magit-diff-refine-hunk t)
+    (require 'evil-magit)
     :local
     (git-commit-mode-hook . ((setq-local ispell-local-dictionary "en"))))
 
   (use-package evil-magit
-    :demand
     :after (evil magit))
 #+END_SRC
 
@@ -1151,10 +1159,10 @@ Use < in visual mode to continuously shift selection
 
 #+BEGIN_SRC emacs-lisp
   (use-package ghub
-    :demand)
+    :defer 30)
 
   (use-package forge
-    :demand
+    :defer 30
     :after (magit ghub))
 #+END_SRC
 
@@ -1852,7 +1860,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
-    :demand
+    :defer 10
     :general
     (my-menu-def
       "h" '(helpful-at-point :which-key "help")
@@ -1908,7 +1916,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 
 #+BEGIN_SRC emacs-lisp
   (use-package eshell
-    :after esh-opt
+    :defer 30
     :commands (eshell eshell-command)
     :config
     ;; (setq pcomplete-ignore-case t)
@@ -1917,6 +1925,8 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     (setq eshell-cmpl-autolist t)
     (setq pcomplete-cycle-cutoff-length 1)
     (setq eshell-cmpl-cycle-cutoff-length 1)
+    (require 'eshell-prompt-extras)
+    (require 'eshell-z)
     :local
     (general-define-key
      :keymaps 'eshell-mode-map
@@ -1938,7 +1948,6 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 
   (use-package eshell-prompt-extras
     :after eshell
-    :demand
     :config
     (setq eshell-highlight-prompt nil)
     (epe-theme-lambda) ;;to set eshell-prompt-regex
@@ -1953,9 +1962,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
       "M-e" 'esh-autosuggest-complete-word))
 
   (use-package eshell-syntax-highlighting
-    :after esh-mod
-    :config
-    (eshell-syntax-highlighting-global-mode +1))
+    :hook (eshell-mode . eshell-syntax-highlighting-mode))
 #+END_SRC
 
 ** shell
