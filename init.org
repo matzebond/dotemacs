@@ -225,7 +225,6 @@ https://github.com/purcell/exec-path-from-shell
   (defvar user-undo-directory (expand-file-name ".cache/undo" user-emacs-directory))
   (make-directory user-undo-directory 'noerror)
   (setq undo-tree-auto-save-history t)
-  (setq undo-tree-history-directory-alist `(("." . ,user-undo-directory)))
   (setq undo-tree-history-directory-alist (list (cons "." user-undo-directory)))
 #+END_SRC
 
@@ -1168,14 +1167,15 @@ Use < in visual mode to continuously shift selection
 #+BEGIN_SRC emacs-lisp
   (use-package magit-todos
     :after magit)
-  ;; (use-package git-gutter-fringe+
-  ;;   :init (global-git-gutter-fringe+-mode)
-  ;;   )
-#+END_SRC
 
-#+BEGIN_SRC emacs-lisp
   (use-package orgit
     :after (org magit))
+
+  (use-package git-gutter-fringe+
+    :disabled
+    :init (global-git-gutter-fringe+-mode))
+#+END_SRC
+
 #+END_SRC
 
 * Mail
@@ -1412,6 +1412,7 @@ Use < in visual mode to continuously shift selection
     (moody-replace-mode-line-buffer-identification)
     (moody-replace-vc-mode))
 #+END_SRC
+
 ** Fringe
 
 #+BEGIN_SRC emacs-lisp
@@ -2421,8 +2422,8 @@ https://github.com/NicolasPetton/Indium
 #+begin_src emacs-lisp
   (use-package gdscript-mode
     :straight (gdscript-mode
-	       :type git :host github :repo "GDQuest/emacs-gdscript-mode"
-	       :files ("*.el" "data/*.txt"))
+           :type git :host github :repo "GDQuest/emacs-gdscript-mode"
+           :files ("*.el" "data/*.txt"))
 
     :config
     (setq gdscript-tabs-mode t) ;; If true, use tabs for indents. Default: t
