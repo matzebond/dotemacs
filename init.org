@@ -607,6 +607,8 @@ https://github.com/noctuid/evil-guide
     (setq evil-want-C-w-in-emacs-state t)
     (setq evil-want-C-u-scroll t)
     (setq evil-want-Y-yank-to-eol t)
+    :custom
+    (evil-undo-system 'undo-tree)
     :config
     (evil-mode 1)
     (cl-loop for (mode . state) in
