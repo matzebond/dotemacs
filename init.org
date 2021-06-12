@@ -1918,6 +1918,14 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     (evil-motion-state))
 #+end_src
 
+** calc
+
+#+begin_src emacs-lisp
+  (my-menu-def
+    "c" '(quick-calc :which-key "calc")
+    "C" '(calc-dispatch :which-key "calc-dispatch"))
+#+end_src
+
 ** eshell
 
 #+BEGIN_SRC emacs-lisp
