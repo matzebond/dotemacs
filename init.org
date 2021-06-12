@@ -1229,9 +1229,11 @@ Use < in visual mode to continuously shift selection
       "H" 'mu4e-view-toggle-html
       "g" nil
       "g r" 'mu4e-update-mail-and-index
+      "G" nil
       "k" nil ;; mu4e-view-save-url
       "y" nil ;; mu4e-select-other-view
       "v" nil ;; mu4e-view-verify-msg-popup
+      "V" nil ;;
       "b" nil ;; mu4e-headers-search-bookmark
       "w" nil ;; visual-line-mode
       "g" nil ;; mu4e-view-go-to-url
@@ -1303,6 +1305,7 @@ Use < in visual mode to continuously shift selection
     (setq mu4e-context-policy 'ask-if-none)
     (setq mu4e-compose-context-policy 'ask)
     (setq mu4e-compose-format-flowed t)
+    (setq mu4e-headers-skip-duplicates nil)
     (setq message-kill-buffer-on-exit t)
     (setq mu4e-confirm-quit nil)
 
@@ -1325,7 +1328,10 @@ Use < in visual mode to continuously shift selection
           :key ?w)
       (:name "Sent"
           :query "maildir:/posteo/Sent OR maildir:/uni/Sent"
-          :key ?s)))
+          :key ?s)
+      (:name "Marked"
+          :query "flag:flagged"
+          :key ?m)))
 
     :local
     (mu4e-compose-mode-hook . ((setq-local ispell-local-dictionary "de_DE"))))
