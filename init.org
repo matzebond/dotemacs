@@ -1833,6 +1833,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    "M-h" 'Info-help
    "w" nil
    "b" nil
+   "e" nil
 
    "u" 'Info-up
    "H" 'Info-up
