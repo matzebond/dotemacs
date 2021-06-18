@@ -947,6 +947,23 @@ Use < in visual mode to continuously shift selection
                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 #+end_src
 
+** org-special-block
+
+#+begin_src emacs-lisp
+  (use-package org-special-block-extras
+    :ensure t
+    :hook (org-mode . org-special-block-extras-mode)
+    ;; :custom
+    ;; (org-special-block-extras--docs-libraries
+    ;;  '("~/org-special-block-extras/documentation.org")
+    ;;  "The places where I keep my ‘#+documentation’")
+    ;; (org-special-block-extras-fancy-links
+    ;; nil "Disable this feature.")
+    :config
+    ;; (org-special-block-extras-short-names)
+    )
+#+end_src
+
 ** TODO org-ref & bibtex
 
 #+begin_src emacs-lisp
