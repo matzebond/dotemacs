@@ -2698,4 +2698,10 @@ Edit textareas of the browser in emacs
     (interactive)
     (let ((enable-local-variables :all))
       (hack-dir-local-variables-non-file-buffer)))
+
+  (defun reload-dir-locals-for-current-buffer ()
+    "reload dir locals for the current buffer"
+    (interactive)
+    (let ((enable-local-variables :all))
+      (hack-dir-local-variables-non-file-buffer)))
 #+END_SRC
