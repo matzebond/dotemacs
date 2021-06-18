@@ -1160,6 +1160,13 @@ Use < in visual mode to continuously shift selection
     (setq org-noter-notes-window-location 'other-frame))
 #+end_src
 
+** org-sidebar
+
+#+begin_src emacs-lisp
+  (use-package org-sidebar
+    :after org)
+#+end_src
+
 * Git
 ** Magit
 
