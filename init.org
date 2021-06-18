@@ -563,6 +563,12 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
   :defer 5)
 #+END_SRC
 
+** deadgrep
+
+#+begin_src emacs-lisp
+(use-package deadgrep)
+#+end_src
+
 ** TODO pair programming
    https://github.com/tjim/lockstep
 * Evil
