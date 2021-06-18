@@ -935,10 +935,10 @@ Use < in visual mode to continuously shift selection
     (require 'ox-beamer)
     (setq org-beamer-frame-default-options "")
     (add-to-list 'org-latex-classes
-                 '(("sdqbeamer" "\\documentclass[presentation]{sdqbeamer}"
-                    ("\\section{%s}" . "\\section*{%s}")
-                    ("\\subsection{%s}" . "\\subsection*{%s}")
-                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))))
+                 '("sdqbeamer" "\\documentclass[presentation]{sdqbeamer}"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 #+end_src
 
 ** TODO org-ref & bibtex
@@ -974,29 +974,49 @@ Use < in visual mode to continuously shift selection
         (bibtex-completion-open-pdf keys fallback-action)))
     )
 
+  (use-package bibtex-actions
+    :config
+    ;; (add-to-list 'embark-keymap-alist '(bibtex . bibtex-actions-map))
+    )
+
   (use-package ivy-bibtex
+    ;; :demand
     :after (ivy bibtex-completion)
+    :custom
+    (ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
     :config
     (ivy-bibtex-ivify-action bibtex-completion-open-pdf-external
                              ivy-bibtex-open-pdf-external)
     (ivy-add-actions
      'ivy-bibtex
      '(("P" ivy-bibtex-open-pdf-external "Open PDF file in external viewer (if present)")))
-    )
+
+
+    (defun bibtex-completion-format-citation-org-ref-cite (keys)
+      "Format ebib references for keys in KEYS."
+      (s-join ", "
+              (--map (format "cite:%s" it) keys)))
+
+    (add-to-list 'bibtex-completion-format-citation-functions
+                 '(org-mode . bibtex-completion-format-citation-org-ref-cite)))
 
   (use-package org-ref
-    :after (org ivy-bibtex)
+    ;; :demand
+    :after (org)
+    :commands (org-ref)
     :init
-    ;; (setq org-ref-completion-library 'org-ref-ivy-cite-completion)
     (setq org-ref-completion-library 'org-ref-ivy-cite)
 
     :config
+    (require 'ivy-bibtex)
+    (org-ref-ivy-cite-completion)
     (setq-default reftex-default-bibliography bibtex-completion-bibliography)
     (setq org-ref-default-bibliography bibtex-completion-bibliography)
 
     (setq org-ref-default-ref-type "autoref")
 
-    (defun maschm/org-ref-open-pdf-at-point ()
+    ;; https://github.com/japhir/ArchConfigs/blob/master/myinit.org#org-ref
+    (defun maschm/org-ref-open-pdf-at-point () 
       "Open the pdf for bibtex key under point if it exists."
       (interactive)
       (let* ((results (org-ref-get-bibtex-key-and-file))
@@ -1008,8 +1028,13 @@ Use < in visual mode to continuously shift selection
 
     (setq org-ref-open-pdf-function 'maschm/org-ref-open-pdf-at-point)
     (setq org-ref-notes-function 'org-ref-notes-function-many-files)
-    (setq org-ref-notes-directory bibtex-completion-notes-path)
-    )
+    (setq org-ref-notes-directory bibtex-completion-notes-path))
+
+  (use-package citeproc-org
+    ;; :demand
+    :after (org-ref)
+    :config
+    (citeproc-org-setup))
 #+end_src
 
 ** org-download
@@ -1088,6 +1113,7 @@ Use < in visual mode to continuously shift selection
     (my-menu-def
       "O r" 'org-roam
       "O f" 'org-roam-find-file
+      "O C" 'org-roam-capture
       "O i" 'org-roam-insert)
     :config
     (my-leader-def
