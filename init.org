@@ -1487,6 +1487,13 @@ from https://github.com/DiegoVicen/my-emacs#Fix-scroll
         mouse-wheel-scroll-amount '(1 ((shift) . 1))
         mouse-wheel-progressive-speed nil
         mouse-wheel-follow-mouse 't)
+
+  (general-def
+    :keymaps 'global
+    "<left-margin><mouse-4>" 'mwheel-scroll
+    "<left-margin><mouse-5>" 'mwheel-scroll
+    "<right-margin><mouse-4>" 'mwheel-scroll
+    "<right-margin><mouse-5>" 'mwheel-scroll)
 #+end_src
 
 ** Dashboard
