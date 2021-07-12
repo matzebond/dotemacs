@@ -1811,21 +1811,6 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
 *** TODO auto fill on paste
 *** TODO fill commands in local menu
-** prog-mode
-
-#+begin_src emacs-lisp
-  (defun comment-auto-fill ()
-    (setq-local comment-auto-fill-only-comments t)
-    (auto-fill-mode 1))
-
-  (defun my-prog-mode-setup ()
-    (electric-pair-local-mode)
-    (comment-auto-fill)
-    (setq-local ispell-local-dictionary "en_US"))
-
-  (add-hook 'prog-mode-hook 'my-prog-mode-setup)
-#+end_src
-
 ** special-mode
 #+begin_src emacs-lisp
   (general-def
@@ -2166,6 +2151,44 @@ When compiling follow the buffer
 #+end_src
 
 * Programming languages
+** prog-mode
+
+#+begin_src emacs-lisp
+  (defun comment-auto-fill ()
+    (setq-local comment-auto-fill-only-comments t)
+    (auto-fill-mode 1))
+
+  (defun my-prog-mode-setup ()
+    (electric-pair-local-mode)
+    (comment-auto-fill)
+    (setq-local ispell-local-dictionary "en_US"))
+
+  (add-hook 'prog-mode-hook 'my-prog-mode-setup)
+#+end_src
+
+*** TODO indent
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default tab-width 4)
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-always-indent nil)
+  (setq-default electric-indent-inhibit t)
+  (setq blink-matching-delay 0.4)
+
+  ;; ignored when using evil-mode ?
+  (use-package clean-aindent-mode
+    :config (setq clean-aindent-is-simple-indent t))
+#+END_SRC
+
+*** electric-operator
+
+#+begin_src emacs-lisp
+  (use-package electric-operator
+    :hook (prog-mode . electric-operator-mode))
+#+end_src
+
+*** TODO whitespace
+*** TODO show-parens
 ** Lisp
 Use common-lips indent function because elisp is not nice with keywords
 
@@ -2600,21 +2623,6 @@ Recognize arch linux pgkbuild files
     (editorconfig-mode 1))
 #+end_src
 
-** TODO indent
-
-#+BEGIN_SRC emacs-lisp
-  (setq-default tab-width 4)
-  (setq-default indent-tabs-mode nil)
-  (setq-default tab-always-indent nil)
-  (setq-default electric-indent-inhibit t)
-
-;; ignored when using evil-mode ?
-  (use-package clean-aindent-mode
-    :config (setq clean-aindent-is-simple-indent t))
-#+END_SRC
-
-** TODO whitespace
-** TODO show-parens
 ** yes-no
 
 #+begin_src emacs-lisp
