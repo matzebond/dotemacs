@@ -625,6 +625,9 @@ https://github.com/noctuid/evil-guide
       "TAB" 'evil-jump-forward  ; "TAB" is "C-i" which is the tab-key in terminal mode
                                 ; use "<tab>" to bind to only the tab-key in gui mode
       )
+    (general-imap
+      "C-a" nil
+      )
     )
 #+END_SRC
 
