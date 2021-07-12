@@ -1905,6 +1905,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    "u" 'Info-up
    "H" 'Info-up
    "g" nil
+   "gt" 'Info-goto-node
    "gj" 'Info-next
    "gk" 'Info-prev
    "gg" 'evil-goto-first-line
@@ -1912,6 +1913,9 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    "q" 'Info-exit)
 
   (evil-make-overriding-map Info-mode-map 'motion)
+
+  (use-package info-colors
+    :hook ((Info-selection . info-colors-fontify-node)))
 #+END_SRC
 
 ** help
