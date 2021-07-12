@@ -776,6 +776,7 @@ Use < in visual mode to continuously shift selection
       "Tp" 'org-toggle-pretty-entities
       "Ti" 'org-toggle-inline-images
       "Tl" 'org-latex-preview
+      "l" 'org-latex-preview
       "," 'org-edit-special)
 
     (general-def
@@ -926,6 +927,9 @@ Use < in visual mode to continuously shift selection
             ("" "capt-of" nil)
             ;; ("" "titletoc" nil)
             ("" "hyperref" nil)))
+
+
+    (setq org-format-latex-options (plist-put org-format-latex-options ':scale 2.0))
 
     ;; (setq org-preview-latex-default-process)
 
