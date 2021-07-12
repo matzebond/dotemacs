@@ -1602,12 +1602,6 @@ Highlight delimiters such as parentheses, brackets or braces according to their 
     :hook (prog-mode . rainbow-delimiters-mode))
 #+END_SRC
 
-Display line numbers in programming modes
-
-#+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
-#+END_SRC
-
 Display '~' on empty lines like in vi (only in programming modes)
 
 #+BEGIN_SRC emacs-lisp
@@ -2202,6 +2196,15 @@ When compiling follow the buffer
   (use-package electric-operator
     :hook (prog-mode . electric-operator-mode))
 #+end_src
+*** line numbers
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+  ;; (setq-default display-line-numbers-width-start t)
+  (setq-default display-line-numbers-grow-only t)
+  (setq-default display-line-numbers-width 3)
+
+#+END_SRC
 
 *** TODO whitespace
 *** TODO show-parens
