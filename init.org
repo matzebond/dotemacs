@@ -2208,7 +2208,12 @@ When compiling follow the buffer
 
 #+begin_src emacs-lisp
   (use-package electric-operator
-    :hook (prog-mode . electric-operator-mode))
+    :disabled
+    :hook ((prog-mode . electric-operator-mode))
+    :config
+    (electric-operator-add-rules-for-mode 'sh-mode
+      (cons "-" nil))
+    )
 #+end_src
 *** line numbers
 
