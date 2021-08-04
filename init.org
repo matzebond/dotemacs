@@ -2082,6 +2082,14 @@ When compiling follow the buffer
   ;; Stop on the first error.
   (setq compilation-auto-jump-to-first-error t)
 
+  (add-hook 'compilation-mode-hook 'follow-mode)
+
+  (defun colorize-compilation-buffer ()
+    (toggle-read-only)
+    (ansi-color-apply-on-region compilation-filter-start (point))
+    (toggle-read-only))
+  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+
   (general-def
     :keymaps 'compilation-mode-map
     "g" nil
