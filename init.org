@@ -1255,7 +1255,8 @@ Use < in visual mode to continuously shift selection
     :defer 15
     :general
     (my-menu-def
-      "m" '(mu4e :which-key "mail")
+      "m" '((lambda () (interactive) (let ((default-directory "~/")) (mu4e)))
+              :which-key "mail")
       "M" '(:ignore t :which-key "Mail")
       "M u" '(mu4e-update-mail-and-index :which-key "update")
       "M g" '(mu4e-headers-search-bookmark :which-key "bookmarks")
@@ -1275,6 +1276,7 @@ Use < in visual mode to continuously shift selection
       "/" 'mu4e-headers-search
       "j" nil
       "J" 'mu4e~headers-jump-to-maildir
+      "b" 'mu4e-search-bookmark
       "g r" 'mu4e-update-mail-and-index)
     (general-def
       :keymaps 'mu4e-headers-mode-map
@@ -1311,26 +1313,19 @@ Use < in visual mode to continuously shift selection
     (evil-set-initial-state 'mu4e-headers-mode 'normal)
     (evil-make-overriding-map mu4e-view-mode-map 'normal)
     (evil-set-initial-state 'mu4e-view-mode 'normal)
-    (setq mu4e-completing-read-function 'ivy-completing-read)
-
-    (setq mu4e-view-show-addresses 't)
-    (setq mu4e-headers-time-format "%T") ;; like "%H:%M:%S"
-    (setq mu4e-headers-date-format "%F") ;; like "%Y-%m-%d"
-    (add-hook 'mu4e-view-mode-hook 'visual-line-mode)
-    (add-hook 'mu4e-view-mode-hook 'visual-fill-column-mode)
-    (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
-    (setq shr-color-visible-luminance-min 80) ;; make html background more readable
+    (setq mu4e-completing-read-function 'completing-read)
 
     (setq mail-user-agent 'mu4e-user-agent)
     (setq mu4e-maildir "~/.mail")
     (setq mu4e-get-mail-command "mbsync -a")
     (setq quick-get-mail-command "mbsync posteo:INBOX uni:INBOX")
+    (setq mu4e-index-cleanup t)        ;; don't do a full cleanup check
+    (setq mu4e-index-lazy-check nil)   ;; don't consider up-to-date dirs
     (setq mu4e-change-filenames-when-moving t) ;; needed by mbsync
     (setq mu4e-attachment-dir  "~/dld")
 
-    (setq message-send-mail-function 'smtpmail-send-it
-      smtpmail-debug-info t
-      smtpmail-debug-verbose t)
+    (setq message-send-mail-function 'smtpmail-send-it)
+    (setq smtpmail-debug-info t)
 
     (setq mu4e-user-mail-address-list '("male.schmitt@posteo.de" "uydvo@student.kit.edu"))
     (setq mu4e-contexts
@@ -1370,12 +1365,17 @@ Use < in visual mode to continuously shift selection
     (setq mu4e-context-policy 'ask-if-none)
     (setq mu4e-compose-context-policy 'ask)
     (setq mu4e-compose-format-flowed t)
-    (setq mu4e-headers-skip-duplicates nil)
     (setq message-kill-buffer-on-exit t)
     (setq mu4e-confirm-quit nil)
 
-    (setq mu4e-index-cleanup nil)     ;; don't do a full cleanup check
-    (setq mu4e-index-lazy-check t)    ;; don't consider up-to-date dirs
+    (setq mu4e-headers-time-format "%T") ;; like "%H:%M:%S"
+    (setq mu4e-headers-date-format "%F") ;; like "%Y-%m-%d"
+    (setq mu4e-headers-skip-duplicates nil)
+    (setq mu4e-view-show-addresses 't)
+    (add-hook 'mu4e-view-mode-hook 'visual-line-mode)
+    (add-hook 'mu4e-view-mode-hook 'visual-fill-column-mode)
+    (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
+
 
     ;; (setq mu4e-maildir-shortcuts
     ;;  '( ("/posteo/Inbox" . ?p)
@@ -1383,7 +1383,7 @@ Use < in visual mode to continuously shift selection
 
     (setq mu4e-bookmarks
      '((:name  "Unread messages"
-          :query "flag:unread AND NOT flag:trashed AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\\ E-Mail"
+          :query "flag:unread AND NOT flag:trashed AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\\ E-Mail AND NOT list:mathe-info-aktiv.fsmi.uni-karlsruhe.de AND NOT list:fsr-einladung.fsmi.uni-karlsruhe.de AND NOT list:info-aktiv.fsmi.uni-karlsruhe.de"
           :key ?u)
       (:name "Today's messages"
           :query "date:today..now AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\\ E-Mail"
@@ -1408,6 +1408,21 @@ Use < in visual mode to continuously shift selection
     (let* ((msg (mu4e-message-at-point 'noerror))
            (docid (mu4e-message-field msg :docid)))
       (mu4e~proc-move docid nil "+D")))
+#+end_src
+
+** Gnus view mode
+
+#+begin_src emacs-lisp
+  (with-eval-after-load "mm-decode"
+    (add-to-list 'mm-discouraged-alternatives "text/html")
+    (add-to-list 'mm-discouraged-alternatives "text/richtext"))
+  (with-eval-after-load "gnus-art"
+    (setq gnus-inhibit-images 't))
+
+  (setq mm-discouraged-alternatives nil)
+
+  (setq shr-color-visible-luminance-min 80) ;; make html background more readable
+  (advice-add #'shr-colorize-region :around (defun shr-no-colourise-region (&rest ignore))) ;; no colors in html mails
 #+end_src
 
 ** Additional mu4e packages
