@@ -1209,8 +1209,15 @@ Use < in visual mode to continuously shift selection
     (general-def
       :keymaps 'magit-mode-map
       "SPC" nil)
+    (general-def
+      :keymaps 'magit-diff-section-base-map
+      [remap magit-visit-thing] 'magit-diff-visit-file-other-window
+      ;; "RET" 'magit-diff-visit-file-other-window
+      "<M-return>" 'magit-diff-visit-file)
+    (general-def
+      :keymaps 'magit-diff-mode-map
+      "SPC" nil)
     :config
-    (setq magit-completing-read-function 'ivy-completing-read)
     (setq magit-diff-refine-hunk t)
     (require 'evil-magit)
     :local
