@@ -2472,8 +2472,52 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     :config
     (general-def
       :keymaps 'pdf-view-mode-map
-      ;; "C-s" 'isearch-forward
-      "SPC" nil)
+      "j" 'pdf-view-next-line-or-next-page
+      "k" 'pdf-view-previous-line-or-previous-page
+      "C-e" 'pdf-view-next-line-or-next-page
+      "C-y" 'pdf-view-previous-line-or-previous-page
+      "C-d" 'pdf-view-scroll-up-or-next-page
+      "C-u" 'pdf-view-scroll-down-or-previous-page
+      "h" 'image-forward-hscroll
+      "l" 'image-backward-hscroll
+      "RET" 'pdf-view-next-page
+      "DEL" 'pdf-view-previous-page
+
+      "G" 'pdf-view-last-page
+      "g" nil
+      "gg" 'pdf-view-first-page
+      "gt" 'pdf-view-goto-page
+      "gl" 'pdf-view-goto-label
+      "gr" 'revert-buffer
+
+      "<C-mouse-4>" '(lambda () (interactive) (pdf-view-enlarge 1.1))
+      "<C-mouse-5>" '(lambda () (interactive) (pdf-view-shrink 1.1))
+      "<mouse-6>" 'image-backward-hscroll
+      "<mouse-7>" 'image-forward-hscroll
+      "=" 'pdf-view-scale-reset
+      "sw" 'pdf-view-fit-width-to-window
+      "sh" 'pdf-view-fit-heigth-to-window
+      "sp" 'pdf-view-fit-page-to-window
+
+      "C-s" 'isearch-forward
+
+      "SPC" nil )
+
+    (my-leader-def
+      :keymaps 'pdf-view-mode-map
+      ;; evil state mode bindings are only active after the first mode change
+      :states nil
+      "a" 'pdf-annot-list-annotations
+      "h" 'pdf-annot-add-highlight-markup-annotation
+      "t" 'pdf-annot-add-text-annotation
+      "c" 'pdf-annot-mouse-add-text-annotation
+      "m" 'pdf-view-themed-minor-mode
+      "d" 'pdf-view-dark-minor-mode
+      "n" 'pdf-view-midnight-minar-mode
+      "p" 'pdf-view-printer-minor-mode)
+
+    (evil-make-overriding-map pdf-view-mode-map 'motion)
+    (evil-set-initial-state 'pdf-view-mode 'motion)
 
     (pdf-tools-install t)
     ;; open pdfs scaled to fit page
