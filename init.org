@@ -1088,6 +1088,7 @@ Use < in visual mode to continuously shift selection
     (setq org-image-actual-width 300)
     (setq org-export-with-smart-quotes t)
     (setq org-hide-emphasis-markers t)
+    (setq org-cite-global-bibliography '("~/zotero.bib"))
 
     (setq org-default-notes-file (expand-file-name "inbox.org" org-directory))
     (setq org-agenda-files '("~/org/inbox.org"
@@ -1109,6 +1110,10 @@ Use < in visual mode to continuously shift selection
     (setq org-tag-alist '(("@home" . ?h) ("@uni" . ?u) ("@work" . ?w)))
     (setq org-refile-use-outline-path 'file)
     (setq org-outline-path-complete-in-steps nil)
+    (require 'oc-biblatex)
+    (setq org-cite-export-processors
+          '((latex biblatex)
+            (t basic)))
 
     (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp"))
     (add-to-list 'org-structure-template-alist '("sp" . "src python"))
@@ -1289,6 +1294,7 @@ Use < in visual mode to continuously shift selection
     :defer 20
     :config
     (setq bibtex-completion-bibliography '("~/zotero.bib"))
+    ;; (setq bibtex-completion-additionalsearch-fields '(doi url))
     (setq bibtex-completion-pdf-field "File")
     (setq bibtex-completion-notes-path "~/org/notes/")
 
@@ -1313,25 +1319,6 @@ Use < in visual mode to continuously shift selection
       (let ((bibtex-completion-pdf-open-function
              (lambda (fpath) (start-process "evince" "*helm-bibtex-evince*" "/usr/bin/evince" fpath))))
         (bibtex-completion-open-pdf keys fallback-action)))
-    )
-
-  (use-package bibtex-actions
-    :config
-    ;; (add-to-list 'embark-keymap-alist '(bibtex . bibtex-actions-map))
-    )
-
-  (use-package ivy-bibtex
-    ;; :demand
-    :after (ivy bibtex-completion)
-    :custom
-    (ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
-    :config
-    (ivy-bibtex-ivify-action bibtex-completion-open-pdf-external
-                             ivy-bibtex-open-pdf-external)
-    (ivy-add-actions
-     'ivy-bibtex
-     '(("P" ivy-bibtex-open-pdf-external "Open PDF file in external viewer (if present)")))
-
 
     (defun bibtex-completion-format-citation-org-ref-cite (keys)
       "Format ebib references for keys in KEYS."
@@ -1339,25 +1326,56 @@ Use < in visual mode to continuously shift selection
               (--map (format "cite:%s" it) keys)))
 
     (add-to-list 'bibtex-completion-format-citation-functions
-                 '(org-mode . bibtex-completion-format-citation-org-ref-cite)))
+                 '(org-mode . bibtex-completion-format-citation-org-ref-cite))
+    )
+
+  (use-package citar
+    :after (embark bibtex-completion)
+    ;; :general
+    ;; (("C-c b" . citar-insert-citation)
+    ;;  :map minibuffer-local-map
+    ;;  ("M-b" . citar-insert-preset))
+    :custom
+    (citar-bibliography '("~/zotero.bib"))
+    (org-cite-global-bibliography '("~/zotero.bib"))
+    :config
+    ;; Make the 'citar' bindings and targets available to `embark'.
+    ;; (add-to-list 'embark-target-finders 'bibtex-actions-citation-key-at-point)
+    ;; (add-to-list 'embark-keymap-alist '(bibtex . bibtex-actions-map))
+    ;; (add-to-list 'embark-keymap-alist '(citation-key . bibtex-actions-buffer-map))
+
+    ;; (file-notify-add-watch
+    ;;  (car citar-bibliography) '(change) 'citar-refresh)
+    )
+
+  (use-package citar-org
+    :disabled
+    :no-require
+    ;; :general
+    ;; (:map org-mode-map
+    ;;       ("C-c b" . #'org-cite-insert)) ; Also bound to C-c C-x C-@
+    :custom
+    (org-cite-insert-processor 'citar)
+    (org-cite-follow-processor 'citar)
+    (org-cite-activate-processor 'citar))
 
   (use-package org-ref
-    ;; :demand
+    :disabled
     :after (org)
     :commands (org-ref)
     :init
     (setq org-ref-completion-library 'org-ref-ivy-cite)
 
     :config
-    (require 'ivy-bibtex)
-    (org-ref-ivy-cite-completion)
+    ;; (require 'ivy-bibtex)
+    ;; (org-ref-ivy-cite-completion)
     (setq-default reftex-default-bibliography bibtex-completion-bibliography)
     (setq org-ref-default-bibliography bibtex-completion-bibliography)
 
     (setq org-ref-default-ref-type "autoref")
 
     ;; https://github.com/japhir/ArchConfigs/blob/master/myinit.org#org-ref
-    (defun maschm/org-ref-open-pdf-at-point () 
+    (defun maschm/org-ref-open-pdf-at-point ()
       "Open the pdf for bibtex key under point if it exists."
       (interactive)
       (let* ((results (org-ref-get-bibtex-key-and-file))
@@ -1370,12 +1388,6 @@ Use < in visual mode to continuously shift selection
     (setq org-ref-open-pdf-function 'maschm/org-ref-open-pdf-at-point)
     (setq org-ref-notes-function 'org-ref-notes-function-many-files)
     (setq org-ref-notes-directory bibtex-completion-notes-path))
-
-  (use-package citeproc-org
-    ;; :demand
-    :after (org-ref)
-    :config
-    (citeproc-org-setup))
 #+end_src
 
 ** org-download
@@ -1487,8 +1499,8 @@ Use < in visual mode to continuously shift selection
     (org-roam-setup))
 
   (use-package org-roam-bibtex
-    :after (org-roam ivy-bibtex)
     :disabled
+    :after (org-roam ivy-bibtex)
     :hook (org-roam-mode . org-roam-bibtex-mode)
     :config
     (setq orb-preformat-keywords
