@@ -2159,6 +2159,26 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     (evil-motion-state))
 #+end_src
 
+** comint
+
+#+begin_src emacs-lisp
+  (evil-define-command maschm/comint-evil-scroll-down-or-maybe-eof (arg)
+    "Delete ARG characters forward or send an EOF to subprocess.
+  Sends an EOF only if point is at the end of the buffer and there is no input."
+    :repeat nil
+    :keep-visual t
+    (interactive "<c>")
+    (let ((proc (get-buffer-process (current-buffer))))
+      (if (and (eobp) proc (= (point) (marker-position (process-mark proc))))
+          (comint-send-eof)
+        (evil-scroll-down arg))))
+
+  (with-eval-after-load "comint"
+    (general-def
+      :keymaps 'comint-mode-map
+      "C-d" 'maschm/comint-evil-scroll-down-or-maybe-eof))
+#+end_src
+
 ** calc
 
 #+begin_src emacs-lisp
@@ -2188,7 +2208,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
      "C-r" 'counsel-esh-history)
     (general-define-key
      :keymaps 'eshell-mode-map
-     :mode 'motion
+     :states 'motion
      "g j" 'eshell-next-prompt
      "g k" 'eshell-previous-prompt
      "0" 'eshell-bol)
@@ -2204,7 +2224,6 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   (use-package eshell-prompt-extras
     :after eshell
     :config
-    (setq eshell-highlight-prompt nil)
     (epe-theme-lambda) ;;to set eshell-prompt-regex
     (setq eshell-prompt-function 'epe-theme-lambda))
 
