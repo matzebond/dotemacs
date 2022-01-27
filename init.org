@@ -1135,19 +1135,23 @@ Use < in visual mode to continuously shift selection
 
 #+begin_src emacs-lisp
   (use-package org-roam
-    :hook
-    (after-init . org-roam-mode)
     :custom
     (org-roam-directory (expand-file-name "~/org/roam/"))
     :general
     (my-menu-def
-      "O r" 'org-roam
+      "O r" 'org-roam-buffer-toggle
       "O f" 'org-roam-node-find
       "O C" 'org-roam-capture
       "O i" 'org-roam-node-insert)
+    (general-def
+      :keymaps 'org-roam-mode-map
+      [mouse-1] #'org-roam-visit-thing)
+    :init
+    (setq org-roam-v2-ack t)
     :config
     (my-leader-def
-      "i" 'org-roam-insert)
+      :states 'normal
+      "i" 'org-roam-node-insert)
     ;; :map org-roam-mode-map
     ;; (("C-c n l" . org-roam)
     ;;  ("C-c n f" . org-roam-find-file)
@@ -1156,8 +1160,17 @@ Use < in visual mode to continuously shift selection
     ;;  ("C-c n g" . org-roam-graph))
     ;; :map org-mode-map
     ;; (("C-c n i" . org-roam-insert))
-    (org-roam-setup)
-    (setq org-roam-v2-ack t))
+
+    ;; for org-roam-buffer-toggle
+    ;; Recommendation in the official manual
+    (add-to-list 'display-buffer-alist
+                 '("\\*org-roam\\*"
+                   (display-buffer-in-direction)
+                   (direction . right)
+                   (window-width . 0.33)
+                   (window-height . fit-window-to-buffer)))
+
+    (org-roam-setup))
 
   (use-package org-roam-bibtex
     :after (org-roam ivy-bibtex)
