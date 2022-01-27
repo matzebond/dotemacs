@@ -151,7 +151,7 @@ use a own file for emacs custom definition
     (defconst my-leader-key ",")
     (defconst my-non-normal-leader-key "M-,")
     (general-create-definer my-leader-def
-      :keymaps 'local
+      ;; :keymaps 'local
       :states '(motion insert)
       :prefix my-leader-key
       :non-normal-prefix my-non-normal-leader-key)
@@ -627,6 +627,7 @@ https://github.com/noctuid/evil-guide
       )
     (general-imap
       "C-a" nil
+      "C-e" nil ; evil-copy-from-below
       )
     )
 #+END_SRC
@@ -735,6 +736,11 @@ Use < in visual mode to continuously shift selection
   (use-package evil-exchange
     :config
     (evil-exchange-install))
+
+  (use-package evil-args
+    :general
+    (:keymaps 'evil-inner-text-objects-map "a" 'evil-inner-arg)
+    (:keymaps 'evil-outer-text-objects-map "a" 'evil-outer-arg))
 #+END_SRC
 
 * Org
@@ -899,9 +905,9 @@ Use < in visual mode to continuously shift selection
     :config
     (setq ob-async-no-async-languages-alist '("jupyter-python" "jupyter-julia")))
 #+end_src
-    
+
 ** org export
-   
+
 #+begin_src emacs-lisp
   ;; (use-package ox-latex
   ;;   :defer
@@ -928,7 +934,7 @@ Use < in visual mode to continuously shift selection
             ("" "textcomp" t)
             ("" "amssymb" t)
             ("" "capt-of" nil)
-            ;; ("" "titletoc" nil)
+            ;; ("" "titletoc" nil) ;; disable for beamer
             ("" "hyperref" nil)))
 
 
@@ -1875,13 +1881,13 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   (my-menu-def
     "D" '(dired-jump :which-key "dired"))
 
-  (general-define-key
+  (general-def
    :keymaps 'global
    "C-c d" 'dired-jump
    "C-c D" 'dired)
 
 
-  (general-define-key
+  (general-def
    :keymaps 'dired-mode-map
    "SPC" nil
    "I" 'wdired-change-to-wdired-mode
