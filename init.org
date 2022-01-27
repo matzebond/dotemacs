@@ -2446,6 +2446,11 @@ Use common-lips indent function because elisp is not nice with keywords
 *** TODO Closure
     https://cider.mx/
 
+*** elisp debug
+
+[[info:elisp#Backtraces][elisp#Backtraces]]
+[[info:elisp#Debugger Commands][elisp#Debugger Commands]]
+
 ** C/C++
 https://github.com/realgud/realgud
 https://github.com/tuhdo/semantic-refactor
