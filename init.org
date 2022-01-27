@@ -1878,18 +1878,26 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
   (setq ispell-dictionary "en")
 
   (cond
-   ((executable-find "aspell")
-    ;; you may also need `ispell-extra-args'
-    (setq ispell-program-name "aspell"))
    ((executable-find "hunspell")
     (setq ispell-program-name "hunspell")
 
     ;; Please note that `ispell-local-dictionary` itself will be passed to hunspell cli with "-d"
     ;; it's also used as the key to lookup ispell-local-dictionary-alist
     ;; if we use different dictionary
-    (setq-default ispell-local-dictionary "en_US")
-    (setq ispell-local-dictionary-alist
-      '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))))
+    (setq ispell-dictionary "de_DE,en_US")
+    ;; (setq-default ispell-local-dictionary "en_US")
+    ;; (setq ispell-local-dictionary-alist
+    ;;   '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+    ;; ispell-set-spellchecker-params has to be called
+    ;; before ispell-hunspell-add-multi-dic will work
+    (ispell-set-spellchecker-params)
+    (ispell-hunspell-add-multi-dic "de_DE,en_US")
+    (setq ispell-personal-dictionary "~/.hunspell_personal")
+    (unless (file-exists-p ispell-personal-dictionary)
+      (write-region "" nil ispell-personal-dictionary nil 0)))
+   ((executable-find "aspell")
+    ;; you may also need `ispell-extra-args'
+    (setq ispell-program-name "aspell"))
    (t
     (message "no ispell program")
     (setq ispell-program-name nil)))
@@ -1908,7 +1916,23 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
     ;; ommit error messages on spell checking for performance sake
     (setq flyspell-issue-message-flag nil))
+
+  (use-package flyspell-correct
+    :after flyspell
+    :general
+    (general-nmap
+      "z =" 'flyspell-correct-wrapper)
+    )
 #+End_SRC
+
+** Thesaurus
+
+#+begin_src emacs-lisp
+  (use-package synosaurus
+    :custom
+    (synosaurus-backend 'synosaurus-backend-openthesaurus)
+    (synosaurus-choose-method 'default))
+#+end_src
 
 * Semantic
 ** TODO srefactor
