@@ -748,7 +748,19 @@ Use < in visual mode to continuously shift selection
 
 #+BEGIN_SRC emacs-lisp
   (use-package org
-    :straight (org-plus-contrib :includes (org))
+    :straight
+    `(org-plus-contrib
+      :type git
+      :repo "https://code.orgmode.org/bzg/org-mode.git"
+      :local-repo "org"
+      :depth full
+      :pre-build
+      ,(list (concat (when (eq system-type 'berkeley-unix) "g") "make")
+             "autoloads"
+             "EMACS=emacs") ;; (concat "EMACS=" invocation-directory invocation-name)
+      :build (:not autoloads)
+      :files (:defaults "lisp/*.el" ("etc/styles/" "etc/styles/*") "contrib/lisp/*.el")
+      :includes org)
     :defer 10
     :general
     (my-menu-def
@@ -805,6 +817,7 @@ Use < in visual mode to continuously shift selection
     (setq org-pretty-entities t)
     (setq org-image-actual-width 300)
     (setq org-export-with-smart-quotes t)
+    (setq org-hide-emphasis-markers t)
 
     (setq org-default-notes-file (expand-file-name "inbox.org" org-directory))
     (setq org-agenda-files '("~/org/inbox.org"
@@ -854,12 +867,20 @@ Use < in visual mode to continuously shift selection
             ("U" "\\mathbb{U}" t "U" "[U]" "[U]" "𝕌")
             ("Z" "\\mathbb{Z}" t "Z" "[Z]" "[Z]" "ℤ")
             ("sqrt" "\\sqrt{\\,}" t "&radic;" "[square root]" "[square root]" "√")
+            ("mapsto" "\\mapsto" t "&rarr;" "->" "->" "↦")
             ("etal" "et~al.~" nil "et al." "et al." "et al." "et al.")
-            ("eg" "e.g.\\ " nil "e.g." "e.g." "e.g." "e.g.")
-            ("ie" "i.e.,\\ " nil "i.e." "i.e." "i.e." "i.e.")))
+            ("eg" "e.g.,\\ " nil "e.g.," "e.g.," "e.g.," "e.g.,")
+            ("ie" "i.e.,\\ " nil "i.e.," "i.e.," "i.e.," "i.e.,")))
+    )
 
+  (use-package org-contrib
+    :after org
+    :straight (:type git :repo "https://git.sr.ht/~bzg/org-contrib")
+    :demand
+    :config
     (require 'ox-extra)
     (ox-extras-activate '(ignore-headlines)))
+
 
   (use-package evil-org
     :after (evil org)
@@ -951,6 +972,16 @@ Use < in visual mode to continuously shift selection
                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
+    (add-to-list 'org-latex-classes
+                 '("thesis"
+                   "\\documentclass[12pt,a4paper,twoside]{book}"
+                   ("\\chapter{%s}" . "\\chapter*{%s}")
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
     (require 'ox-beamer)
     (setq org-beamer-frame-default-options "")
     (add-to-list 'org-latex-classes
@@ -959,6 +990,10 @@ Use < in visual mode to continuously shift selection
                    ("\\subsection{%s}" . "\\subsection*{%s}")
                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 #+end_src
+
+** org capture
+   https://github.com/abo-abo/orca
+   https://orgmode.org/worg/org-contrib/org-protocol.html
 
 ** org-special-block
 
@@ -1078,16 +1113,19 @@ Use < in visual mode to continuously shift selection
 #+begin_src emacs-lisp
   (use-package org-download
     :after (org)
-    :commands (org-download-screenshot org-download-yank)
+    :commands (org-download-screenshot org-download-yank org-download-clipboard)
     ;; :general
     ;; (my-leader-def
     ;;   :keymaps 'org-mode-map
     ;;   "I" 'org-download-screenshot
     ;;   "y" 'org-download-yank)
+    :custom
+    (org-download-method 'directory)
+    (org-download-image-dir "./attach")
+    (org-download-heading-lvl nil)
     :config
     (org-download-enable)
-    (setq org-download-screenshot-method "xclip -selection clipboard -t image/png -o > %s")
-    )
+    (setq org-download-screenshot-method "maim --select --hidecursor --format=png %s"))
 #+end_src
 
 ** org-reveal
