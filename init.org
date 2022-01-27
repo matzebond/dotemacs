@@ -1274,6 +1274,12 @@ Use < in visual mode to continuously shift selection
     (general-def
       :keymaps 'magit-diff-mode-map
       "SPC" nil)
+    (general-def
+      :keymaps 'magit-log-mode-map
+      "C-n" 'magit-log-move-to-parent
+      "C-p" 'evil-previous-visual-line)
+    :custom
+    (magit-diff-adjust-tab-width t)
     :config
     (setq magit-diff-refine-hunk t)
     (require 'evil-magit)
