@@ -3354,6 +3354,15 @@ Edit textareas of the browser in emacs
     (let ((enable-local-variables :all))
       (hack-dir-local-variables-non-file-buffer)))
 #+END_SRC
+
+** TODO calendar
+
+#+begin_src emacs-lisp
+  (defun maschm/show-calendar ()
+    (interactive)
+    (calendar))
+#+end_src
+
 ** format-flowed
 
 #+begin_src emacs-lisp
