@@ -2848,7 +2848,7 @@ https://github.com/tuhdo/semantic-refactor
     ("SConstruct" . python-mode)
     ("SConscript" . python-mode)
     :config
-    ;; Use IPython when available or fall back to regular Python 
+    ;; Use IPython when available or fall back to regular Python
     (cond
      ((executable-find "ipython")
       (progn
@@ -2863,9 +2863,14 @@ https://github.com/tuhdo/semantic-refactor
       (setq python-shell-interpreter "python"))))
 
   (use-package lsp-pyright
-    :hook (python-mode . (lambda () (require 'lsp-pyright) (lsp))) ; or lsp-deferred
+    :hook (python-mode . (lambda () (require 'lsp-pyright) (lsp-deferred))) ; or lsp
     :config
     ())
+
+  (use-package blacken
+    :init
+    (setq-default blacken-fast-unsafe t)
+    (setq-default blacken-line-length 80))
 #+end_src
 
 #+begin_src emacs-lisp
