@@ -2245,6 +2245,17 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   (use-package vterm)
 #+end_src
 
+** tramp
+
+recognize the OTP prompt of the uni cluster
+
+#+begin_src emacs-lisp
+  (setq tramp-password-prompt-regexp
+        (format "^.*\\(%s\\).*:\^@? *" (regexp-opt
+                                        (cons "OTP"
+                                              password-word-equivalents))))
+#+end_src
+
 ** irc
 
 #+BEGIN_SRC emacs-lisp
