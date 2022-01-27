@@ -2345,6 +2345,25 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   ;; (evil-make-overriding-map wdired-mode-map 'normal)
 #+END_SRC
 
+*** dired hacks
+    by [[https://github.com/Fuco1/dired-hacks][Fuco1 @ github]]
+
+#+begin_src emacs-lisp
+  (use-package dired-collapse
+    :hook (dired-mode . dired-collapse-mode)
+    :config
+    (my-leader-def
+      :keymaps 'dired-mode-map
+      :states nil
+      "c" 'dired-collapse-mode))
+
+  (use-package dired-narrow
+    :general
+    (general-def
+      :keymaps 'dired-mode-map
+      "/" 'dired-narrow))
+#+end_src
+
 ** info
 
 #+BEGIN_SRC emacs-lisp
