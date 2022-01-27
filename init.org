@@ -1370,6 +1370,9 @@ Use < in visual mode to continuously shift selection
       "g" nil ;; mu4e-view-go-to-url
       "0" nil
       "z" nil)
+    (my-leader-def
+      :keymaps 'mu4e-compose-mode-map
+      "f" 'mu4e-fill-paragraph)
 
     (evil-make-overriding-map mu4e-main-mode-map 'normal)
     (evil-set-initial-state 'mu4e-main-mode 'normal)
@@ -1435,10 +1438,8 @@ Use < in visual mode to continuously shift selection
     (setq mu4e-headers-time-format "%T") ;; like "%H:%M:%S"
     (setq mu4e-headers-date-format "%F") ;; like "%Y-%m-%d"
     (setq mu4e-headers-skip-duplicates nil)
-    (setq mu4e-view-show-addresses 't)
-    (add-hook 'mu4e-view-mode-hook 'visual-line-mode)
-    (add-hook 'mu4e-view-mode-hook 'visual-fill-column-mode)
-    (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
+    (add-hook 'mu4e-compose-mode-hook 'visual-line-mode)
+    (add-hook 'mu4e-compose-mode-hook 'visual-fill-column-mode)
 
 
     ;; (setq mu4e-maildir-shortcuts
@@ -1480,13 +1481,18 @@ Use < in visual mode to continuously shift selection
   (with-eval-after-load "mm-decode"
     (add-to-list 'mm-discouraged-alternatives "text/html")
     (add-to-list 'mm-discouraged-alternatives "text/richtext"))
+
   (with-eval-after-load "gnus-art"
-    (setq gnus-inhibit-images 't))
+    (setq gnus-inhibit-images 't)
+    (add-hook 'gnus-article-mode-hook 'visual-line-mode)
+    (add-hook 'gnus-article-mode-hook 'visual-fill-column-mode))
+  (setq fill-flowed-display-column nil)
+  (customize-set-variable 'visual-line-fringe-indicators '(nil right-curly-arrow))
 
-  (setq mm-discouraged-alternatives nil)
-
-  (setq shr-color-visible-luminance-min 80) ;; make html background more readable
-  (advice-add #'shr-colorize-region :around (defun shr-no-colourise-region (&rest ignore))) ;; no colors in html mails
+  ;; make html background more readable
+  (setq shr-color-visible-luminance-min 80)
+  ;; no colors in html mails
+  (advice-add #'shr-colorize-region :around (defun shr-no-colourise-region (&rest ignore)))
 #+end_src
 
 ** Additional mu4e packages
@@ -1639,7 +1645,11 @@ from https://github.com/DiegoVicen/my-emacs#Fix-scroll
     "<left-margin><mouse-4>" 'mwheel-scroll
     "<left-margin><mouse-5>" 'mwheel-scroll
     "<right-margin><mouse-4>" 'mwheel-scroll
-    "<right-margin><mouse-5>" 'mwheel-scroll)
+    "<right-margin><mouse-5>" 'mwheel-scroll
+    "<left-fringe><mouse-4>" 'mwheel-scroll
+    "<left-fringe><mouse-5>" 'mwheel-scroll
+    "<right-fringe><mouse-4>" 'mwheel-scroll
+    "<right-fringe><mouse-5>" 'mwheel-scroll)
 #+end_src
 
 ** Dashboard
@@ -1872,10 +1882,9 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 ** text-mode
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'text-mode-hook 'auto-fill-mode)
   (add-hook 'text-mode-hook 'visual-line-mode)
 
-  (setq-default fill-column 80)
+  (setq-default fill-column 78)
 
   (my-leader-def
     :keymaps 'text-mode-map
@@ -2906,3 +2915,59 @@ Edit textareas of the browser in emacs
     (let ((enable-local-variables :all))
       (hack-dir-local-variables-non-file-buffer)))
 #+END_SRC
+** format-flowed
+
+#+begin_src emacs-lisp
+  (defun fill-flowed (&optional buffer delete-space)
+    "Apply RFC2646 decoding to BUFFER.
+  If BUFFER is nil, default to the current buffer.
+
+  If DELETE-SPACE, delete RFC2646 spaces padding at the end of
+  lines."
+    (with-current-buffer (or buffer (current-buffer))
+      (let ((fill-column  (eval fill-flowed-display-column)))
+        (goto-char (point-min))
+        (while (not (eobp))
+          (cond
+           ((and (looking-at "^>+")
+                 (eq (char-before (line-end-position)) ?\s))
+            (let ((prefix (match-string 0)))
+              ;; Insert a space character after the quote signs for more
+              ;; pleasant reading of quoted lines.
+              (goto-char (match-end 0))
+              (unless (looking-at " ")
+                (insert " "))
+              (end-of-line)
+              (when (and (not (eobp))
+                         (save-excursion
+                           (forward-line 1)
+                           (looking-at (format "\\(%s ?\\)[^>]" prefix))))
+                ;; Delete the newline and the quote at the start of the
+                ;; next line.
+                (delete-region (point) (match-end 1))
+                (ignore-errors
+                  (let ((fill-prefix (concat prefix " "))
+                        adaptive-fill-mode)
+                    (fill-region (line-beginning-position)
+                                 (line-end-position)
+                                 'left 'nosqueeze))))))
+           (t
+            ;; Delete the newline.
+            (when (eq (following-char) ?\s)
+              (delete-char 1))
+            ;; Hack: Don't do the flowing on the signature line.
+            (when (and (not (looking-at "-- $"))
+                       (eq (char-before (line-end-position)) ?\s))
+              (end-of-line)
+              (when delete-space
+                (delete-char -1))
+              (delete-char 1)
+              (ignore-errors
+                (let ((fill-prefix ""))
+                  (fill-region (line-beginning-position)
+                               (line-end-position)
+                               'left 'nosqueeze))))))
+          (unless (eq (char-before (line-end-position)) ?\s)
+            (forward-line 1))
+          (beginning-of-line)))))
+#+end_src
