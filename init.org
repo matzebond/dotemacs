@@ -2781,6 +2781,7 @@ https://github.com/tuhdo/semantic-refactor
                        (setq-local c-basic-offset 4))))
 
   (use-package ccls
+    :disabled
     :after projectile
     ;; :ensure-system-package ccls
     :custom
