@@ -2422,7 +2422,15 @@ When compiling follow the buffer
 
 #+END_SRC
 
-*** TODO whitespace
+*** whitespace
+
+#+begin_src emacs-lisp
+    (use-package ws-butler
+      :hook
+      (prog-mode . ws-butler-mode)
+      (org-mode . ws-butler-mode))
+#+end_src
+
 *** TODO show-parens
 ** Lisp
 Use common-lips indent function because elisp is not nice with keywords
