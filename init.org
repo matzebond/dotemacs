@@ -3058,7 +3058,8 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
 
 #+BEGIN_SRC emacs-lisp
   (use-package rustic
-    :mode ("\\.rs\\'" . rustic-mode)
+    :mode (("\\.rs\\'" . rustic-mode)
+           ("\\.ron\\'" . rustic-mode))
     :config
     (push "target" projectile-globally-ignored-directories)
 
