@@ -2989,9 +2989,13 @@ Edit textareas of the browser in emacs
     (interactive)
     (unless (buffer-file-name)
       (error "Buffer '%s' is not visiting a file!" (buffer-name)))
-    (let ((new-file-name
-           (read-file-name "Rename current file to: "
-                           (file-name-directory buffer-file-name))))
+    (let* ((new-file-name
+            (read-file-name "Rename current file to: "
+                            (file-name-directory buffer-file-name)))
+           (new-dir (f-parent new-file-name)))
+      (unless (f-dir? new-dir)
+        (make-directory new-dir t)
+        (message "Create dir %s." new-dir))
       (rename-file buffer-file-name new-file-name)
       (rename-buffer new-file-name)
       (set-visited-file-name new-file-name)
