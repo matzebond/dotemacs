@@ -2657,6 +2657,16 @@ When compiling follow the buffer
     (calendar-week-start-day 1))
 #+end_src
 
+** man
+
+woman > man because emacs suffices
+
+#+begin_src emacs-lisp
+  (defalias 'man 'woman)
+  (with-eval-after-load 'woman
+    (customize-set-variable 'woman-fill-frame t))
+#+end_src
+
 ** drawing
 *** dot
 
