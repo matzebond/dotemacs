@@ -1951,7 +1951,17 @@ https://github.com/emacs-dashboard/emacs-dashboard
       :keymaps 'dashboard-mode-map
       "SPC" nil
       "DEL" nil
-      "s" '(lambda () (interactive) (switch-to-buffer "*scratch*")))
+      "m" '(lambda () (interactive)
+             (dashboard-jump-to-bookmarks)
+             (call-interactively 'consult-bookmark))
+      "r" '(lambda () (interactive)
+             (dashboard-jump-to-recent-files)
+             (call-interactively 'consult-recent-file))
+      "p" '(lambda () (interactive)
+             (dashboard-jump-to-projects)
+             (call-interactively 'projectile-switch-project))
+      "s" '(lambda () (interactive) (switch-to-buffer "*scratch*"))
+      "M" 'mu4e)
     :config
     (evil-make-overriding-map dashboard-mode-map 'motion)
     (evil-set-initial-state 'dashboard-mode 'motion)
