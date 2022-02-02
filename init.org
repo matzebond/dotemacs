@@ -1174,26 +1174,25 @@ Use < in visual mode to continuously shift selection
 ** org babel
 
 #+begin_src emacs-lisp
-  (eval-after-load 'org
-    '(progn
-       (setq org-ditaa-jar-path (expand-file-name
-                                 "straight/repos/org/contrib/scripts/ditaa.jar"
-                                 user-emacs-directory))
-       (setq org-plantuml-jar-path (expand-file-name "plantuml.jar" user-emacs-directory))
+  (with-eval-after-load 'org
+    (setq org-ditaa-jar-path (expand-file-name
+                              "straight/repos/org/contrib/scripts/ditaa.jar"
+                              user-emacs-directory))
+    (setq org-plantuml-jar-path (expand-file-name "plantuml.jar" user-emacs-directory))
 
-       ;;(require 'gnuplot)
-       (add-to-list 'org-babel-load-languages '(shell . t))
-       (add-to-list 'org-babel-load-languages '(python . t))
-       (add-to-list 'org-babel-load-languages '(R . t))
-       (add-to-list 'org-babel-load-languages '(latex . t))
-       (add-to-list 'org-babel-load-languages '(ditaa . t))
-       (add-to-list 'org-babel-load-languages '(dot . t))
-       (add-to-list 'org-babel-load-languages '(gnuplot . t))
-       (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
-       (add-to-list 'org-babel-load-languages '(plantuml . t))
+    ;;(require 'gnuplot)
+    (add-to-list 'org-babel-load-languages '(shell . t))
+    (add-to-list 'org-babel-load-languages '(python . t))
+    (add-to-list 'org-babel-load-languages '(R . t))
+    (add-to-list 'org-babel-load-languages '(latex . t))
+    (add-to-list 'org-babel-load-languages '(ditaa . t))
+    (add-to-list 'org-babel-load-languages '(dot . t))
+    (add-to-list 'org-babel-load-languages '(gnuplot . t))
+    (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+    (add-to-list 'org-babel-load-languages '(plantuml . t))
 
 
-       (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)))
+    (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages))
 
 
   (use-package ob-async
@@ -2608,14 +2607,13 @@ When compiling follow the buffer
 ** image
 
 #+begin_src emacs-lisp
-  (eval-after-load 'evil
-    '(eval-after-load 'image-mode
-       '(progn
-          (general-define-key
-            :keymaps 'image-mode-map
-            "q" 'kill-current-buffer
-            "SPC" nil)
-          (evil-make-overriding-map image-mode-map 'normal))))
+  (with-eval-after-load 'evil
+    (with-eval-after-load 'image-mode
+      (general-define-key
+       :keymaps 'image-mode-map
+       "q" 'kill-current-buffer
+       "SPC" nil)
+      (evil-make-overriding-map image-mode-map 'normal)))
 
   ;; (use-package image-mode
   ;;   :after evi   l
