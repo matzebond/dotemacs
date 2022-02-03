@@ -2426,24 +2426,38 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 ** helpful
 
 #+BEGIN_SRC emacs-lisp
+
+  (defalias 'describe-variable 'helpful-variable)
+  (defalias 'describe-function 'helpful-function)
+  (defalias 'describe-symbol 'helpful-symbol)
+
   (use-package helpful
     :defer 10
     :general
     (my-menu-def
       "h" '(helpful-at-point :which-key "help")
       "H" '(:ignore t :which-key "Help")
-      "H h" 'helpful-symbol
-      "H v" 'helpful-variable
-      "H f" 'helpful-function
-      "H c" 'helpful-callable
-      "H k" 'helpful-key
+      "H h" '(helpful-symbol :which-key "symbol")
+      "H v" '(helpful-variable :which-key "variable")
+      "H f" '(helpful-function :which-key "function")
+      "H c" '(helpful-callable :which-key "callable")
+      "H k" '(helpful-key :which-key "key")
       "H X" 'helpful-kill-buffers
       "H i" 'info
-      "H I" 'counsel-info-lookup-symbol
-      "H m" 'describe-mode
-      "H a" 'consult-apropos)
-      ;; "H V" 'counsel-set-variable
-      ;; "H F" 'counsel-faces
+      "H I" 'info-display-manual
+      "H m" '(woman :which-key "man-page")
+      "H M" '(consult-man :which-key "search man-page")
+      ;; "H m" '(describe-mode :which-key "mode")
+      "H a" 'consult-apropos
+      "H F" '(describe-face :which-key "face")
+      "H C" '(describe-char :which-key "char")
+      "H s" 'set-variable
+      "H d" '(:ignore t :which-key "Debug")
+      "H d e" 'debug-on-entry
+      "H d E" 'cancel-debug-on-entry)
+      ;; "H K" which-key-show-keymap
+      ;; "H T" which-key-show-top-level
+
       ;; "H U" 'counsel-unicode-char
 
     :config
@@ -2455,10 +2469,8 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
       "g" nil
       "g r" 'helpful-update
       "q" 'quit-window)
-    (evil-make-overriding-map helpful-mode-map 'normal)
+    (evil-make-overriding-map helpful-mode-map 'motion))
 
-    (setq counsel-describe-function-function #'helpful-callable)
-    (setq counsel-describe-variable-function #'helpful-variable))
 #+END_SRC
 
 *** TODO think at point in org-mode src environment
