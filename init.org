@@ -2473,6 +2473,25 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 
 #+END_SRC
 
+*** embark become keymap for helpful commands
+
+#+BEGIN_SRC emacs-lisp
+  (with-eval-after-load "embark"
+    (with-eval-after-load "helpful"
+      (setq embark-become-helpful-map
+	    '(keymap
+	      (105 . describe-input-method)
+	      (112 . describe-package)
+	      (70 . describe-face)
+	      (115 . helpful-symbol)
+	      (102 . helpful-function)
+	      (118 . helpful-variable)
+	      (67 . apropos-command)
+	      (85 . apropos-user-option)
+	      (86 . apropos-variable)))
+      (add-to-list 'embark-become-keymaps 'embark-become-helpful-map)))
+#+END_SRC
+
 *** TODO think at point in org-mode src environment
 
 ** TODO view
