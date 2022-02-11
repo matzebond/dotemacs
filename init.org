@@ -94,7 +94,21 @@ of handy syntactic sugar and useful features.
 
 #+BEGIN_SRC emacs-lisp
   (eval-when-compile
-    (straight-use-package 'use-package))
+    (straight-override-recipe
+     '(bind-key ;; also specify :fork otherwise the recipies are incompatible
+       :type git
+       :flavor melpa
+       :files ("bind-key.el" "bind-key-pkg.el")
+       :host github :repo "jwiegley/use-package"
+       :fork (:host github :repo "matzebond/use-package")))
+    (straight-use-package
+     '(use-package ; :type git :host github :repo "raxod502/el-patch"
+          :type git
+          :flavor melpa
+          :files (:defaults (:exclude "bind-key.el" "bind-chord.el" "use-package-chords.el" "use-package-ensure-system-package.el") "use-package-pkg.el")
+          :host github :repo "jwiegley/use-package"
+          :fork (:host github :repo "matzebond/use-package"))))
+
 
   ;; Tell `use-package' to always load features lazily unless told
   ;; otherwise. It's nicer to have this kind of thing be deterministic:
@@ -207,7 +221,7 @@ https://github.com/purcell/exec-path-from-shell
     (exec-path-from-shell-initialize))
 #+end_src
 
-* Saving
+* Saving, Backup & History
 ** Backup
 
 #+BEGIN_SRC emacs-lisp
@@ -954,6 +968,9 @@ Use < in visual mode to continuously shift selection
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-commentary
+    :straight
+     '(evil-commentary :type git :flavor melpa :host github :repo "linktohack/evil-commentary"
+                       :fork (:host github :repo "matzebond/evil-commentary"))
     :general
     (general-nmap
       "gc" 'evil-commentary
@@ -1155,7 +1172,6 @@ Use < in visual mode to continuously shift selection
 
   (use-package org-contrib
     :after org
-    :straight (:type git :repo "https://git.sr.ht/~bzg/org-contrib")
     :demand
     :config
     (require 'ox-extra)
