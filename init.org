@@ -21,15 +21,18 @@ Automatically reload the configuration after changes to the =init.org= file.
     (interactive)
     (when (equal (buffer-file-name)
                  (expand-file-name "init.org" user-emacs-directory))
-      (let ((prog-mode-hook nil)) ;; Avoid running hooks when tangling.
+      (let* ((time (current-time))
+             (prog-mode-hook nil)) ;; Avoid running hooks when tangling.
         (org-babel-tangle)
         ;; (byte-compile-file (expand-file-name "init.el" user-emacs-directory))
-        )))
+
+        (message "Tangled init.el in %.06f seconds"
+                   (float-time (time-since time))))))
 
   (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
 
-*** TODO why are there use-package errors when using byte-compile-file
+*** TODO investigate use-package errors when using byte-compile-file
 * Initial Stuff
 ** Start up
 #+BEGIN_SRC emacs-lisp
@@ -62,9 +65,8 @@ After startup reset it to reasonable value
   (add-hook 'focus-out-hook 'garbage-collect)
 #+END_SRC
 
-** Package management & straight.el
-
-Bootstrap straight.el
+** Package management
+*** Bootstrap straight.el
 
 #+BEGIN_SRC emacs-lisp
   (setq straight-recipes-gnu-elpa-use-mirror t)
@@ -83,6 +85,7 @@ Bootstrap straight.el
     (load bootstrap-file nil 'nomessage))
 #+END_SRC
 
+*** use-package
 Use ~straight.el~ together with ~use-package~
 
 Package `use-package' provides a handy macro by the same name which
@@ -108,6 +111,8 @@ of handy syntactic sugar and useful features.
   ;; (setq use-package-compute-statistics t)
   (setq use-package-verbose t)
 #+END_SRC
+
+**** TODO use :ensure-system-package key word for system dependencies
 
 ** Custom
 
@@ -1027,7 +1032,7 @@ Use < in visual mode to continuously shift selection
       :pre-build
       ,(list (concat (when (eq system-type 'berkeley-unix) "g") "make")
              "autoloads"
-             "EMACS=emacs") ;; (concat "EMACS=" invocation-directory invocation-name)
+             "EMACS=emacs") ;;replaces ,(concat "EMACS=" invocation-directory invocation-name)
       :build (:not autoloads)
       :files (:defaults "lisp/*.el" ("etc/styles/" "etc/styles/*") "contrib/lisp/*.el")
       :includes org)
