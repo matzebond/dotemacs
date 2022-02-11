@@ -1620,6 +1620,9 @@ Use < in visual mode to continuously shift selection
 #+END_SRC
 
 * Mail
+** TODO
+https://github.com/mullikine/gnus/blob/master/gnus-dired.el
+https://github.com/oantolin/embark/issues/376
 ** mu4e
 
 #+begin_src emacs-lisp
@@ -1666,7 +1669,7 @@ Use < in visual mode to continuously shift selection
       "J" 'mu4e~headers-jump-to-maildir
       "h" nil
       "H" 'mu4e-view-toggle-html
-      "g" nil
+      "g" nil ;; mu4e-view-go-to-url
       "g r" 'mu4e-update-mail-and-index
       "G" nil
       "k" nil ;; mu4e-view-save-url
@@ -1675,7 +1678,6 @@ Use < in visual mode to continuously shift selection
       "V" nil ;;
       "b" nil ;; mu4e-headers-search-bookmark
       "w" nil ;; visual-line-mode
-      "g" nil ;; mu4e-view-go-to-url
       "0" nil
       "z" nil)
     (my-leader-def
