@@ -1043,6 +1043,13 @@ Use < in visual mode to continuously shift selection
     :general
     (:keymaps 'evil-inner-text-objects-map "a" 'evil-inner-arg)
     (:keymaps 'evil-outer-text-objects-map "a" 'evil-outer-arg))
+
+  (use-package evil-owl
+    :config
+    (setq evil-owl-display-method 'posframe
+          evil-owl-extra-posframe-args '(:width 50 :height 20)
+          evil-owl-max-string-length 50)
+    (evil-owl-mode))
 #+END_SRC
 
 * Org
