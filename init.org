@@ -1674,6 +1674,7 @@ https://github.com/oantolin/embark/issues/376
 #+begin_src emacs-lisp
   (use-package mu4e
     :defer 15
+    :commands (mu4e) ;; not picked up because inside a lambda
     :general
     (my-menu-def
       "m" '((lambda () (interactive) (let ((default-directory "~/")) (mu4e)))
@@ -1820,6 +1821,7 @@ https://github.com/oantolin/embark/issues/376
           :key ?m)))
 
     :local
+    (mu4e-main-mode-hook . ((setq-local default-directory "~/")))
     (mu4e-compose-mode-hook . ((setq-local ispell-local-dictionary "de_DE"))))
 #+end_src
 
