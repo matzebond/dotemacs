@@ -1303,6 +1303,39 @@ Use < in visual mode to continuously shift selection
                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 #+end_src
 
+** org publish
+
+#+begin_src emacs-lisp
+  ;; (require 'ox-publish)
+  (with-eval-after-load 'ox-publish
+    (setq org-publish-project-alist
+          '(
+            ("website-notes"
+             :base-directory "~/website/"
+             :base-extension "org"
+             :publishing-directory "~/website/public_html/"
+             :exclude "public_html"
+             :recursive t
+             :publishing-function org-html-publish-to-html
+             :headline-levels 4             ; Just the default for this project.
+             :auto-preamble t
+             )
+            ("website-static"
+             :base-directory "~/website/"
+             :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
+             :publishing-directory "~/website/public_html/"
+             :exclude "public_html"
+             :recursive t
+             :publishing-function org-publish-attachment
+             )
+            ("website" :components ("website-notes" "website-static"))
+            )))
+
+  (defun push-website ()
+    (interactive)
+    (async-shell-command "rsync -rltv ~/website/public_html/ netcup:/var/www/maschm"))
+#+end_src
+
 ** org capture
    https://github.com/abo-abo/orca
    https://orgmode.org/worg/org-contrib/org-protocol.html
