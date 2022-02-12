@@ -222,7 +222,7 @@ https://github.com/purcell/exec-path-from-shell
 #+end_src
 
 * Saving, Backup & History
-** Backup
+** TODO Backup
 
 #+BEGIN_SRC emacs-lisp
   (defvar user-backup-directory (expand-file-name ".cache/backups" user-emacs-directory))
@@ -272,7 +272,7 @@ https://github.com/purcell/exec-path-from-shell
   (setq create-lockfiles nil)
 #+end_src
 
-* Navigation & Search
+* Navigation & Minibuffer & Search
 ** Buffer & Window menu
 
 #+BEGIN_SRC emacs-lisp
@@ -921,7 +921,7 @@ https://github.com/noctuid/evil-guide
     )
 #+END_SRC
 
-** Vim goodies
+** evil config & vim goodies
 *** visual line
 
 #+begin_src emacs-lisp
@@ -967,6 +967,10 @@ Use < in visual mode to continuously shift selection
 ** Evil packages
 
 #+BEGIN_SRC emacs-lisp
+  (use-package evil-collection
+    :config
+    (evil-collection-init 'magit))
+
   (use-package evil-commentary
     :straight
      '(evil-commentary :type git :flavor melpa :host github :repo "linktohack/evil-commentary"
@@ -990,7 +994,10 @@ Use < in visual mode to continuously shift selection
       "gS" 'evil-Surround-region))
 
   (use-package evil-numbers
-    :demand)
+    :general
+    (general-nmap
+      "g+" 'evil-numbers/inc-at-pt-incremental
+      "g-" 'evil-numbers/dec-at-pt-incremental))
 
   (use-package evil-matchit
     :demand
@@ -1022,12 +1029,15 @@ Use < in visual mode to continuously shift selection
     :general
     (general-def
       :keymaps 'normal
-      "g l" 'evil-lion-left
-      "g L" 'evil-lion-right))
+      "gl" 'evil-lion-left
+      "gL" 'evil-lion-right))
 
   (use-package evil-exchange
-    :config
-    (evil-exchange-install))
+    :general
+    (nmap "gx" 'evil-exchange)
+    (vmap "gx" 'evil-exchange)
+    (nmap "gX" 'evil-exchange-cancel)
+    (vmap "gX" 'evil-exchange-cancel))
 
   (use-package evil-args
     :general
@@ -1584,12 +1594,8 @@ Use < in visual mode to continuously shift selection
     (magit-diff-adjust-tab-width t)
     :config
     (setq magit-diff-refine-hunk t)
-    (require 'evil-magit)
     :local
     (git-commit-mode-hook . ((setq-local ispell-local-dictionary "en"))))
-
-  (use-package evil-magit
-    :after (evil magit))
 #+END_SRC
 
 ** Forge
