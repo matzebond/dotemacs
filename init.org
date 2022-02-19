@@ -987,8 +987,9 @@ Use < in visual mode to continuously shift selection
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-collection
+    :demand
     :config
-    (evil-collection-init 'magit))
+    (evil-collection-init '(magit forge)))
 
   (use-package evil-commentary
     :straight
