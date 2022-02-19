@@ -1329,6 +1329,9 @@ Use < in visual mode to continuously shift selection
                    ("\\section{%s}" . "\\section*{%s}")
                    ("\\subsection{%s}" . "\\subsection*{%s}")
                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
+
+  (use-package org-fragtog
+    :hook (org-mode . org-fragtog-mode))
 #+end_src
 
 ** org publish
