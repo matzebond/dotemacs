@@ -3358,6 +3358,19 @@ https://github.com/NicolasPetton/Indium
   (use-package erlang)
 #+end_src
 
+** Java
+*** Android
+*** Gradle
+groovy-mode provides syntax highlighting for the groovy lang and thus for grade files
+
+gradle-mode integrates gradle builds into emacs compilation feature
+
+#+begin_src emacs-lisp
+  (use-package groovy-mode)
+
+  (use-package gradle-mode)
+#+end_src
+
 ** Sonic Pi
 
 #+begin_src emacs-lisp
