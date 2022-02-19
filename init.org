@@ -2744,6 +2744,24 @@ recognize the OTP prompt of the uni cluster
         (format "^.*\\(%s\\).*:\^@? *" (regexp-opt
                                         (cons "OTP"
                                               password-word-equivalents))))
+
+  (connection-local-set-profile-variables
+   'remote-ksh
+   '((shell-file-name . "/bin/ksh")
+     (shell-command-switch . "-c")))
+
+  (connection-local-set-profile-variables
+   'remote-bash
+   '((shell-file-name . "/bin/bash")
+     (shell-command-switch . "-c")))
+
+  (connection-local-set-profile-variables
+   'remote-zsh
+   '((shell-file-name . "/bin/zsh")
+     (shell-command-switch . "-c")))
+
+  (connection-local-set-profiles
+   '(:application tramp :machine "pi") 'remote-zsh)
 #+end_src
 
 ** irc
