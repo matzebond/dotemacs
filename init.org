@@ -399,7 +399,7 @@ consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all ma
      :preview-key '(:debounce 0.2 any)
      consult-ripgrep consult-git-grep consult-grep
      consult-bookmark consult-recent-file consult-xref
-     consult--source-file consult--source-project-file consult--source-bookmark
+     consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
      :preview-key (kbd "M-."))
 
     ;; Optionally configure the narrowing key.
@@ -567,7 +567,6 @@ Use `consult-line` search as last evil/isearch string copied from [[https://gith
 
   ;; Consult users will also want the embark-consult package.
   (use-package embark-consult
-    :ensure t
     :after (embark consult)
     :demand t ; only necessary if you have the hook below
     ;; if you want to have consult previews as you move around an
@@ -1364,7 +1363,6 @@ Use < in visual mode to continuously shift selection
 
 #+begin_src emacs-lisp
   (use-package org-special-block-extras
-    :ensure t
     :hook (org-mode . org-special-block-extras-mode)
     ;; :custom
     ;; (org-special-block-extras--docs-libraries
@@ -1677,12 +1675,44 @@ Use < in visual mode to continuously shift selection
 
   (use-package orgit
     :after (org magit))
-
-  (use-package git-gutter-fringe+
-    :disabled
-    :init (global-git-gutter-fringe+-mode))
 #+END_SRC
 
+*** Git Highlight Fringe
+config taken from https://github.com/jimeh/.emacs.d/blob/master/modules/version-control/siren-diff-hl.el
+
+#+BEGIN_SRC emacs-lisp
+  (use-package diff-hl
+    :demand
+    :hook
+    (magit-pre-refresh . diff-hl-magit-pre-refresh)
+    (magit-post-refresh . diff-hl-magit-post-refresh)
+
+    :config
+    (global-diff-hl-mode)
+
+    (define-fringe-bitmap 'diff-hl-bmp-insert
+      [#b01100000] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-change
+      [#b01100000] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-delete
+      [#b11111000
+       #b11110000
+       #b11100000
+       #b11000000
+       #b10000000] nil nil 'top)
+
+    (defun maschm/diff-hl-fringe-bmp-function (type pos)
+        (cl-loop for bmp in (list (format "diff-hl-bmp-%s-%s" type pos)
+                                  (format "diff-hl-bmp-%s" type)
+                                  (format "diff-hl-bmp-%s" pos))
+                 do (setq bmp (intern bmp))
+                 if (fringe-bitmap-p bmp)
+                 return bmp))
+    (setq diff-hl-fringe-bmp-function 'maschm/diff-hl-fringe-bmp-function)
+
+    ;; (defun maschm/diff-hl-fringe-face-from-type (type _pos)
+      ;; (intern (format "maschm/diff-hl-face-%s" type)))
+    )
 #+END_SRC
 
 * Mail
@@ -1956,6 +1986,8 @@ https://github.com/oantolin/embark/issues/376
 #+BEGIN_SRC emacs-lisp
   (setq indicate-buffer-boundaries 'left)
 #+END_SRC
+
+*** [[*Git Highlight Fringe][Git Fringe]]
 
 ** Scale
 
