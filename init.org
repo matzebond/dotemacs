@@ -1793,10 +1793,10 @@ https://github.com/oantolin/embark/issues/376
       :keymaps 'mu4e-compose-mode-map
       "f" 'mu4e-fill-paragraph)
 
-    (evil-make-overriding-map mu4e-main-mode-map 'normal)
-    (evil-set-initial-state 'mu4e-main-mode 'normal)
-    (evil-make-overriding-map mu4e-headers-mode-map 'normal)
-    (evil-set-initial-state 'mu4e-headers-mode 'normal)
+    (evil-make-overriding-map mu4e-main-mode-map 'motion)
+    (evil-set-initial-state 'mu4e-main-mode 'motion)
+    (evil-make-overriding-map mu4e-headers-mode-map 'motion)
+    (evil-set-initial-state 'mu4e-headers-mode 'motion)
     (evil-make-overriding-map mu4e-view-mode-map 'normal)
     (evil-set-initial-state 'mu4e-view-mode 'normal)
     (setq mu4e-completing-read-function 'completing-read)
