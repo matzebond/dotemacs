@@ -2393,6 +2393,8 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    "k" 'dired-previous-line
    "h" 'dired-up-directory
    "l" 'dired-find-file
+   "N" 'dired-next-subdir ; dired-man
+   "P" 'dired-prev-subdir ; dired-do-print
    "<normal-state> j" nil
    "<normal-state> k" nil
    "<normal-state> h" nil
@@ -2450,10 +2452,11 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   (general-define-key
    :keymaps 'Info-mode-map
    "SPC" nil
-   "<tab>" 'Info-next-reference-or-link
-   "S-<tab>" 'Info-prev-reference-or-link
+   "<tab>" 'Info-next-reference ;;-or-link
+   "S-<tab>" 'Info-prev-reference ;;-or-link
    "C-o" 'Info-history-back
    "C-i" 'Info-history-forward
+   "M-r" 'Info-history
 
    "h" nil
    "l" nil
@@ -2469,7 +2472,8 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    "gj" 'Info-next
    "gk" 'Info-prev
    "gg" 'evil-goto-first-line
-
+   "+" 'clone-buffer
+  
    "q" 'Info-exit)
 
   (evil-make-overriding-map Info-mode-map 'motion)
@@ -2484,6 +2488,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   (general-define-key
    :keymaps 'help-mode-map
    "SPC" nil
+   "h" nil
 
    "C-o" 'help-go-back
    "C-i" 'help-go-forward
@@ -2497,40 +2502,38 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 ** helpful
 
 #+BEGIN_SRC emacs-lisp
-
   (defalias 'describe-variable 'helpful-variable)
   (defalias 'describe-function 'helpful-function)
   (defalias 'describe-symbol 'helpful-symbol)
 
+  (my-menu-def
+    "h" '(helpful-at-point :which-key "help")
+    "H" '(:ignore t :which-key "Help")
+    "H h" '(helpful-symbol :which-key "symbol")
+    "H v" '(helpful-variable :which-key "variable")
+    "H f" '(helpful-function :which-key "function")
+    "H c" '(helpful-callable :which-key "callable")
+    "H k" '(helpful-key :which-key "key")
+    "H X" 'helpful-kill-buffers
+    "H i" 'info
+    "H I" 'info-display-manual
+    ;; "H m" '(describe-mode :which-key "mode")
+    "H m" '(woman :which-key "man-page")
+    "H M" '(consult-man :which-key "search man-page")
+    "H a" 'consult-apropos
+    "H F" '(describe-face :which-key "face")
+    "H C" '(describe-char :which-key "char")
+    "H U" 'insert-char
+    "H s" 'set-variable
+    "H d" '(:ignore t :which-key "Debug")
+    "H d e" 'debug-on-entry
+    "H d E" 'cancel-debug-on-entry)
+    ;; "H K" which-key-show-keymap
+    ;; "H T" which-key-show-top-level
+
   (use-package helpful
     :defer 10
-    :general
-    (my-menu-def
-      "h" '(helpful-at-point :which-key "help")
-      "H" '(:ignore t :which-key "Help")
-      "H h" '(helpful-symbol :which-key "symbol")
-      "H v" '(helpful-variable :which-key "variable")
-      "H f" '(helpful-function :which-key "function")
-      "H c" '(helpful-callable :which-key "callable")
-      "H k" '(helpful-key :which-key "key")
-      "H X" 'helpful-kill-buffers
-      "H i" 'info
-      "H I" 'info-display-manual
-      "H m" '(woman :which-key "man-page")
-      "H M" '(consult-man :which-key "search man-page")
-      ;; "H m" '(describe-mode :which-key "mode")
-      "H a" 'consult-apropos
-      "H F" '(describe-face :which-key "face")
-      "H C" '(describe-char :which-key "char")
-      "H s" 'set-variable
-      "H d" '(:ignore t :which-key "Debug")
-      "H d e" 'debug-on-entry
-      "H d E" 'cancel-debug-on-entry)
-      ;; "H K" which-key-show-keymap
-      ;; "H T" which-key-show-top-level
-
-      ;; "H U" 'counsel-unicode-char
-
+    :commands (helpful-symbol helpful-variable helpful-function helpful-callable helpful-key)
     :config
     (general-def
       :keymaps 'helpful-mode-map
@@ -2541,7 +2544,6 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
       "g r" 'helpful-update
       "q" 'quit-window)
     (evil-make-overriding-map helpful-mode-map 'motion))
-
 #+END_SRC
 
 *** embark become keymap for helpful commands
@@ -2628,7 +2630,8 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     :local
     (general-define-key
      :keymaps 'eshell-mode-map
-     "C-r" 'counsel-esh-history)
+     :states '(normal insert)
+     "M-r" 'consult-history)
     (general-define-key
      :keymaps 'eshell-mode-map
      :states 'motion
