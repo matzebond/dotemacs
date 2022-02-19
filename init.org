@@ -3371,13 +3371,14 @@ https://github.com/NicolasPetton/Indium
 #+begin_src emacs-lisp
   (use-package gdscript-mode
     :straight (gdscript-mode
-           :type git :host github :repo "GDQuest/emacs-gdscript-mode"
-           :files ("*.el" "data/*.txt"))
-
+               :type git
+               :host github
+               :repo "godotengine/emacs-gdscript-mode")
     :config
-    (setq gdscript-tabs-mode t) ;; If true, use tabs for indents. Default: t
-    (setq gdscript-tab-width 4) ;; Controls the width of tab-based indents
-    )
+    (setq gdscript-use-tab-indents t) ;; If true, use tabs for indents. Default: t
+    (setq gdscript-indent-offset 4) ;; Controls the width of tab-based indents
+    ;; (setq gdscript-gdformat-save-and-format t) ;; Save all buffers and format them with gdformat anytime Godot executable is run.
+    (setq gdscript-docs-local-path "/home/maschm/.local/share/godot/docs"))
 #+end_src
 
 ** Markup & Config Langs
