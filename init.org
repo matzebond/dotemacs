@@ -1295,6 +1295,15 @@ Use < in visual mode to continuously shift selection
     ;; (setq org-preview-latex-default-process)
 
     (add-to-list 'org-latex-classes
+                 '("letter"
+                   "\\documentclass[10pt]{letter}"
+                   ("\\section{%s}" . "\\section*{%s}") ;; TODO does letter not support any?
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+    (add-to-list 'org-latex-classes
                  '("ieee"
                    "\\documentclass[11pt]{IEEEtran}"
                    ("\\section{%s}" . "\\section*{%s}")
