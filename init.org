@@ -801,12 +801,24 @@ use =/ C-j= or =~ //= to get to the local / directory
 #+end_src
 *** TODO symbol-overlay hydra
     Or use swiper to got to symbol?
-** projectile
+** Project Management
+*** project.el
+
+#+begin_src emacs-lisp
+  (use-package consult-project
+    :disabled
+    :straight (consult-project :type git :host github :repo "Qkessler/consult-project")
+    :general
+    (my-menu-def
+      "p" 'consult-project
+      "P o" 'consult-project-other-window))
+#+end_src
+
+*** projectile
 
 TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project]] vs projectile
 
 #+BEGIN_SRC emacs-lisp
-
   (use-package projectile
     :diminish (projectile-mode)
     :general
@@ -826,7 +838,14 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     ;; (setq projectile-indexing-method 'turbo-alien)
     (setq projectile-project-search-path '("~/proj/")))
 
+  (use-package consult-projectile
+    :after (consult projectile)
+    :general
+    (my-menu-def
+      "p" 'consult-projectile))
+
   (use-package counsel-projectile
+    :disabled
     :after (counsel projectile)
     :general
     (my-menu-def
