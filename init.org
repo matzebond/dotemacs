@@ -1013,10 +1013,23 @@ Use < in visual mode to continuously shift selection
       "gS" 'evil-Surround-region))
 
   (use-package evil-numbers
+    :init
+    (defhydra hydra-numbers ()
+      "Number hydra"
+      ("+" evil-numbers/inc-at-pt "inc")
+      ("-" evil-numbers/dec-at-pt "dec")
+      ("<up>" evil-numbers/inc-at-pt-incremental "inc*")
+      ("<down>" evil-numbers/dec-at-pt-incremental "dec*"))
     :general
     (general-nmap
-      "g+" 'evil-numbers/inc-at-pt-incremental
-      "g-" 'evil-numbers/dec-at-pt-incremental))
+      "g+" 'hydra-numbers/evil-numbers/inc-at-pt
+      "g-" 'hydra-numbers/evil-numbers/dec-at-pt)
+    (my-menu-def
+      "Tn" '(hydra-numbers/body :which-key "Numbers"))
+    :config
+    (advice-add 'evil-numbers/inc-at-pt :after #'maschm/visual-restore-after-shift)
+    (advice-add 'evil-numbers/inc-at-pt-incremental :after #'maschm/visual-restore-after-shift)
+    )
 
   (use-package evil-matchit
     :demand
