@@ -1867,6 +1867,9 @@ https://github.com/oantolin/embark/issues/376
     (setq message-kill-buffer-on-exit t)
     (setq mu4e-confirm-quit nil)
 
+    (require 'mu4e-icalendar)
+    (mu4e-icalendar-setup)
+
     (setq mu4e-headers-time-format "%T") ;; like "%H:%M:%S"
     (setq mu4e-headers-date-format "%F") ;; like "%Y-%m-%d"
     (setq mu4e-headers-skip-duplicates nil)
@@ -1896,8 +1899,7 @@ https://github.com/oantolin/embark/issues/376
           :key ?m)))
 
     :local
-    (mu4e-main-mode-hook . ((setq-local default-directory "~/")))
-    (mu4e-compose-mode-hook . ((setq-local ispell-local-dictionary "de_DE"))))
+    (mu4e-main-mode-hook . ((setq-local default-directory "~/"))))
 #+end_src
 
 #+begin_src emacs-lisp
