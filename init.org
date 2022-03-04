@@ -162,7 +162,8 @@ use a own file for emacs custom definition
       :prefix my-menu-key
       :non-normal-prefix my-non-normal-menu-key)
     (my-menu-def
-      "?" '(general-describe-keybindings :which-key "show bindings"))
+      "?" '(general-describe-keybindings :which-key "show bindings")
+      "u" '(universal-argument :which-key "C-u"))
     (general-def
       :keymaps 'global
       my-non-normal-menu-key nil)
