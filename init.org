@@ -915,6 +915,7 @@ https://github.com/noctuid/evil-guide
     (setq evil-want-Y-yank-to-eol t)
     :custom
     (evil-undo-system 'undo-tree)
+    (evil-symbol-word-search t) ; * and # search for symbols
     :config
     (evil-mode 1)
     (cl-loop for (mode . state) in
@@ -925,6 +926,7 @@ https://github.com/noctuid/evil-guide
     (setq evil-echo-state nil)
     (setq evil-ex-substitute-global t)
     (setq evil-vsplit-window-right t)
+    (setq evil-emacs-state-cursor '(hollow))
 
     (general-mmap
       "SPC" nil
@@ -933,8 +935,9 @@ https://github.com/noctuid/evil-guide
                                 ; use "<tab>" to bind to only the tab-key in gui mode
       )
     (general-imap
-      "C-a" nil
+      "C-a" nil ; evil-paste-last-insertion
       "C-e" nil ; evil-copy-from-below
+      "C-y" nil ; evil-copy-from-above
       )
     )
 #+END_SRC
