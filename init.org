@@ -965,12 +965,6 @@ https://github.com/noctuid/evil-guide
     "gk" 'evil-previous-line)
 #+end_src
 
-*** Folding
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'hs-minor-mode)
-#+END_SRC
-
 *** center search result
 Equivalent of ~nnoremap n nzz~
 
@@ -2950,6 +2944,7 @@ woman > man because emacs suffices
     (auto-fill-mode 1))
 
   (defun my-prog-mode-setup ()
+    (hs-minor-mode)
     (electric-pair-local-mode)
     (comment-auto-fill)
     (setq-local ispell-local-dictionary "en_US"))
