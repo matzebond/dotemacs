@@ -1729,32 +1729,42 @@ config taken from https://github.com/jimeh/.emacs.d/blob/master/modules/version-
     :hook
     (magit-pre-refresh . diff-hl-magit-pre-refresh)
     (magit-post-refresh . diff-hl-magit-post-refresh)
-
+    :general
+    (my-menu-def
+      "gr" '(diff-hl-revert-hunk :which-key "revert hunk")
+      "gh" '(diff-hl-show-hunk :which-key "show hunk")
+      "gj" '(diff-hl-next-hunk :which-key "next hunk")
+      "gk" '(diff-hl-previous-hunk :which-key "previous hunk")
+      "gn" '(diff-hl-next-hunk :which-key "next hunk")
+      "gp" '(diff-hl-previous-hunk :which-key "previous hunk"))
     :config
     (global-diff-hl-mode)
+    (evil-collection-diff-hl-setup)
 
     (define-fringe-bitmap 'diff-hl-bmp-insert
       [#b01100000] nil nil '(center repeated))
     (define-fringe-bitmap 'diff-hl-bmp-change
       [#b01100000] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-delete
-      [#b11111000
-       #b11110000
-       #b11100000
-       #b11000000
-       #b10000000] nil nil 'top)
+    (define-fringe-bitmap 'diff-hl-bmp-delete-single
+      [#b01111110
+       #b01111100
+       #b01111000
+       #b01110000
+       #b01100000
+       #b01000000] nil nil 'top)
+    ; stop diff-hl from redefining bitmaps
+    (define-fringe-bitmap 'diff-hl-bmp-empty [0] 1 1 'center)
 
     (defun maschm/diff-hl-fringe-bmp-function (type pos)
-        (cl-loop for bmp in (list (format "diff-hl-bmp-%s-%s" type pos)
-                                  (format "diff-hl-bmp-%s" type)
-                                  (format "diff-hl-bmp-%s" pos))
-                 do (setq bmp (intern bmp))
-                 if (fringe-bitmap-p bmp)
-                 return bmp))
+      (cl-loop for bmp in (list (format "diff-hl-bmp-%s-%s" type pos)
+                                (format "diff-hl-bmp-%s" type)
+                                (format "diff-hl-bmp-%s" pos))
+               do (setq bmp (intern bmp))
+               if (fringe-bitmap-p bmp)
+               return bmp))
     (setq diff-hl-fringe-bmp-function 'maschm/diff-hl-fringe-bmp-function)
 
     ;; (defun maschm/diff-hl-fringe-face-from-type (type _pos)
-      ;; (intern (format "maschm/diff-hl-face-%s" type)))
     )
 #+END_SRC
 
