@@ -754,6 +754,16 @@ use =/ C-j= or =~ //= to get to the local / directory
     :defer 15)
 #+end_src
 
+*** ace-window
+
+#+begin_src emacs-lisp
+  (use-package ace-window
+    :general
+    (general-def
+      :keymaps 'global
+      "M-o" 'ace-window))
+#+end_src
+
 ** winner
    undo and redo for window operations
 
