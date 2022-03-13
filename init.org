@@ -2121,6 +2121,51 @@ from https://github.com/DiegoVicen/my-emacs#Fix-scroll
     "<right-fringe><mouse-5>" 'mwheel-scroll)
 #+end_src
 
+** Long lines
+*** Bidirectional Text
+
+#+begin_src emacs-lisp
+  (setq-default bidi-paragraph-direction 'left-to-right)
+  (if (version<= "27.1" emacs-version)
+    (setq bidi-inhibit-bpa t))
+#+end_src
+
+*** so-long-mode
+
+#+begin_src emacs-lisp
+  (if (version<= "27.1" emacs-version)
+    (global-so-long-mode 1))
+#+end_src
+
+** Pulse
+
+#+begin_src emacs-lisp
+  (use-package pulse
+    :straight (:type built-in)
+    :commands pulse-momentary-highlight-one-line
+    :init
+    (defun pulse-line (&rest _)
+      "Pulse the current line."
+      (pulse-momentary-highlight-one-line (point)))
+
+    (dolist (command '(scroll-up-command
+                       scroll-down-command
+                       recenter-top-bottom
+                       other-window
+                       ace-window
+                       evil-window-next
+                       evil-scroll-line-to-center
+                       evil-scroll-line-to-top
+                       evil-scroll-line-to-bottom
+                       ))
+      (advice-add command :after #'pulse-line))
+    (add-hook 'focus-in-hook #'pulse-line)
+    ;; (remove-hook 'focus-in-hook #'pulse-line)
+    ;; (add-function :after after-focus-change-function #'pulse-line)
+    ;; (remove-function after-focus-change-function #'pulse-line)
+    )
+#+end_src
+
 ** Dashboard
 
 https://github.com/emacs-dashboard/emacs-dashboard
@@ -2144,14 +2189,15 @@ https://github.com/emacs-dashboard/emacs-dashboard
              (call-interactively 'projectile-switch-project))
       "s" '(lambda () (interactive) (switch-to-buffer "*scratch*"))
       "M" 'mu4e)
+    :custom
+    (dashboard-set-file-icons t)
+    (dashboard-items '((recents . 5)
+                       (projects . 3)
+                       (bookmarks . 5)
+                       (agenda . 5)))
     :config
     (evil-make-overriding-map dashboard-mode-map 'motion)
     (evil-set-initial-state 'dashboard-mode 'motion)
-
-    (setq dashboard-items '((recents . 5)
-                            (projects . 3)
-                            (bookmarks . 5)
-                            (agenda . 5)))
 
     (dashboard-setup-startup-hook)
     (add-hook 'dashboard-after-initialize-hook
@@ -2162,34 +2208,12 @@ https://github.com/emacs-dashboard/emacs-dashboard
     (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))))
 #+end_src
 
-** Long lines
-*** Bidirectional Text
-
-#+begin_src emacs-lisp
-  (setq-default bidi-paragraph-direction 'left-to-right)
-  (if (version<= "27.1" emacs-version)
-    (setq bidi-inhibit-bpa t))
-#+end_src
-
-*** so-long-mode
-
-#+begin_src emacs-lisp
-  (if (version<= "27.1" emacs-version)
-    (global-so-long-mode 1))
-#+end_src
-
 ** Other
 
 Turn off mouse interface early in startup to avoid momentary display.
 
 #+BEGIN_SRC emacs-lisp
   (tooltip-mode -1)
-#+END_SRC
-
-Highlight trailing whitespace
-
-#+BEGIN_SRC emacs-lisp
-  (setq show-trailing-whitespace t)
 #+END_SRC
 
 Highlight delimiters such as parentheses, brackets or braces according to their depth
@@ -2995,6 +3019,12 @@ woman > man because emacs suffices
       (prog-mode . ws-butler-mode)
       (org-mode . ws-butler-mode))
 #+end_src
+
+Highlight trailing whitespace
+
+#+BEGIN_SRC emacs-lisp
+  (setq show-trailing-whitespace t)
+#+END_SRC
 
 *** TODO show-parens
 ** Lisp
