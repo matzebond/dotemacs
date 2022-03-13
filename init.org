@@ -1074,12 +1074,7 @@ Use < in visual mode to continuously shift selection
     (vmap "gx" 'evil-exchange)
     (nmap "gX" 'evil-exchange-cancel)
     (vmap "gX" 'evil-exchange-cancel))
-
-  (use-package evil-args
-    :general
-    (:keymaps 'evil-inner-text-objects-map "a" 'evil-inner-arg)
-    (:keymaps 'evil-outer-text-objects-map "a" 'evil-outer-arg))
-
+  
   (use-package evil-owl
     :config
     (setq evil-owl-display-method 'posframe
@@ -1087,6 +1082,25 @@ Use < in visual mode to continuously shift selection
           evil-owl-max-string-length 50)
     (evil-owl-mode))
 #+END_SRC
+
+** Evil text-object
+
+#+begin_src emacs-lisp
+  (use-package evil-args
+    :general
+    (:keymaps 'evil-inner-text-objects-map "a" 'evil-inner-arg)
+    (:keymaps 'evil-outer-text-objects-map "a" 'evil-outer-arg))
+
+  (use-package evil-textobj-line
+    :general
+    (:keymaps 'evil-inner-text-objects-map "l" 'evil-inner-line)
+    (:keymaps 'evil-outer-text-objects-map "l" 'evil-a-line))
+
+  (use-package evil-textobj-syntax
+    :general
+    (:keymaps 'evil-inner-text-objects-map "h" 'evil-i-syntax)
+    (:keymaps 'evil-outer-text-objects-map "h" 'evil-a-syntax))
+#+end_src
 
 * Org
 ** org-mode
