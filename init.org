@@ -2234,14 +2234,6 @@ Turn off mouse interface early in startup to avoid momentary display.
   (tooltip-mode -1)
 #+END_SRC
 
-Highlight delimiters such as parentheses, brackets or braces according to their depth
-
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :defer 15
-    :hook (prog-mode . rainbow-delimiters-mode))
-#+END_SRC
-
 Display '~' on empty lines like in vi (only in programming modes)
 
 #+BEGIN_SRC emacs-lisp
@@ -2720,6 +2712,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 
 *** TODO think at point in org-mode src environment
 
+** TODO customize
 ** TODO view
    [[info:emacs#View%20Mode][info:emacs#View Mode]]
    SPC and S-SPC are bound to scrolling.
@@ -3044,7 +3037,24 @@ Highlight trailing whitespace
   (setq show-trailing-whitespace t)
 #+END_SRC
 
-*** TODO show-parens
+*** parentheses
+**** show-paren
+
+#+begin_src emacs-lisp
+  (setq show-paren-delay 0)
+  (custom-set-faces '(show-paren-match ((t (:foreground "white" :underline t :weight bold)))))
+#+end_src
+
+**** rainbow-delimiters
+
+Highlight delimiters such as parentheses, brackets or braces according to their depth
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :defer 15
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+END_SRC
+
 ** Lisp
 Use common-lips indent function because elisp is not nice with keywords
 
