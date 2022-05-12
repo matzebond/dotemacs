@@ -2931,6 +2931,13 @@ When compiling follow the buffer
 *** TODO fix image-mode bindings
     image mode map is defined with =make-composed-keymap=
 
+** archive
+
+#+begin_src emacs-lisp
+  (evil-make-overriding-map archive-mode-map 'motion)
+  (evil-set-initial-state 'archive-mode 'motion)
+#+end_src
+
 ** ediff
 
 #+begin_src emacs-lisp
