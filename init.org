@@ -2043,6 +2043,12 @@ https://github.com/oantolin/embark/issues/376
 
 #+END_SRC
 
+** Cursor
+
+#+BEGIN_SRC emacs-lisp
+  (setq x-stretch-cursor t)
+#+END_SRC
+
 ** Modeline
 
 #+BEGIN_SRC emacs-lisp
@@ -2057,6 +2063,13 @@ https://github.com/oantolin/embark/issues/376
     (moody-replace-mode-line-buffer-identification)
     (moody-replace-vc-mode))
 #+END_SRC
+
+#+begin_src emacs-lisp
+  (use-package recursion-indicator
+    :demand t
+    :config
+    (recursion-indicator-mode))
+#+end_src
 
 ** Fringe
 
@@ -2157,14 +2170,24 @@ from https://github.com/DiegoVicen/my-emacs#Fix-scroll
 
 ** Pulse
 
+alternative https://github.com/Malabarba/beacon
+
 #+begin_src emacs-lisp
   (use-package pulse
     :straight (:type built-in)
     :commands pulse-momentary-highlight-one-line
     :init
     (defun pulse-line (&rest _)
-      "Pulse the current line."
-      (pulse-momentary-highlight-one-line (point)))
+      "Pulse the current virtual line."
+      (let ((start (save-excursion
+                     (vertical-motion 0)
+                     (point)))
+            (end (save-excursion
+                   (vertical-motion 1)
+                   (when (not (eobp))
+                     (backward-char 1))
+                   (point))))
+        (pulse-momentary-highlight-region start end)))
 
     (dolist (command '(scroll-up-command
                        scroll-down-command
