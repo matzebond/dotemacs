@@ -3000,6 +3000,12 @@ woman > man because emacs suffices
     (add-to-list 'mediawiki-site-alist '("Fachschaft" "https://wiki.fsmi.uni-karlsruhe.de/" "username" "password" nil "Main Page")))
 #+end_src
 
+** anki
+
+#+begin_src emacs-lisp :tangle no
+  (use-package anki-editor)
+#+end_src
+
 * Programming languages
 ** prog-mode
 
