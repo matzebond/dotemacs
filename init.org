@@ -3347,8 +3347,8 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
       "C-y" 'pdf-view-previous-line-or-previous-page
       "C-d" 'pdf-view-scroll-up-or-next-page
       "C-u" 'pdf-view-scroll-down-or-previous-page
-      "h" 'image-forward-hscroll
-      "l" 'image-backward-hscroll
+      "h" 'image-backward-hscroll
+      "l" 'image-forward-hscroll
       "RET" 'pdf-view-next-page
       "DEL" 'pdf-view-previous-page
 
@@ -3358,6 +3358,8 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
       "gt" 'pdf-view-goto-page
       "gl" 'pdf-view-goto-label
       "gr" 'revert-buffer
+
+      "y" 'pdf-view-kill-ring-save
 
       "<C-mouse-4>" '(lambda () (interactive) (pdf-view-enlarge 1.1))
       "<C-mouse-5>" '(lambda () (interactive) (pdf-view-shrink 1.1))
