@@ -1078,7 +1078,7 @@ Use < in visual mode to continuously shift selection
     (vmap "gx" 'evil-exchange)
     (nmap "gX" 'evil-exchange-cancel)
     (vmap "gX" 'evil-exchange-cancel))
-  
+
   (use-package evil-owl
     :config
     (setq evil-owl-display-method 'posframe
@@ -2490,7 +2490,8 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 ** tree-sitter
 
 #+begin_src emacs-lisp
-  (use-package tree-sitter)
+  (use-package tree-sitter
+    :commands (tree-sitter-hl-mode))
 
   (use-package tree-sitter-langs
     :after (tree-sitter)
@@ -2644,7 +2645,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    "gk" 'Info-prev
    "gg" 'evil-goto-first-line
    "+" 'clone-buffer
-  
+
    "q" 'Info-exit)
 
   (evil-make-overriding-map Info-mode-map 'motion)
@@ -3450,6 +3451,10 @@ https://github.com/NicolasPetton/Indium
 #+begin_src emacs-lisp
   (use-package web-mode)
 #+end_src
+
+look into
+https://github.com/smihica/emmet-mode
+when writing lots of html code
 
 ** TODO Typescript
 
