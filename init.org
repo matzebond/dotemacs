@@ -429,7 +429,7 @@ consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all ma
   )
 #+end_src
 
-*** custom
+*** line history
 
 Use `consult-line` search as last evil/isearch string copied from [[https://github.com/minad/consult/issues/318][issue]]
 
@@ -1046,13 +1046,11 @@ Use < in visual mode to continuously shift selection
     :demand
     :config (global-evil-matchit-mode 1))
 
-  (use-package smartparens
-    :demand)
+  (use-package smartparens)
 
   (use-package evil-smartparens
-    :demand
-    :after (evil smartparens)
-    :config (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode))
+    :after (smartparens evil)
+    :hook (smartparens-enabled . evil-smartparens-mode))
 
   (use-package evil-mc
     :demand
@@ -3180,7 +3178,7 @@ https://github.com/tuhdo/semantic-refactor
   (use-package cmake-mode)
 
   (use-package cmake-font-lock
-    :hook (cmake-mode-hook . cmake-font-lock-activate))
+    :hook (cmake-mode . cmake-font-lock-activate))
 
   (use-package cmake-project
     :disabled
