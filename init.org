@@ -3421,6 +3421,15 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     (setq TeX-view-program-list '(("pdf-tools" TeX-pdf-tools-sync-view))))
 #+end_src
 
+** Shell script
+
+wants `bash-language-server` and `shellcheck`
+
+#+begin_src emacs-lisp
+  (add-hook 'sh-mode-hook 'lsp-mode)
+#+end_src
+
+alternatively enable only 'flycheck-mode
 ** Rust
    https://github.com/brotzeit/rustic
    rustic focuses on integration to many emacs packages and rust-mode wants to
