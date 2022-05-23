@@ -846,6 +846,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     ;; (setq projectile-completion-system 'ivy)
     (setq projectile-generic-command "fd -H --ignore-file .projectile -t f -0")
     ;; (setq projectile-indexing-method 'turbo-alien)
+    (setq projectile-switch-project-action #'projectile-dired)
     (setq projectile-project-search-path '("~/proj/")))
 
   (use-package consult-projectile
@@ -996,8 +997,10 @@ Use < in visual mode to continuously shift selection
   (use-package evil-collection
     :demand
     :config
-    (evil-collection-init '(magit forge)))
+    (evil-collection-init '(magit forge calendar consult)))
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp
   (use-package evil-commentary
     :straight
      '(evil-commentary :type git :flavor melpa :host github :repo "linktohack/evil-commentary"
@@ -1068,7 +1071,7 @@ Use < in visual mode to continuously shift selection
   (use-package evil-lion
     :general
     (general-def
-      :keymaps 'normal
+      :keymaps 'visual
       "gl" 'evil-lion-left
       "gL" 'evil-lion-right))
 
@@ -1865,6 +1868,7 @@ https://github.com/oantolin/embark/issues/376
     (setq mu4e-completing-read-function 'completing-read)
 
     (setq mail-user-agent 'mu4e-user-agent)
+    (set-variable 'read-mail-command 'mu4e)
     (setq mu4e-maildir "~/.mail")
     (setq mu4e-get-mail-command "mbsync -a")
     (setq quick-get-mail-command "mbsync posteo:INBOX uni:INBOX")
@@ -2938,8 +2942,9 @@ When compiling follow the buffer
 ** archive
 
 #+begin_src emacs-lisp
-  (evil-make-overriding-map archive-mode-map 'motion)
-  (evil-set-initial-state 'archive-mode 'motion)
+  (with-eval-after-load 'arc-mode
+    (evil-make-overriding-map archive-mode-map 'motion)
+    (evil-set-initial-state 'archive-mode 'motion))
 #+end_src
 
 ** ediff
@@ -3608,7 +3613,8 @@ Recognize arch linux pgkbuild files
   (use-package editorconfig
     :hook (prog-mode . editorconfig-mode-apply)
     :config
-    (editorconfig-mode 1))
+    (editorconfig-mode 1)
+    (setq editorconfig-trim-whitespaces-mode 'ws-butler-mode))
 #+end_src
 
 ** yes-no
