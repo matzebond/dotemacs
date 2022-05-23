@@ -2359,9 +2359,12 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     :init
     ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
     (setq lsp-keymap-prefix "C-c l")
-    :hook ((rust-mode . lsp-deferred)
-           ;; if you want which-key integration
-           (lsp-mode . lsp-enable-which-key-integration))
+    :hook
+    (rust-mode . lsp-deferred)
+    (dart-mode . lsp-deferred)
+    (python-mode . lsp-deferred)
+    ;; if you want which-key integration
+    (lsp-mode . lsp-enable-which-key-integration)
     :custom
     (lsp-diagnostics-provider :capf)
     (lsp-headerline-breadcrumb-enable t)
@@ -2379,13 +2382,13 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols))
 
   (use-package lsp-ui
-    :disabled
     :commands lsp-ui-mode
     :custom
+    (lsp-ui-doc-enable t)
     (lsp-ui-doc-show-with-cursor nil)
-    :config
-    (setq lsp-ui-doc-enable nil)
-    (setq lsp-ui-doc-position 'bottom))
+    (lsp-ui-doc-position 'at-point)
+    (lsp-ui-sideline-show-code-actions nil)
+    )
 #+END_SRC
 
 ** xref
