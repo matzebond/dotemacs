@@ -3199,6 +3199,14 @@ Highlight trailing whitespace
   (custom-set-faces '(show-paren-match ((t (:foreground "white" :underline t :weight bold)))))
 #+end_src
 
+** documentation
+#+begin_src emacs-lisp
+  (use-package devdocs
+    :general
+    (my-menu-def
+      "H D" 'devdocs-lookup))
+#+end_src
+
 **** rainbow-delimiters
 
 Highlight delimiters such as parentheses, brackets or braces according to their depth
