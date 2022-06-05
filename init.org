@@ -1716,7 +1716,8 @@ add https://github.com/jgru/consult-org-roam ?
       "g s" 'magit-status
       "g b" 'magit-blame
       "g d" 'magit-diff-buffer-file
-      "g l" 'magit-log-buffer-file)
+      "g l" 'magit-log-buffer-file
+      "g f" 'magit-file-dispatch)
     (general-def
       :keymaps 'magit-mode-map
       "SPC" nil)
@@ -2672,7 +2673,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    "gg" 'evil-goto-first-line
    "+" 'clone-buffer
 
-   "q" 'Info-exit)
+   "q" 'quit-window)
 
   (evil-make-overriding-map Info-mode-map 'motion)
 
@@ -2726,7 +2727,10 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     "H s" 'set-variable
     "H d" '(:ignore t :which-key "Debug")
     "H d e" 'debug-on-entry
-    "H d E" 'cancel-debug-on-entry)
+    "H d E" 'cancel-debug-on-entry
+    "H P p" 'profiler-start
+    "H P s" 'profiler-stop
+    "H P r" 'profiler-report)
     ;; "H K" which-key-show-keymap
     ;; "H T" which-key-show-top-level
 
