@@ -825,6 +825,14 @@ use =/ C-j= or =~ //= to get to the local / directory
 *** project.el
 
 #+begin_src emacs-lisp
+  (use-package project
+    :config
+    (defun maschm/project-find-function-transient (dir)
+      (let ((root (or (locate-dominating-file dir ".root")
+                      (locate-dominating-file dir ".projectile"))))
+        (and root (cons 'transient root))))
+    (add-hook 'project-find-functions 'maschm/project-find-function-transient))
+
   (use-package consult-project
     :disabled
     :straight (consult-project :type git :host github :repo "Qkessler/consult-project")
@@ -850,7 +858,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
       "P r" 'projectile-run-project
       "P t" 'projectile-test-project)
     :custom
-    (projectile-indexing-method 'native)
+    (projectile-indexing-method 'alien)
     :config
     (projectile-mode +1)
     ;; (setq projectile-completion-system 'ivy)
@@ -863,7 +871,12 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     :after (consult projectile)
     :general
     (my-menu-def
-      "p" 'consult-projectile))
+      "p" 'consult-projectile
+      "P d" 'consult-projectile-find-dir
+      "P f" 'consult-projectile-find-file
+      "P r" 'consult-projectile-recentf
+      "P p" 'consult-projectile-switch-project
+      "P b" 'consult-projectile-switch-to-buffer))
 
   (use-package counsel-projectile
     :disabled
