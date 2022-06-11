@@ -1114,6 +1114,12 @@ Use < in visual mode to continuously shift selection
 ** org-mode
 
 #+BEGIN_SRC emacs-lisp
+  (defun maschm/consult-outline-or-org-heading ()
+    (interactive)
+    (if (derived-mode-p 'org-mode)
+        (consult-org-heading)
+      (consult-outline)))
+
   (use-package org
     :straight
     `(org-plus-contrib
@@ -1132,7 +1138,7 @@ Use < in visual mode to continuously shift selection
     :general
     (my-menu-def
       "o" '(:ignore t :which-key "org-outline")
-      "o" (general-key-dispatch 'consult-outline
+      "o" (general-key-dispatch 'maschm/consult-outline-or-org-heading
             :timeout .33
             "a" 'org-agenda
             "c" 'org-capture)
@@ -1615,6 +1621,8 @@ Use < in visual mode to continuously shift selection
 #+end_src
 
 ** org-roam
+
+add https://github.com/jgru/consult-org-roam ?
 
 #+begin_src emacs-lisp
   (use-package org-roam
