@@ -2857,6 +2857,71 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     :hook (eshell-mode . eshell-syntax-highlighting-mode))
 #+END_SRC
 
+*** protect prompt from moving into
+
+#+begin_src emacs-lisp
+  (defvar eshell-prompt-properties
+    '(read-only t
+      font-lock-face eshell-prompt
+      front-sticky (font-lock-face read-only)
+      rear-nonsticky (font-lock-face read-only)))
+
+  (setq eshell-prompt-properties
+        '(inhibit-line-move-field-capture t
+          read-only t
+          cursor-intangible t
+          rear-nonsticky t
+          field prompt
+          front-sticky (field inhibit-line-move-field-capture)))
+
+
+  ;; (setq eshell-prompt-properties
+  ;;   '(read-only t cursor-intangible t face minibuffer-prompt))
+
+  (defun eshell-emit-prompt ()
+    "Emit a prompt if eshell is being used interactively."
+    (when (boundp 'ansi-color-context-region)
+      (setq ansi-color-context-region nil))
+    (run-hooks 'eshell-before-prompt-hook)
+    (if (not eshell-prompt-function)
+        (set-marker eshell-last-output-end (point))
+      (let ((prompt (funcall eshell-prompt-function)))
+        (and eshell-highlight-prompt
+         (add-text-properties 0 (length prompt)
+                              eshell-prompt-properties
+                              prompt))
+        (eshell-interactive-print prompt)))
+    (run-hooks 'eshell-after-prompt-hook))
+
+
+  (defun eshell-reset (&optional no-hooks)
+    "Output a prompt on a new line, aborting any current input.
+    If NO-HOOKS is non-nil, then `eshell-post-command-hook' won't be run."
+    (goto-char (point-max))
+    (setq eshell-last-input-start (point-marker)
+          eshell-last-input-end (point-marker)
+          eshell-last-output-start (point-marker)
+          eshell-last-output-block-begin (point)
+          eshell-last-output-end (point-marker))
+    (eshell-begin-on-new-line)
+    (unless no-hooks
+      (run-hooks 'eshell-post-command-hook)
+      (goto-char (point-max))))
+
+  (defun eshell-begin-on-new-line ()
+    "This function outputs a newline if not at beginning of line."
+    (save-excursion
+      (goto-char eshell-last-output-end)
+      (unless (bolp)
+          (edebug)
+          (eshell-interactive-print "\n")
+          (add-text-properties eshell-last-output-end
+                               (point)
+                                eshell-prompt-properties
+                                ))))
+#+end_src
+
+*** TODO use eshell-alias?
 ** shell
 
 #+begin_src emacs-lisp
