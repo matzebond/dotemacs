@@ -3586,14 +3586,28 @@ when writing lots of html code
     :hook (julia-mode . julia-snail-mode))
 #+end_src
 
-** Dart
+** Dart / Flutter
 
 #+begin_src emacs-lisp
   (use-package dart-mode)
 
-  (use-package lsp-dart
-    :disabled
-    :hook (dart-mode . lsp))
+  (use-package lsp-dart)
+
+  (use-package flutter
+    :after dart-mode
+    :general
+    (general-def
+      :keymaps 'dart-mode-map
+      "C-M-x" 'flutter-run-or-hot-reload))
+#+end_src
+
+** Android
+
+#+begin_src emacs-lisp
+  (use-package android-mode
+    :commands 'android-start-emulator
+    :config
+    (setq android-mode-sdk-dir "/opt/android-sdk/"))
 #+end_src
 
 ** Erlang
