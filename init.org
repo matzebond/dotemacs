@@ -315,8 +315,15 @@ https://github.com/purcell/exec-path-from-shell
     "w" 'other-window
     ;; "W"  (general-simulate-key "C-w")
     "W" '(:ignore t :which-key "Window")
-    "W d" 'delete-window
-    "W o" 'delete-other-windows)
+    "W w" 'ace-window
+    "W S" 'ace-swap-window
+    "W s" 'evil-window-split
+    "W v" 'evil-window-vsplit
+    "W -" 'evil-window-split
+    "W |" 'evil-window-vsplit
+    "W d" 'delete-window ;;evil-delete-window would rebalance siblings
+    "W o" 'delete-other-windows
+    "W =" 'balance-windows)
 #+end_src
 
 ** consult
@@ -350,8 +357,8 @@ consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all ma
       "/" '(consult-ripgrep :which-key "search")
       )
 
-    (my-leader-def
-      "p" 'consult-yank-from-kill-ring)
+    (general-nmap
+      "g p" 'consult-yank-from-kill-ring)
 
     (general-def
       :keymaps 'global
@@ -581,7 +588,7 @@ Use `consult-line` search as last evil/isearch string copied from [[https://gith
 
 ** abo-abo
 [[http://oremacs.com/swiper/][ivy & swiper manual]]
-*** ivy
+*** DEPRECATED ivy
     :PROPERTIES:
     :header-args:emacs-lisp: :tangle no
     :END:
@@ -671,7 +678,7 @@ Use `consult-line` search as last evil/isearch string copied from [[https://gith
 **** TODO fix ivy-occur
 dired keymap is set to overriding and no ivy-occur cmd can be used
 
-*** counsel
+*** DEPRECATED counsel
     :PROPERTIES:
     :header-args:emacs-lisp: :tangle no
     :END:
@@ -716,7 +723,7 @@ dired keymap is set to overriding and no ivy-occur cmd can be used
 get back to the local file system when in find-file while using tramp
 use =/ C-j= or =~ //= to get to the local / directory
 
-*** swiper
+*** DEPRECATED swiper
     :PROPERTIES:
     :header-args:emacs-lisp: :tangle no
     :END:
@@ -2715,6 +2722,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     "H F" '(describe-face :which-key "face")
     "H C" '(describe-char :which-key "char")
     "H U" 'insert-char
+    "H S" 'info-lookup-symbol
     "H s" 'set-variable
     "H d" '(:ignore t :which-key "Debug")
     "H d e" 'debug-on-entry
@@ -3052,7 +3060,13 @@ When compiling follow the buffer
 #+begin_src emacs-lisp
   (use-package calendar
     :custom
-    (calendar-week-start-day 1))
+    (calendar-week-start-day 1)
+    (calendar-latitude 50.775556)
+    (calendar-longitude 6.083611)
+    ;; (calendar-time-zone 60)
+    ;; (calendar-standard-time-zone-name "CET")
+    ;; (calendar-daylight-time-zone-name "CEST")
+    )
 #+end_src
 
 ** man
@@ -3903,3 +3917,10 @@ Edit textareas of the browser in emacs
             (forward-line 1))
           (beginning-of-line)))))
 #+end_src
+
+
+* to read
+[[info:elisp#Completion][elisp#Completion]]
+[[info:elisp#Choosing Window][elisp#Choosing Window]]
+[[info:elisp#Mode Line Variables][elisp#Mode Line Variables]]
+[[info:elisp#Quitting Windows][elisp#Quitting Windows]]
