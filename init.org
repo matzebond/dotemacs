@@ -406,10 +406,12 @@ consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all ma
     ;; For some commands and buffer sources it is useful to configure the
     ;; :preview-key on a per-command basis using the `consult-customize' macro.
     (consult-customize
+     consult-xref
+     :preview-key 'any
      consult-theme
      :preview-key '(:debounce 0.2 any)
      consult-ripgrep consult-git-grep consult-grep
-     consult-bookmark consult-recent-file consult-xref
+     consult-bookmark consult-recent-file
      consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
      :preview-key (kbd "M-."))
 
@@ -2380,7 +2382,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
       "e b" 'flycheck-buffer
       "e c" 'flycheck-compile
       "e n" 'flycheck-next-error
-      "e p" 'flycheck-prev-error)
+      "e p" 'flycheck-previous-error)
     :custom
     (flycheck-display-errors-delay 0.1)
     (flycheck-display-errors-function 'flycheck-pos-tip-error-messages))
@@ -2439,8 +2441,12 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     (general-def
       :keymaps 'global
       "M-m" 'xref-find-definitions)
+    (general-mmap
+      "gr" 'xref-find-definitions
+      "gR" 'xref-find-definitions-other-window)
     :config
     nil
+    (setq xref-prompt-for-identifier '(not xref-find-definitions xref-find-definitions-other-window xref-find-definitions-other-frame xref-find-references))
     )
 #+end_src
 
