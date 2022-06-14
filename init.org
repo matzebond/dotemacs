@@ -3916,6 +3916,16 @@ Edit textareas of the browser in emacs
       (error "Buffer '%s' is not visiting a file!" (buffer-name)))
     (delete-file buffer-file-name)
     (kill-buffer))
+
+  (defun copy-current-filename-as-kill ()
+    "Copy the current file-name into the kill ring."
+    (interactive)
+    (kill-new buffer-file-name))
+
+  (defun copy-current-dir-as-kill ()
+    "Copy the current file-name into the kill ring."
+    (interactive)
+    (kill-new default-directory))
 #+END_SRC
 
 ** macro execute
