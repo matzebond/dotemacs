@@ -3357,13 +3357,28 @@ https://github.com/tuhdo/semantic-refactor
   (use-package lsp-pyright
     :hook (python-mode . (lambda () (require 'lsp-pyright) (lsp-deferred))) ; or lsp
     :config
-    ())
+    (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.venv"))
 
   (use-package blacken
+    :after python
     :init
     (setq-default blacken-fast-unsafe t)
     (setq-default blacken-line-length 80))
+
+  (use-package yapfify
+    :after python)
+  ;; (add-hook 'python-mode-hook 'py-yapf-enable-on-save)
+
+  (use-package pyenv
+    :after python)
+
+  (use-package pyvenv
+    :after python
+    :config
+    (pyvenv-mode))
 #+end_src
+
+*** jupyter
 
 #+begin_src emacs-lisp
   (use-package jupyter
