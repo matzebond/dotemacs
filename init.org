@@ -2720,10 +2720,6 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 ** helpful
 
 #+BEGIN_SRC emacs-lisp
-  (defalias 'describe-variable 'helpful-variable)
-  (defalias 'describe-function 'helpful-function)
-  (defalias 'describe-symbol 'helpful-symbol)
-
   (my-menu-def
     "h" '(helpful-at-point :which-key "help")
     "H" '(:ignore t :which-key "Help")
@@ -2744,18 +2740,23 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     "H U" 'insert-char
     "H S" 'info-lookup-symbol
     "H s" 'set-variable
+    "H V" 'set-variable
     "H d" '(:ignore t :which-key "Debug")
     "H d e" 'debug-on-entry
     "H d E" 'cancel-debug-on-entry
     "H P p" 'profiler-start
     "H P s" 'profiler-stop
     "H P r" 'profiler-report)
-    ;; "H K" which-key-show-keymap
-    ;; "H T" which-key-show-top-level
+    ;; "H K" 'which-key-show-keymap
+    ;; "H T" 'which-key-show-top-level
 
   (use-package helpful
     :defer 10
     :commands (helpful-symbol helpful-variable helpful-function helpful-callable helpful-key)
+    :init
+    (defalias 'describe-variable 'helpful-variable)
+    (defalias 'describe-function 'helpful-function)
+    (defalias 'describe-symbol 'helpful-symbol)
     :config
     (general-def
       :keymaps 'helpful-mode-map
@@ -2765,7 +2766,11 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
       "g" nil
       "g r" 'helpful-update
       "q" 'quit-window)
-    (evil-make-overriding-map helpful-mode-map 'motion))
+    (evil-make-overriding-map helpful-mode-map 'motion)
+    ;; double defalias works
+    (defalias 'describe-variable 'helpful-variable)
+    (defalias 'describe-function 'helpful-function)
+    (defalias 'describe-symbol 'helpful-symbol))
 #+END_SRC
 
 *** embark become keymap for helpful commands
