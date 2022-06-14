@@ -3220,6 +3220,19 @@ Highlight trailing whitespace
   (custom-set-faces '(show-paren-match ((t (:foreground "white" :underline t :weight bold)))))
 #+end_src
 
+*** formatting
+
+#+begin_src emacs-lisp
+  (use-package apheleia
+    :init
+    (apheleia-global-mode +1)
+    :config
+    (setf (alist-get 'yapf apheleia-formatters)
+          '("yapf" file))
+    (setf (alist-get 'python-mode apheleia-mode-alist)
+          '(yapf)))
+#+end_src
+
 ** documentation
 
 #+begin_src emacs-lisp
@@ -3374,22 +3387,13 @@ https://github.com/tuhdo/semantic-refactor
     :config
     (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.venv"))
 
-  (use-package blacken
-    :after python
-    :init
-    (setq-default blacken-fast-unsafe t)
-    (setq-default blacken-line-length 80))
-
-  (use-package yapfify
-    :after python)
-  ;; (add-hook 'python-mode-hook 'py-yapf-enable-on-save)
-
   (use-package pyenv
     :after python)
 
   (use-package pyvenv
     :after python
     :config
+    (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
     (pyvenv-mode))
 #+end_src
 
