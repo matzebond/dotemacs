@@ -3536,6 +3536,8 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
 
       "y" 'pdf-view-kill-ring-save
 
+      "C-o" 'pdf-history-goto
+
       "<C-mouse-4>" '(lambda () (interactive) (pdf-view-enlarge 1.1))
       "<C-mouse-5>" '(lambda () (interactive) (pdf-view-shrink 1.1))
       "<mouse-6>" 'image-backward-hscroll
@@ -3544,35 +3546,60 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
       "sw" 'pdf-view-fit-width-to-window
       "sh" 'pdf-view-fit-heigth-to-window
       "sp" 'pdf-view-fit-page-to-window
+      "sr" 'pdf-view-scale-reset
+      "ss" 'pdf-view-auto-slice-minor-mode
 
       "C-s" 'isearch-forward
 
-      "SPC" nil )
+      "SPC" nil)
 
     (my-leader-def
       :keymaps 'pdf-view-mode-map
       ;; evil state mode bindings are only active after the first mode change
       :states nil
       "a" 'pdf-annot-list-annotations
+      "m" 'pdf-annot-add-markup-annotation
       "h" 'pdf-annot-add-highlight-markup-annotation
       "t" 'pdf-annot-add-text-annotation
-      "c" 'pdf-annot-mouse-add-text-annotation
-      "m" 'pdf-view-themed-minor-mode
-      "d" 'pdf-view-dark-minor-mode
-      "n" 'pdf-view-midnight-minar-mode
-      "p" 'pdf-view-printer-minor-mode)
+      "u" 'pdf-annot-add-underline-markup-annotation
+      "s" 'pdf-annot-add-squiggly-markup-annotation
+      "k" 'pdf-annot-add-strikeout-markup-annotation
+      "d" 'pdf-annot-delete
+      "A" 'pdf-annot-display-attachment
+      "S" 'pdf-view-auto-slice-minor-mode
+      "T" 'pdf-view-themed-minor-mode
+      "D" 'pdf-view-dark-minor-mode
+      "M" 'pdf-view-midnight-minor-mode
+      "P" 'pdf-view-printer-minor-mode)
+
+    (my-leader-def
+      :keymaps 'pdf-annot-edit-contents-minor-mode-map
+      ;; evil state mode bindings are only active after the first mode change
+      :states nil
+      "," 'pdf-annot-edit-contents-commit)
+
+    (general-def
+      :keymaps 'pdf-annot-edit-contents-minor-mode-map
+      ", ," 'pdf-annot-edit-contents-commit
+      "C-c C-k" 'pdf-annot-edit-contents-abort)
 
     (evil-make-overriding-map pdf-view-mode-map 'motion)
     (evil-set-initial-state 'pdf-view-mode 'motion)
 
+    (evil-make-overriding-map pdf-annot-edit-contents-minor-mode-map 'normal)
+
     (pdf-tools-install t)
     ;; open pdfs scaled to fit page
-    (setq-default pdf-view-display-size 'fit-page)
+    (setq-default pdf-view-display-size 'fit-width)
     ;; automatically annotate highlights
     (setq pdf-annot-activate-created-annotations t)
     ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
     (add-to-list 'revert-without-query "\.pdf$")
     (setq TeX-view-program-list '(("pdf-tools" TeX-pdf-tools-sync-view))))
+
+
+  (use-package saveplace-pdf-view
+    :defer 15)
 #+end_src
 
 ** Shell script
