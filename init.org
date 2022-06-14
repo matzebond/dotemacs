@@ -3206,11 +3206,23 @@ Highlight trailing whitespace
 #+end_src
 
 ** documentation
+
 #+begin_src emacs-lisp
   (use-package devdocs
     :general
     (my-menu-def
-      "H D" 'devdocs-lookup))
+      "H D" 'devdocs-lookup)
+    :config
+    (general-def
+      :keymaps 'devdocs-mode-map
+      "h" nil
+      "l" nil
+      "g" nil
+      "C-o" 'devdocs-go-back
+      "C-i" 'devdocs-go-forward)
+    (evil-make-overriding-map devdocs-mode-map 'motion)
+    (evil-set-initial-state 'devdocs-mode 'motion))
+
 #+end_src
 
 **** rainbow-delimiters
