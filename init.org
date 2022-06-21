@@ -415,6 +415,13 @@ consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all ma
      consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
      :preview-key (kbd "M-."))
 
+    (consult-customize
+     consult-man :initial "")
+
+    (consult-customize
+     consult-line
+     :add-history (seq-some #'thing-at-point '(region symbol)))
+
     ;; Optionally configure the narrowing key.
     (setq consult-narrow-key "<")
 
