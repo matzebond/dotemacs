@@ -556,21 +556,19 @@ Use `consult-line` search as last evil/isearch string copied from [[https://gith
   (use-package embark
     :general
     (general-def :keymaps 'global
-      "C-." 'embark-act         ;; pick some comfortable binding
-      "C-;" 'embark-dwim        ;; good alternative: M-.
-      "C-h B" 'embark-bindings  ;; alternative for `describe-bindings'
-      )
+      "C-." 'embark-act
+      "C-;" 'embark-dwim)
 
-    (general-def :keymaps '(evil-normal-state-map flyspell-mode-map)
-      "C-." nil ;; evil-repeat-pop flyspell-correct-word
-      )
+    (my-menu-def
+      "H B" 'embark-bindings)
 
     :init
-
     ;; Optionally replace the key help with a completing-read interface
     (setq prefix-help-command #'embark-prefix-help-command)
 
     :config
+    (general-def :keymaps 'embark-general-map
+      "y" 'embark-copy-as-kill)
 
     ;; Hide the mode line of the Embark live/completions buffers
     (add-to-list 'display-buffer-alist
@@ -970,6 +968,11 @@ https://github.com/noctuid/evil-guide
       "RET" nil
       "TAB" 'evil-jump-forward  ; "TAB" is "C-i" which is the tab-key in terminal mode
                                 ; use "<tab>" to bind to only the tab-key in gui mode
+      )
+    (general-nmap
+      "C-." nil ;; evil-repeat-pop
+      "M-." 'evil-repeat-pop ;; evil-repeat-pop-next
+      "C-M-." 'evil-repeat-pop-next
       )
     (general-imap
       "C-a" nil ; evil-paste-last-insertion
@@ -2497,6 +2500,12 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 #+BEGIN_SRC emacs-lisp
   (use-package flyspell
     :hook (text-mode . flyspell-mode)
+    :general
+    (general-def :keymaps 'flyspell-mode-map
+      "C-;" nil ;flyspell-auto-correct-previous-word
+      "C-," nil ;flyspell-goto-next-error
+      "C-M-i" nil ;flyspell-auto-correct-word
+      )
     :config
     ;; do flyspell-buffer after changing the dictionary
     (defun flyspell-buffer-after-change-dict (&rest args)
@@ -2776,19 +2785,19 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 *** embark become keymap for helpful commands
 
 #+BEGIN_SRC emacs-lisp
-  (with-eval-after-load "embark"
-    (with-eval-after-load "helpful"
+  (with-eval-after-load 'embark
+    (with-eval-after-load 'helpful
       (setq embark-become-helpful-map
-	    '(keymap
-	      (105 . describe-input-method)
-	      (112 . describe-package)
-	      (70 . describe-face)
-	      (115 . helpful-symbol)
-	      (102 . helpful-function)
-	      (118 . helpful-variable)
-	      (67 . apropos-command)
-	      (85 . apropos-user-option)
-	      (86 . apropos-variable)))
+        '(keymap
+          (105 . describe-input-method)
+          (112 . describe-package)
+          (70 . describe-face)
+          (115 . helpful-symbol)
+          (102 . helpful-function)
+          (118 . helpful-variable)
+          (67 . apropos-command)
+          (85 . apropos-user-option)
+          (86 . apropos-variable)))
       (add-to-list 'embark-become-keymaps 'embark-become-helpful-map)))
 #+END_SRC
 
