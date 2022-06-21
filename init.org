@@ -342,10 +342,6 @@ consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all ma
       "B b" '(consult-buffer :which-key "Buffer")
       "B B" '(consult-buffer-other-window :which-key "Buffer")
       "F b" '(consult-bookmark :which-key "Bookmarks")
-      ;; "W p" '(:ignore t :which-key "ivy-view")
-      ;; "W pu" 'ivy-push-view
-      ;; "W po" 'ivy-pop-view
-      ;; "W w" 'ivy-switch-view
       "f" '(:ignore t :which-key "File")
       "f" 'find-file
       "F" '(:ignore t :which-key "File")
@@ -564,10 +560,13 @@ Use `consult-line` search as last evil/isearch string copied from [[https://gith
     :general
     (general-def :keymaps 'global
       "C-." 'embark-act
-      "C-;" 'embark-dwim)
-
+      "M-." 'embark-dwim ; xref-find-definition
+      )
     (my-menu-def
       "H B" 'embark-bindings)
+
+    :custom
+    (embark-help-key "?")
 
     :init
     ;; Optionally replace the key help with a completing-read interface
@@ -591,6 +590,53 @@ Use `consult-line` search as last evil/isearch string copied from [[https://gith
     ;; auto-updating embark collect buffer
     :hook
     (embark-collect-mode . consult-preview-at-point-mode))
+#+end_src
+
+If you find you prefer entering actions that way [via embark-help-key],
+you can configure embark to always prompt you for actions by setting the variable ~embark-prompter~ to =embark-completing-read-prompter=.
+
+*** embark which-key
+
+https://github.com/oantolin/embark/wiki/Additional-Configuration#use-which-key-like-a-key-menu-prompt
+
+#+begin_src emacs-lisp
+  (defun embark-which-key-indicator ()
+    "An embark indicator that displays keymaps using which-key.
+  The which-key help message will show the type and value of the
+  current target followed by an ellipsis if there are further
+  targets."
+    (lambda (&optional keymap targets prefix)
+      (if (null keymap)
+          (which-key--hide-popup-ignore-command)
+        (which-key--show-keymap
+         (if (eq (plist-get (car targets) :type) 'embark-become)
+             "Become"
+           (format "Act on %s '%s'%s"
+                   (plist-get (car targets) :type)
+                   (embark--truncate-target (plist-get (car targets) :target))
+                   (if (cdr targets) "…" "")))
+         (if prefix
+             (pcase (lookup-key keymap prefix 'accept-default)
+               ((and (pred keymapp) km) km)
+               (_ (key-binding prefix 'accept-default)))
+           keymap)
+         nil nil t (lambda (binding)
+                     (not (string-suffix-p "-argument" (cdr binding))))))))
+
+  (setq embark-indicators
+    '(embark-which-key-indicator
+      embark-highlight-indicator
+      embark-isearch-highlight-indicator))
+
+  (defun embark-hide-which-key-indicator (fn &rest args)
+    "Hide the which-key indicator immediately when using the completing-read prompter."
+    (which-key--hide-popup-ignore-command)
+    (let ((embark-indicators
+           (remq #'embark-which-key-indicator embark-indicators)))
+        (apply fn args)))
+
+  (advice-add #'embark-completing-read-prompter
+              :around #'embark-hide-which-key-indicator)
 #+end_src
 
 ** abo-abo
@@ -980,8 +1026,8 @@ https://github.com/noctuid/evil-guide
       )
     (general-nmap
       "C-." nil ;; evil-repeat-pop
-      "M-." 'evil-repeat-pop ;; evil-repeat-pop-next
-      "C-M-." 'evil-repeat-pop-next
+      "M-." nil ;; evil-repeat-pop-next
+      "C-M-." 'evil-repeat-pop
       )
     (general-imap
       "C-a" nil ; evil-paste-last-insertion
@@ -2454,17 +2500,18 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 #+begin_src emacs-lisp
   (use-package xref
     :general
-    (general-def
-      :keymaps 'global
-      "M-m" 'xref-find-definitions)
     (general-mmap
-      "gr" 'xref-find-definitions
-      "gR" 'xref-find-definitions-other-window)
+      "gr" 'xref-find-references
+      "gD" 'xref-find-definitions-other-window)
+    (general-def :keymaps 'global
+      "M-." nil ; xref-find-definition
+      )
     :config
-    nil
     (setq xref-prompt-for-identifier '(not xref-find-definitions xref-find-definitions-other-window xref-find-definitions-other-frame xref-find-references))
     )
 #+end_src
+
+*** TODO xref-find-references-other-window
 
 ** TODO DAP
    https://emacs-lsp.github.io/dap-mode/page/features/
