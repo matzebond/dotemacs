@@ -968,6 +968,8 @@ https://github.com/noctuid/evil-guide
       "RET" nil
       "TAB" 'evil-jump-forward  ; "TAB" is "C-i" which is the tab-key in terminal mode
                                 ; use "<tab>" to bind to only the tab-key in gui mode
+      "C-b" nil ; evil-scroll-page-up
+      "C-f" nil ; evil-scroll-page-down
       )
     (general-nmap
       "C-." nil ;; evil-repeat-pop
