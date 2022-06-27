@@ -3592,6 +3592,8 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     ;; :pin manual
     :defer 15
     :config
+    (pdf-tools-install t)
+
     (general-def
       :keymaps 'pdf-view-mode-map
       "j" 'pdf-view-next-line-or-next-page
@@ -3622,7 +3624,7 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
       "<mouse-7>" 'image-forward-hscroll
       "=" 'pdf-view-scale-reset
       "sw" 'pdf-view-fit-width-to-window
-      "sh" 'pdf-view-fit-heigth-to-window
+      "sh" 'pdf-view-fit-height-to-window
       "sp" 'pdf-view-fit-page-to-window
       "sr" 'pdf-view-scale-reset
       "ss" 'pdf-view-auto-slice-minor-mode
@@ -3645,36 +3647,36 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
       "d" 'pdf-annot-delete
       "A" 'pdf-annot-display-attachment
       "S" 'pdf-view-auto-slice-minor-mode
+      "W" 'pdf-view-fit-width-to-window
+      "H" 'pdf-view-fit-height-to-window
       "T" 'pdf-view-themed-minor-mode
       "D" 'pdf-view-dark-minor-mode
       "M" 'pdf-view-midnight-minor-mode
       "P" 'pdf-view-printer-minor-mode)
 
+    (evil-make-overriding-map pdf-view-mode-map 'motion)
+    (evil-set-initial-state 'pdf-view-mode 'motion)
+
+    ;; open pdfs scaled to fit page
+    (setq-default pdf-view-display-size 'fit-width)
+    ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
+    (add-to-list 'revert-without-query "\.pdf$")
+    (setq TeX-view-program-list '(("pdf-tools" TeX-pdf-tools-sync-view))))
+
+  (with-eval-after-load 'pdf-annot
     (my-leader-def
       :keymaps 'pdf-annot-edit-contents-minor-mode-map
       ;; evil state mode bindings are only active after the first mode change
       :states nil
       "," 'pdf-annot-edit-contents-commit)
-
     (general-def
       :keymaps 'pdf-annot-edit-contents-minor-mode-map
       ", ," 'pdf-annot-edit-contents-commit
       "C-c C-k" 'pdf-annot-edit-contents-abort)
-
-    (evil-make-overriding-map pdf-view-mode-map 'motion)
-    (evil-set-initial-state 'pdf-view-mode 'motion)
-
     (evil-make-overriding-map pdf-annot-edit-contents-minor-mode-map 'normal)
-
-    (pdf-tools-install t)
-    ;; open pdfs scaled to fit page
-    (setq-default pdf-view-display-size 'fit-width)
-    ;; automatically annotate highlights
-    (setq pdf-annot-activate-created-annotations t)
-    ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
-    (add-to-list 'revert-without-query "\.pdf$")
-    (setq TeX-view-program-list '(("pdf-tools" TeX-pdf-tools-sync-view))))
-
+    ;; open annotation buffer when creating highlights
+    ;; (setq pdf-annot-activate-created-annotations t)
+  )
 
   (use-package saveplace-pdf-view
     :defer 15)
