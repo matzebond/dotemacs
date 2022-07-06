@@ -1818,10 +1818,12 @@ add https://github.com/jgru/consult-org-roam ?
     (my-menu-def
       "g" '(:ignore t :which-key "git/vc")
       "g s" 'magit-status
-      "g b" 'magit-blame
+      "g b" 'magit-branch
+      "g B" 'magit-blame
       "g d" 'magit-diff-buffer-file
       "g l" 'magit-log-buffer-file
-      "g f" 'magit-file-dispatch)
+      "g f" 'magit-file-dispatch
+      "g g" 'magit-file-dispatch)
     (general-def
       :keymaps 'magit-mode-map
       "SPC" nil)
