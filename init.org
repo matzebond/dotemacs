@@ -3288,9 +3288,13 @@ woman > man because emacs suffices
 
 #+begin_src emacs-lisp
   (use-package electric-operator
-    :hook (prog-mode . electric-operator-mode)
+    ;; :hook (prog-mode . electric-operator-mode)
     :config
     (electric-operator-add-rules-for-mode 'sh-mode
+      (cons "-" nil))
+    (electric-operator-add-rules-for-mode 'lisp-mode
+      (cons "-" nil))
+    (electric-operator-add-rules-for-mode 'emacs-lisp-mode
       (cons "-" nil)))
 #+end_src
 *** line numbers
