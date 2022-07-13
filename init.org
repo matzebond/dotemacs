@@ -385,9 +385,6 @@ consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all ma
     ;; This adds thin lines, sorting and hides the mode line of the window.
     (advice-add #'register-preview :override #'consult-register-window)
 
-    ;; Optionally replace `completing-read-multiple' with an enhanced version.
-    (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
-
     ;; Use Consult to select xref locations with preview
     (setq xref-show-xrefs-function #'consult-xref
           xref-show-definitions-function #'consult-xref)
@@ -1253,6 +1250,9 @@ Use < in visual mode to continuously shift selection
       "l" 'org-latex-preview
       "," 'org-edit-special)
 
+    (setq org-special-ctrl-a/e t)
+    (setq org-insert-heading-respect-content t)
+
     (general-def
       :keymaps 'org-src-mode-map
       :states 'insert
@@ -1267,10 +1267,8 @@ Use < in visual mode to continuously shift selection
     (setq org-directory "~/org/")
     (setq org-return-follows-link t)
     (setq org-startup-folded t)
-    (setq org-pretty-entities t)
     (setq org-image-actual-width 300)
     (setq org-export-with-smart-quotes t)
-    (setq org-hide-emphasis-markers t)
     (setq org-cite-global-bibliography '("~/zotero.bib"))
 
     (setq org-default-notes-file (expand-file-name "inbox.org" org-directory))
@@ -1775,6 +1773,39 @@ add https://github.com/jgru/consult-org-roam ?
 #+begin_src emacs-lisp
   (use-package org-sidebar
     :after org)
+#+end_src
+
+** org-modern & visuals
+
+#+begin_src emacs-lisp
+  (use-package org-modern
+    :init
+    (global-org-modern-mode)
+    :custom
+    (org-modern-keyword '(("src" "beg" "end")
+                          ( t . ""))))
+
+  ;; Org styling, hide markup etc.
+  (setq org-hide-emphasis-markers t
+        org-pretty-entities t
+        org-ellipsis "…")
+
+   ;; ;; Edit settings
+   ;; org-auto-align-tags nil
+   ;; org-tags-column 0
+   ;; org-catch-invisible-edits 'show-and-error
+
+
+   ;; ;; Agenda styling
+   ;; org-agenda-tags-column 0
+   ;; org-agenda-block-separator ?─
+   ;; org-agenda-time-grid
+   ;; '((daily today require-timed)
+   ;;   (800 1000 1200 1400 1600 1800 2000)
+   ;;   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+   ;; org-agenda-current-time-string
+   ;; "⭠ now ─────────────────────────────────────────────────")
+
 #+end_src
 
 * Git
