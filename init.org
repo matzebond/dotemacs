@@ -305,6 +305,8 @@ https://github.com/purcell/exec-path-from-shell
     "B r" 'revert-buffer
     "B q" 'quit-window
     "B k" 'bury-buffer
+    "B c" 'clone-buffer
+    "B C" 'clone-indirect-buffer
 
     "d" 'kill-current-buffer
     "k" 'bury-buffer
