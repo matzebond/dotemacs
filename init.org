@@ -1,6 +1,7 @@
 #+TITLE: Emacs configuration file
-#+AUTHOR: Matthias Schmitt
+#+AUTHOR: Matthias Schmitt - 마띠아쎄
 #+LANGUAGE: en
+#+OPTIONS: toc:nil
 #+PROPERTY: header-args:emacs-lisp :tangle yes :comments link
 
 This is my emacs configuration file in literate style as an org mode file.
@@ -268,6 +269,7 @@ https://github.com/purcell/exec-path-from-shell
   (setq recentf-max-menu-items 2048 ;; MRU configs
         recentf-max-saved-items 2048
         recentf-exclude '("recentf" "autoload" "emacs-customizations.el"))
+  (run-at-time nil (* 5 60) 'recentf-save-list)
 #+end_src
 
 ** Lockfile
