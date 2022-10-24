@@ -4042,6 +4042,107 @@ Edit textareas of the browser in emacs
         secret)))
 #+end_src
 
+** Korean hangul/jamo conversion
+
+#+begin_src emacs-lisp
+  (defconst hangul-block-start #xac00)
+  (defconst hangul-block-end #xd7a3)
+  (defconst hangul-positioned-jamo-start #x1100)
+  (defconst hangul-positioned-jamo-end #x11ff)
+  (defconst hangul-compatibility-jamo-start #x3130)
+  (defconst hangul-compatibility-jamo-end #x3189)
+  (defvar hangul-compatibility-regex "가-힣")
+  (defvar hangul-compatibility-unregex "^가-힣")
+  (defvar hangul-compatibility-jamo-regex "ㄱ-ㆎᇿ")
+  (defvar hangul-compatibility-jamo-unregex "^ㄱ-ㆎᇿ")
+  ;; (defvar hangul-compatibility-jamo-regex (rx (category korean)))
+  ;; (defvar hangul-compatibility-jamo-unregex (rx (not (category korean))))
+
+  (defconst jamo-trailing-consonant-filler ?ᇿ)
+  (defconst jamo-head-consonants "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ")
+  (defconst jamo-vowels "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ")
+  (defconst jamo-trailing-consonants (seq-concatenate 'string (string jamo-trailing-consonant-filler) "ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂ""ㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ"))
+
+  (defconst hangul-K1 44032)
+  (defconst hangul-K2 588)
+  (defconst hangul-K3 28)
+
+  (defun jamo-aligned-to-syllable (CHO &optional JUNG JONG)
+    (let* ((ih (seq-position jamo-head-consonants CHO))
+           (iv (if JUNG (seq-position jamo-vowels JUNG) 0))
+           (it (if JONG (seq-position jamo-trailing-consonants JONG) 0)))
+      (+ hangul-K1 (* hangul-K2 ih) (* hangul-K3 iv) it)))
+
+  (defun jamo-aligned-to-hangul (jamos)
+    (apply 'string (seq-map (lambda (p) (jamo-aligned-to-syllable (elt p 0)(elt p 1)(elt p 2)))
+                     (seq-partition jamos 3))))
+
+  (defun syllable-to-jamo-aligned (s)
+      (let* ((ci_quote (- s hangul-K1))
+             (ih (/ ci_quote hangul-K2))
+             (iv (/ (- ci_quote (* hangul-K2 ih)) hangul-K3))
+             (it (- ci_quote (* hangul-K2 ih) (* hangul-K3 iv))))
+        (list (elt jamo-head-consonants ih) (elt jamo-vowels iv) (elt jamo-trailing-consonants it))))
+
+  (defun hangul-to-jamo-aligned (hanguls)
+    (apply 'string (seq-mapcat 'syllable-to-jamo-aligned hanguls)))
+
+  (jamo-aligned-to-hangul (hangul-to-jamo-aligned "제거걷하다"))
+  (hangul-to-jamo-aligned (jamo-aligned-to-hangul "ㅈㅔᇿㄱㅓᇿㄱㅓㄷㅎㅏᇿㄷㅏᇿ"))
+
+  (defun convert-to-hangul (start end)
+    (interactive "r")
+    (save-excursion
+      (goto-char start)
+      (setq m-end (make-marker))
+      (set-marker m-end end)
+      (skip-chars-forward hangul-compatibility-jamo-unregex)
+      (while (< (point) m-end)
+        (let* ((w-start (point))
+               (w-len (skip-chars-forward hangul-compatibility-jamo-regex))
+               (w-end (min m-end (+ w-start w-len)))
+               (w (buffer-substring-no-properties w-start w-end))
+               (w-hangul (jamo-aligned-to-hangul w)))
+          ;; (print w)
+          ;; (print w-hangul)
+          (goto-char w-start)
+          (delete-region w-start w-end)
+          (insert w-hangul)
+          (skip-chars-forward hangul-compatibility-jamo-unregex)
+        ))
+      ))
+
+  (defun convert-to-jamo-aligned (start end)
+    (interactive "r")
+    (save-excursion
+      (goto-char start)
+      (setq m-end (make-marker))
+      (set-marker m-end end)
+      (skip-chars-forward hangul-compatibility-unregex)
+      (while (< (point) m-end)
+        (let* ((w-start (point))
+               (w-len (skip-chars-forward hangul-compatibility-regex))
+               (w-end (min m-end (+ w-start w-len)))
+               (w (buffer-substring-no-properties w-start w-end))
+               (w-hangul (hangul-to-jamo-aligned w)))
+          ;; (print w)
+          ;; (print w-hangul)
+          (goto-char w-start)
+          (delete-region w-start w-end)
+          (insert w-hangul)
+          (skip-chars-forward hangul-compatibility-unregex)
+        ))
+      ))
+
+
+  ;; ㅈㅔᇿㄱㅓᇿㅎㅏᇿㄷㅏᇿ --X--> ㅈㅔᇿㄱㅓᇿㅎㅏㅂㄴㅣᇿㄷㅏᇿ
+  ;; 제거하다 --X--> 제거합니다
+  ;; a
+
+  ;; ㅈㅔᇿㄱㅓᇿㅎㅏᇿㄷㅏᇿ --X--> ㅈㅔᇿㄱㅓᇿㅎㅏㅂㄴㅣᇿㄷㅏᇿ
+  ;; test
+#+end_src
+
 * Functions
 ** current-file
 #+BEGIN_SRC emacs-lisp
