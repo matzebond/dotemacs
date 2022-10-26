@@ -2225,6 +2225,11 @@ https://github.com/oantolin/embark/issues/376
     :demand t
     :config
     (recursion-indicator-mode))
+
+  (general-def
+    :keymaps 'global
+    "M-Q" 'exit-recursive-edit
+    "M-S-q" 'exit-recursive-edit)
 #+end_src
 
 ** Fringe
