@@ -2176,6 +2176,29 @@ https://github.com/oantolin/embark/issues/376
 
 #+END_SRC
 
+#+begin_src emacs-lisp
+  (custom-theme-set-faces
+   'user
+   '(org-meta-line ((t (;;:inherit (mindre-faded fixed-pitch)
+                        :background "#303030"
+                        :height 0.9
+                        :extend t))))
+
+   '(org-block ((t (:inherit (mindre-block fixed-pitch)))))
+
+   `(org-block-begin-line ((t (;;:inherit (mindre-faded fixed-pitch)
+                               ;; :overline "#606060"
+                               :background "#303030"
+                               :height 0.9
+                               :extend t))))
+
+   `(org-block-end-line ((t (;;:inherit (mindre-faded fixed-pitch)
+                             ;; :underline "#606060"
+                             :background "#303030"
+                             :height 0.9
+                             :extend t)))))
+#+end_src
+
 ** Cursor
 
 #+BEGIN_SRC emacs-lisp
