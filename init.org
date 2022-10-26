@@ -3651,10 +3651,13 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
 *** pdf-tools
 
 #+begin_src emacs-lisp
+  (add-to-list 'revert-without-query "\.pdf$")
+
   (use-package pdf-tools
     ;; manually update
     ;; :pin manual
     :defer 15
+    :mode ("\\.pdf\\'" . pdf-view-mode)
     :config
     (pdf-tools-install t)
 
@@ -3724,7 +3727,6 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
     ;; open pdfs scaled to fit page
     (setq-default pdf-view-display-size 'fit-width)
     ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
-    (add-to-list 'revert-without-query "\.pdf$")
     (setq TeX-view-program-list '(("pdf-tools" TeX-pdf-tools-sync-view))))
 
   (with-eval-after-load 'pdf-annot
