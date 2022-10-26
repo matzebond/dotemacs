@@ -3517,6 +3517,8 @@ https://github.com/tuhdo/semantic-refactor
 
   (use-package lsp-pyright
     :hook (python-mode . (lambda () (require 'lsp-pyright) (lsp-deferred))) ; or lsp
+    :init
+    (setq lsp-pyright-multi-root nil) ;; disable to use different python venv
     :config
     (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.venv"))
 
