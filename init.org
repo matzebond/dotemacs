@@ -224,13 +224,16 @@ https://github.com/purcell/exec-path-from-shell
 #+end_src
 
 * Saving, Backup & History
+** no littering
+
+#+begin_src emacs-lisp
+  (use-package no-littering
+    :demand)
+#+end_src
+
 ** TODO Backup
 
 #+BEGIN_SRC emacs-lisp
-  (defvar user-cache-directory (expand-file-name ".cache" user-emacs-directory))
-  (defvar user-backup-directory (expand-file-name "backups" user-cache-directory))
-  (make-directory user-backup-directory 'noerror)
-  (setq backup-directory-alist `(("." . ,user-backup-directory)))
   (setq make-backup-files t      ; backup of a file the first time it is saved.
         backup-by-copying t      ; don't clobber symlinks
         version-control t        ; version numbers for backup files
@@ -241,18 +244,13 @@ https://github.com/purcell/exec-path-from-shell
         auto-save-default t      ; auto-save every buffer that visits a file
         auto-save-timeout 20     ; number of seconds idle time before auto-save (default: 30)
         auto-save-interval 200   ; number of keystrokes between auto-saves (default: 300)
-        auto-save-list-file-prefix (expand-file-name "auto-save/.saves-"
-                                                     user-cache-directory)
         )
 #+END_SRC
 
 ** Undo history
 
 #+BEGIN_SRC emacs-lisp
-  (defvar user-undo-directory (expand-file-name ".cache/undo" user-emacs-directory))
-  (make-directory user-undo-directory 'noerror)
   (setq undo-tree-auto-save-history t)
-  (setq undo-tree-history-directory-alist (list (cons "." user-undo-directory)))
 #+END_SRC
 
 ** File history
