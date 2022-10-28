@@ -247,6 +247,25 @@ https://github.com/purcell/exec-path-from-shell
         )
 #+END_SRC
 
+Disable backup & auto save for remote files.
+
+#+begin_src emacs-lisp
+  (setq backup-enable-predicate
+      (lambda (name)
+        (and (normal-backup-enable-predicate name)
+             (not
+              (let ((method (file-remote-p name 'method)))
+                (when (stringp method)
+                  (member method '("su" "sudo"))))))))
+
+  (defun maschm/conditionally-disable-auto-save ()
+     (when (and (stringp buffer-file-name)
+                (string-equal (file-remote-p buffer-file-name 'user) "root"))
+       (setq buffer-auto-save-file-name nil)))
+
+  (add-hook 'find-file-hook #'maschm/conditionally-disable-auto-save)
+#+end_src
+
 ** Undo history
 
 #+BEGIN_SRC emacs-lisp
