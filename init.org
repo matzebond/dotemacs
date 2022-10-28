@@ -1309,7 +1309,11 @@ Use < in visual mode to continuously shift selection
     (setq org-refile-targets '(("~/org/gtd.org" :maxlevel . 3)
                                ("~/org/someday.org" :level . 1)
                                ("~/org/tickler.org" :maxlevel . 2)))
-    (setq org-tag-alist '(("@home" . ?h) ("@uni" . ?u) ("@work" . ?w)))
+
+    (setq org-tag-alist '(("noexport" . ?n) ("ignore" . ?i) ("@home" . ?h) ("@work" . ?w)))
+    (setq org-auto-align-tags nil)
+    (setq org-tags-column 0)
+
     (setq org-refile-use-outline-path 'file)
     (setq org-outline-path-complete-in-steps nil)
     (require 'oc-biblatex)
@@ -1814,8 +1818,6 @@ add https://github.com/jgru/consult-org-roam ?
         org-ellipsis "…")
 
    ;; ;; Edit settings
-   ;; org-auto-align-tags nil
-   ;; org-tags-column 0
    ;; org-catch-invisible-edits 'show-and-error
 
 
@@ -1827,7 +1829,7 @@ add https://github.com/jgru/consult-org-roam ?
    ;;   (800 1000 1200 1400 1600 1800 2000)
    ;;   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
    ;; org-agenda-current-time-string
-   ;; "⭠ now ─────────────────────────────────────────────────")
+   ;; "⭠ now ─────────────────────────────────────────────────"
 
 #+end_src
 
