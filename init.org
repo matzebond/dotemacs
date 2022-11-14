@@ -218,6 +218,7 @@ https://github.com/purcell/exec-path-from-shell
     :if (daemonp)
     :demand
     :config
+    (add-to-list 'exec-path-from-shell-variables '"SSH_AUTH_SOCK")
     (add-to-list 'exec-path-from-shell-variables '"MOZ_ENABLE_WAYLAND")
     (add-to-list 'exec-path-from-shell-variables '"QT_QPA_PLATFORM")
     (exec-path-from-shell-initialize))
