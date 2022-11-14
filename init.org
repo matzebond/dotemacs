@@ -286,7 +286,10 @@ Disable backup & auto save for remote files.
   (setq recentf-max-menu-items 2048 ;; MRU configs
         recentf-max-saved-items 2048
         recentf-exclude '("recentf" "autoload" "emacs-customizations.el"))
-  (run-at-time nil (* 5 60) 'recentf-save-list)
+  ;; (add-to-list 'recentf-exclude no-littering-var-directory)
+  (add-to-list 'recentf-exclude no-littering-etc-directory)
+
+  (run-at-time t (* 5 60) 'recentf-save-list)
 #+end_src
 
 ** Lockfile
