@@ -3329,6 +3329,14 @@ woman > man because emacs suffices
     (customize-set-variable 'woman-fill-frame t))
 #+end_src
 
+** keycast
+
+#+begin_src emacs-lisp
+  (use-package keycast
+    :custom
+    (keycast-mode-line-insert-after . 'minions-mode-line-modes))
+#+end_src
+
 ** drawing
 *** dot
 
