@@ -330,6 +330,7 @@ Disable backup & auto save for remote files.
     "B k" 'bury-buffer
     "B c" 'clone-buffer
     "B C" 'clone-indirect-buffer
+  ;;"B f" 'apheleia-format-buffer
 
     "d" 'kill-current-buffer
     "k" 'bury-buffer
@@ -345,6 +346,7 @@ Disable backup & auto save for remote files.
     "W s" 'evil-window-split
     "W v" 'evil-window-vsplit
     "W -" 'evil-window-split
+    "W _" 'evil-window-split
     "W |" 'evil-window-vsplit
     "W d" 'delete-window ;;evil-delete-window would rebalance siblings
     "W o" 'delete-other-windows
@@ -1912,7 +1914,8 @@ add https://github.com/jgru/consult-org-roam ?
       "g d" 'magit-diff-buffer-file
       "g l" 'magit-log-buffer-file
       "g f" 'magit-file-dispatch
-      "g g" 'magit-file-dispatch)
+      "g g" 'magit-file-dispatch
+      "g c" 'magit-show-commit)
     (general-def
       :keymaps 'magit-mode-map
       "SPC" nil)
@@ -3451,6 +3454,8 @@ Highlight trailing whitespace
   (use-package apheleia
     :init
     (apheleia-global-mode +1)
+    :general
+    (my-menu-def "B f" 'apheleia-format-buffer)
     :config
     (setf (alist-get 'yapf apheleia-formatters)
           '("yapf" file))
@@ -4096,7 +4101,9 @@ This happens a lot because my dotfiles are linked by stow.
   (use-package sudo-edit
     :general
     (my-menu-def
-      "F s" 'sudo-edit-find-file))
+      "F s" 'sudo-edit-find-file)
+    (general-def :keymaps 'embark-file-map
+      "s" 'sudo-edit-find-file))
 #+end_src
 
 ** atomic-chrome
