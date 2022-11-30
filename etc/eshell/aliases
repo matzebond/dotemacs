@@ -1,2 +1,2 @@
-alias ll ls -alh
+alias ll ls -alh $1
 alias ssh cd /ssh:$1:~
