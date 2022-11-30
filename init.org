@@ -2331,6 +2331,7 @@ https://github.com/oantolin/embark/issues/376
 *** [[*Git Highlight Fringe][Git Fringe]]
 
 ** Scale
+*** Frame
 
 this or https://github.com/purcell/default-text-scale/blob/master/default-text-scale.el
 
@@ -2357,6 +2358,36 @@ this or https://github.com/purcell/default-text-scale/blob/master/default-text-s
     "Reset the height of the default face."
     (interactive)
     (set-face-attribute 'default nil :height default-text-scale-pre))
+#+end_src
+
+*** Buffer
+
+[[info:emacs#Text Scale][Text Scale Mode]]
+
+#+begin_src emacs-lisp
+  (defun my/text-scale-adjust-latex-previews ()
+    "Adjust the size of latex preview fragments when changing the buffer's text scale."
+    (pcase major-mode
+      ('latex-mode
+       (dolist (ov (overlays-in (point-min) (point-max)))
+         (if (eq (overlay-get ov 'category)
+                 'preview-overlay)
+             (my/text-scale--resize-fragment ov))))
+      ('org-mode
+       (dolist (ov (overlays-in (point-min) (point-max)))
+         (if (eq (overlay-get ov 'org-overlay-type)
+                 'org-latex-overlay)
+             (my/text-scale--resize-fragment ov))))))
+
+  (defun my/text-scale--resize-fragment (ov)
+    (overlay-put
+     ov 'display
+     (cons 'image
+           (plist-put
+            (cdr (overlay-get ov 'display))
+            :scale (+ 1.0 (* 0.25 text-scale-mode-amount))))))
+
+  (add-hook 'text-scale-mode-hook #'my/text-scale-adjust-latex-previews)
 #+end_src
 
 *** Hydra
