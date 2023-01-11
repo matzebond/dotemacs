@@ -4156,15 +4156,17 @@ This happens a lot because my dotfiles are linked by stow.
       "s" 'sudo-edit-find-file))
 #+end_src
 
-** atomic-chrome
+** emacs-everywhere
 Edit textareas of the browser in emacs
 
 #+begin_src emacs-lisp
-  (use-package atomic-chrome
-    :defer 20
-    :config
-    (atomic-chrome-start-server))
+  (use-package emacs-everywhere
+    :defer 20)
 #+end_src
+
+then use with a window manager keybinding
+
+~emacsclient --eval "(emacs-everywhere)"~
 
 ** auth-sources
 
