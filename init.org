@@ -2890,6 +2890,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    "g k" 'dired-prev-dirline)
 
   (setq dired-listing-switches "-v --group-directories-first -alh")
+  (setq dired-create-destination-dirs t)
   (setq dired-dwim-target t)
 #+END_SRC
 
@@ -3028,6 +3029,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
       "n" nil
       "p" nil
       "g" nil
+      "h" nil
       "g r" 'helpful-update
       "q" 'quit-window)
     (evil-make-overriding-map helpful-mode-map 'motion)
