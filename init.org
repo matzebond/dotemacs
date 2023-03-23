@@ -3662,7 +3662,11 @@ https://github.com/tuhdo/semantic-refactor
      ((executable-find "python2")
       (setq python-shell-interpreter "python2"))
      (t
-      (setq python-shell-interpreter "python"))))
+      (setq python-shell-interpreter "python")))
+    :local
+    (setq-local compile-command (concat "python "
+                                        (shell-quote-argument
+                                         (or buffer-file-name "")))))
 
   (use-package lsp-pyright
     :hook (python-mode . (lambda () (require 'lsp-pyright) (lsp-deferred))) ; or lsp
