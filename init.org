@@ -2298,6 +2298,11 @@ https://github.com/oantolin/embark/issues/376
                              :background "#303030"
                              :height 0.9
                              :extend t)))))
+** Icons
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :if (display-graphic-p))
 #+end_src
 
 ** Cursor
@@ -2309,16 +2314,12 @@ https://github.com/oantolin/embark/issues/376
 ** Modeline
 
 #+BEGIN_SRC emacs-lisp
-  (use-package minions
-    :demand
-    :config (minions-mode 1))
+  (column-number-mode)
 
-  (use-package moody
+  (use-package doom-modeline
     :demand
-    :config
-    (setq x-underline-at-descent-line t)
-    (moody-replace-mode-line-buffer-identification)
-    (moody-replace-vc-mode))
+    :init
+    (doom-modeline-mode 1))
 #+END_SRC
 
 #+begin_src emacs-lisp
