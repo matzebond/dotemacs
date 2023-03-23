@@ -3106,6 +3106,8 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     "C" '(calc-dispatch :which-key "calc-dispatch"))
 #+end_src
 
+https://github.com/ahyatt/emacs-calc-tutorials
+
 ** eshell
 
 #+BEGIN_SRC emacs-lisp
