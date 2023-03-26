@@ -86,6 +86,9 @@ After startup reset it to reasonable value
     (load bootstrap-file nil 'nomessage))
 #+END_SRC
 
+*** TODO elpaca?
+https://github.com/progfolio/elpaca
+
 *** use-package
 Use ~straight.el~ together with ~use-package~
 
