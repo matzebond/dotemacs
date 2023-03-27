@@ -3099,7 +3099,15 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   (with-eval-after-load "comint"
     (general-def
       :keymaps 'comint-mode-map
-      "C-d" 'maschm/comint-evil-scroll-down-or-maybe-eof))
+      "C-d" 'maschm/comint-evil-scroll-down-or-maybe-eof)
+    (general-def
+      :keymaps 'comint-mode-map
+      ;; :states nil
+      ;; "g" nil
+      :states 'motion
+      "g k" 'comint-previous-prompt
+      "g j" 'comint-next-prompt
+      ))
 #+end_src
 
 ** calc
