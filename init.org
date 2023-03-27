@@ -3669,6 +3669,18 @@ https://github.com/tuhdo/semantic-refactor
       (setq python-shell-interpreter "python2"))
      (t
       (setq python-shell-interpreter "python")))
+
+
+    (defun maschm/python-shell-other-scroll-end (&rest _)
+      (interactive)
+      (save-selected-window
+        (switch-to-buffer-other-window (python-shell-get-buffer))
+        (evil-goto-line)
+        ;;(end-of-buffer)
+        )
+      )
+    (advice-add 'python-shell-send-string :after 'maschm/python-shell-scroll-end)
+
     :local
     (setq-local compile-command (concat "python "
                                         (shell-quote-argument
