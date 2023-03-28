@@ -2692,17 +2692,23 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     (python-mode . lsp-deferred)
     ;; if you want which-key integration
     (lsp-mode . lsp-enable-which-key-integration)
+    :general
+    (my-menu-def
+      "L a" 'lsp-execute-code-action
+      "L d" 'consult-lsp-diagnostics
+     )
     :custom
-    (lsp-diagnostics-provider :capf)
+    (lsp-keep-workspace-alive nil)
+    (lsp-diagnostics-provider :auto)
     (lsp-headerline-breadcrumb-enable t)
     (lsp-headerline-breadcrumb-segments '(project file symbols))
     (lsp-lens-enable nil)
-    (lsp-disabled-clients '((python-mode . pyls)))
+    (lsp-file-watch-threshold 1500)
+    (lsp-disabled-clients '((python-mode . (pylsp pyls))))
     :config
     (setq lsp-idle-delay 0.500)
     (setq lsp-log-io nil))
 
-  ;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
   (use-package consult-lsp
     :after (lsp-mode consult)
     :config
@@ -2714,7 +2720,9 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     (lsp-ui-doc-enable t)
     (lsp-ui-doc-show-with-cursor nil)
     (lsp-ui-doc-position 'at-point)
+    (lsp-ui-sideline-enable nil)
     (lsp-ui-sideline-show-code-actions nil)
+    (lsp-ui-imenu-auto-refresh t)
     )
 #+END_SRC
 
