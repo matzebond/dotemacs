@@ -830,6 +830,8 @@ use =/ C-j= or =~ //= to get to the local / directory
   (use-package avy
     :defer 15
     :commands (avy-goto-char-2 avy-goto-char-timer avy-goto-line)
+    :custom
+    (avy-keys '(?e ?n ?a ?r ?i ?t ?u ?d ?o ?s))
     :general
     (general-def
       :states 'motion
