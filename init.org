@@ -3054,18 +3054,20 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     ;; "H T" 'which-key-show-top-level
 
   (use-package helpful
-    :defer 10
+    :demand
     :commands (helpful-symbol helpful-variable helpful-function helpful-callable helpful-key)
     :init
     (defalias 'describe-variable 'helpful-variable)
     (defalias 'describe-function 'helpful-function)
     (defalias 'describe-symbol 'helpful-symbol)
+    (defalias 'describe-key 'helpful-key)
     :config
     (general-def
       :keymaps 'helpful-mode-map
       "SPC" nil
       "n" nil
       "p" nil
+      "h" nil
       "g" nil
       "h" nil
       "g r" 'helpful-update
@@ -3074,7 +3076,12 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     ;; double defalias works
     (defalias 'describe-variable 'helpful-variable)
     (defalias 'describe-function 'helpful-function)
-    (defalias 'describe-symbol 'helpful-symbol))
+    (defalias 'describe-symbol 'helpful-symbol)
+    (defalias 'describe-key 'helpful-key)
+
+    ;; pay initial cost early
+    (require 'info-look)
+    (info-lookup-setup-mode 'symbol 'emacs-lisp-mode))
 #+END_SRC
 
 *** embark become keymap for helpful commands
