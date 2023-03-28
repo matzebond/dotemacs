@@ -1086,6 +1086,7 @@ Equivalent of ~nnoremap n nzz~
     (evil-scroll-line-to-center nil))
 
   (advice-add 'evil-search-next :after #'my-center-line)
+  (advice-add 'evil-search-previous :after #'my-center-line)
 #+END_SRC
 
 *** continuous shifting
