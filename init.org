@@ -1969,8 +1969,9 @@ add https://github.com/jgru/consult-org-roam ?
       "g B" 'magit-blame
       "g d" 'magit-diff-buffer-file
       "g l" 'magit-log-buffer-file
-      "g f" 'magit-file-dispatch
+      "g f" 'magit-find-file
       "g g" 'magit-file-dispatch
+      "g G" 'magit-dispatch
       "g c" 'magit-show-commit)
     (general-def
       :keymaps 'magit-mode-map
@@ -1989,6 +1990,7 @@ add https://github.com/jgru/consult-org-roam ?
       "C-p" 'evil-previous-visual-line)
     :custom
     (magit-diff-adjust-tab-width t)
+    (magit-section-disable-line-numbers nil)
     :config
     (setq magit-diff-refine-hunk t)
     :local
