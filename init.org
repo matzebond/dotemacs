@@ -2669,11 +2669,12 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
       "E n" 'flycheck-next-error
       "E p" 'flycheck-previous-error)
     :custom
-    (flycheck-display-errors-delay 0.1)
-    (flycheck-display-errors-function 'flycheck-pos-tip-error-messages))
+    (flycheck-display-errors-delay 0.1))
 
-  (use-package flycheck-pos-tip
-    :hook (flycheck-mode . flycheck-pos-tip-mode))
+  ;; (use-package flycheck-pos-tip
+  ;;   :hook (flycheck-mode . flycheck-pos-tip-mode)
+  ;;   :custom
+  ;;   (flycheck-display-errors-function 'flycheck-pos-tip-error-messages))
 #+END_SRC
 
 ** TODO LSP
