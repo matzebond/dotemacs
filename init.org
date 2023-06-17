@@ -2099,7 +2099,8 @@ https://github.com/oantolin/embark/issues/376
     (general-def
       :keymaps 'mu4e-main-mode-map
       "/" 'mu4e-headers-search
-      "j" nil
+      ;; "j" nil
+      "j" 'mu4e~headers-jump-to-maildir
       "J" 'mu4e~headers-jump-to-maildir
       "b" 'mu4e-search-bookmark
       "g r" 'mu4e-update-mail-and-index)
@@ -2172,24 +2173,7 @@ https://github.com/oantolin/embark/issues/376
                    (mu4e-refile-folder    . "/posteo/Archive")
                    (smtpmail-smtp-server  . "posteo.de")
                    (smtpmail-smtp-service . 465)
-                   (smtpmail-stream-type  . ssl)))
-         ,(make-mu4e-context
-           :name "uni"
-           :enter-func (lambda () (mu4e-message "Entering uni context"))
-           :leave-func (lambda () (mu4e-message "Leaving uni context"))
-           :match-func (lambda (msg)
-                         (when msg
-                           (string-match-p "^/uni" (mu4e-message-field msg :maildir))))
-           :vars '((user-mail-address     . "uydvo@student.kit.edu")
-                   (user-full-name        . "Matthias Schmitt")
-                   (mu4e-sent-folder      . "/uni/Sent")
-                   (mu4e-drafts-folder    . "/uni/Drafts")
-                   (mu4e-trash-folder     . "/uni/Trash")
-                   (mu4e-refile-folder    . "/uni/Archives")
-                   (smtpmail-smtp-server  . "smtp.kit.edu")
-                   (smtpmail-smtp-service . 587)
-                   (smtpmail-stream-type  . starttls))
-       )))
+                   (smtpmail-stream-type  . ssl)))))
     (setq mu4e-context-policy 'ask-if-none)
     (setq mu4e-compose-context-policy 'ask)
     (setq mu4e-compose-format-flowed t)
@@ -2206,13 +2190,15 @@ https://github.com/oantolin/embark/issues/376
     (add-hook 'mu4e-compose-mode-hook 'visual-fill-column-mode)
 
 
-    ;; (setq mu4e-maildir-shortcuts
-    ;;  '( ("/posteo/Inbox" . ?p)
-    ;;     ("/uni/Inbox" . ?u)))
+    (setq mu4e-maildir-shortcuts
+     '((:maildir "/posteo/Inbox" :key ?i)
+       (:maildir "/posteo/Emacs" :key ?e)
+       (:maildir "/posteo/Politik" :key ?p)
+       (:maildir "/posteo/Junk" :key ?j)))
 
     (setq mu4e-bookmarks
      '((:name  "Unread messages"
-          :query "flag:unread AND NOT flag:trashed AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\\ E-Mail AND NOT list:mathe-info-aktiv.fsmi.uni-karlsruhe.de AND NOT list:fsr-einladung.fsmi.uni-karlsruhe.de AND NOT list:info-aktiv.fsmi.uni-karlsruhe.de"
+          :query "flag:unread AND NOT flag:trashed AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\\ E-Mail AND NOT list:mathe-info-aktiv.fsmi.uni-karlsruhe.de AND NOT list:fsr-einladung.fsmi.uni-karlsruhe.de AND NOT list:info-aktiv.fsmi.uni-karlsruhe.de AND NOT maildir:/posteo/Emacs"
           :key ?u)
       (:name "Today's messages"
           :query "date:today..now AND NOT maildir:/posteo/Spam AND NOT maildir:/uni/Junk\\ E-Mail"
