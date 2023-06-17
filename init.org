@@ -3273,13 +3273,16 @@ https://github.com/ahyatt/emacs-calc-tutorials
 
 ** tramp
 
-recognize the OTP prompt of the uni cluster
+recognize the OTP prompt of the KIT uni cluster
 
 #+begin_src emacs-lisp
   (setq tramp-password-prompt-regexp
         (format "^.*\\(%s\\).*:\^@? *" (regexp-opt
                                         (cons "OTP"
                                               password-word-equivalents))))
+#+end_src
+
+#+begin_src
 
   (connection-local-set-profile-variables
    'remote-ksh
@@ -3413,6 +3416,31 @@ woman > man because emacs suffices
   (with-eval-after-load 'woman
     (customize-set-variable 'woman-fill-frame t))
 #+end_src
+
+** music
+*** EMMS
+
+#+begin_src emacs-lisp
+  (use-package emms
+    :custom
+    (emms-player-list '(emms-player-mpv))
+    (emms-info-functions '(emms-info-native))
+    :config
+    (emms-all)
+    ;; (evil-make-overriding-map emms-playlist-mode-map 'motion)
+    ;; (evil-set-initial-state 'emms-playlist-mode 'emacs)
+
+    (require 'emms-player-mpd)
+    (setq emms-player-mpd-server-name "192.168.0.31")
+    (setq emms-player-mpd-server-port "6600")
+    (add-to-list 'emms-info-functions 'emms-info-mpd)
+    (add-to-list 'emms-player-list 'emms-player-mpd)
+    (require 'emms-volume)
+    (setq emms-volume-change-function 'emms-volume-mpd-change)
+    )
+#+end_src
+
+emms-cache-set-from-mpd-all
 
 ** keycast
 
