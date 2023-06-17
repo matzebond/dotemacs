@@ -2584,11 +2584,8 @@ Display '~' on empty lines like in vi (only in programming modes)
 #+END_SRC
 
 * Completion
-
 https://company-mode.github.io/
-
 https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.html
-
 ** Snippets
 
 #+BEGIN_SRC emacs-lisp
@@ -4649,7 +4646,6 @@ then use with a window manager keybinding
             (forward-line 1))
           (beginning-of-line)))))
 #+end_src
-
 
 * to read
 [[info:elisp#Completion][elisp#Completion]]
