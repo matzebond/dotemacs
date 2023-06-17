@@ -1898,7 +1898,57 @@ add https://github.com/jgru/consult-org-roam ?
    ;;   (800 1000 1200 1400 1600 1800 2000)
    ;;   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
    ;; org-agenda-current-time-string
-   ;; "⭠ now ─────────────────────────────────────────────────"
+   ;; "⭠ now ─────────────────────────────────────────────────")
+#+end_src
+
+** theme
+
+#+begin_src emacs-lisp
+  (custom-theme-set-faces
+   'user
+   '(org-meta-line ((t (;;:inherit (mindre-faded fixed-pitch)
+                        :background "#303030"
+                        :height 0.9
+                        :extend t))))
+
+   '(org-block ((t (:inherit (mindre-block fixed-pitch)))))
+
+   `(org-block-begin-line ((t (;;:inherit (mindre-faded fixed-pitch)
+                               ;; :background "#303030"
+                               :overline "dim gray"
+                               :height 0.8
+                               :extend t))))
+
+   `(org-block-end-line ((t (;;:inherit (mindre-faded fixed-pitch)
+                             ;; :background "#303030"
+                             :underline "dim gray"
+                             :height 0.8
+                             :extend t)))))
+
+  ;; (defvar g (ceiling (frame-char-height) 1.8))
+  ;; (defvar h (- (default-line-height) g))
+
+  (define-fringe-bitmap 'org-modern--block-inner [#b01000000] nil nil '(center repeated))
+  (define-fringe-bitmap 'org-modern--block-begin
+    (vconcat [#b01111111]
+             (make-vector 127 #b01000000))
+    nil nil 'top)
+  (define-fringe-bitmap 'org-modern--block-end
+    (vconcat (make-vector 127 #b01000000)
+             [#b01111111])
+    nil nil 'bottom)
+
+  (defface org-modern-block-fringe
+    '(;;(default :inherit diff-added)
+      (((class color) (min-colors 88) (background dark)) :foreground "dim gray")
+      (((class color) (min-colors 88) (background light)) :foreground "dark gray"))
+    "")
+
+    (set-face-attribute 'org-modern-block-fringe nil :background "dim gray")
+
+  (dolist (f '(org-modern--block-inner org-modern--block-begin org-modern--block-end))
+    (set-fringe-bitmap-face f 'org-modern-block-fringe))
+  (set-fringe-bitmap-face 'org-modern--block-inner 'org-modern-block-fringe)
 
 #+end_src
 
@@ -1999,8 +2049,11 @@ config taken from https://github.com/jimeh/.emacs.d/blob/master/modules/version-
        #b01110000
        #b01100000
        #b01000000] nil nil 'top)
+
     ; stop diff-hl from redefining bitmaps
     (define-fringe-bitmap 'diff-hl-bmp-empty [0] 1 1 'center)
+    (remove-hook 'text-scale-mode-hook 'diff-hl-maybe-redefine-bitmaps)
+    (advice-add 'diff-hl-maybe-redefine-bitmaps :override (lambda () nil))
 
     (defun maschm/diff-hl-fringe-bmp-function (type pos)
       (cl-loop for bmp in (list (format "diff-hl-bmp-%s-%s" type pos)
@@ -2278,29 +2331,11 @@ https://github.com/oantolin/embark/issues/376
   ;; (setq frame-background-mode 'dark)
   ;; (mapc 'frame-set-background-mode (frame-list))
 
+
+
+
 #+END_SRC
 
-#+begin_src emacs-lisp
-  (custom-theme-set-faces
-   'user
-   '(org-meta-line ((t (;;:inherit (mindre-faded fixed-pitch)
-                        :background "#303030"
-                        :height 0.9
-                        :extend t))))
-
-   '(org-block ((t (:inherit (mindre-block fixed-pitch)))))
-
-   `(org-block-begin-line ((t (;;:inherit (mindre-faded fixed-pitch)
-                               ;; :overline "#606060"
-                               :background "#303030"
-                               :height 0.9
-                               :extend t))))
-
-   `(org-block-end-line ((t (;;:inherit (mindre-faded fixed-pitch)
-                             ;; :underline "#606060"
-                             :background "#303030"
-                             :height 0.9
-                             :extend t)))))
 ** Icons
 
 #+begin_src emacs-lisp
@@ -2638,12 +2673,12 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     :defer 30
     :general
     (my-menu-def
-      "e" '(:ignore t :which-key "Errors")
-      "e e" 'flycheck-buffer
-      "e b" 'flycheck-buffer
-      "e c" 'flycheck-compile
-      "e n" 'flycheck-next-error
-      "e p" 'flycheck-previous-error)
+      "E" '(:ignore t :which-key "Errors")
+      "E e" 'flycheck-buffer
+      "E b" 'flycheck-buffer
+      "E c" 'flycheck-compile
+      "E n" 'flycheck-next-error
+      "E p" 'flycheck-previous-error)
     :custom
     (flycheck-display-errors-delay 0.1)
     (flycheck-display-errors-function 'flycheck-pos-tip-error-messages))
@@ -2891,7 +2926,8 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    "g" nil
    "g r" 'revert-buffer
    "g j" 'dired-next-dirline
-   "g k" 'dired-prev-dirline)
+   "g k" 'dired-prev-dirline
+   "F" 'find-file)
 
   (setq dired-listing-switches "-v --group-directories-first -alh")
   (setq dired-create-destination-dirs t)
@@ -3126,6 +3162,11 @@ https://github.com/ahyatt/emacs-calc-tutorials
   (use-package eshell
     :defer 30
     :commands (eshell eshell-command)
+    :general
+    (general-def
+     "C-c e" 'eshell)
+    (my-menu-def
+     "e" 'eshell)
     :config
     ;; (setq pcomplete-ignore-case t)
     (setq eshell-cmpl-ignore-case t)
