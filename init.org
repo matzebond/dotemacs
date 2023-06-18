@@ -376,6 +376,8 @@ consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all ma
               :which-key "tramp")
       "F r" '(consult-recent-file :which-key "recent")
       "F f" '(consult-find :which-key "recent")
+      "F g" '(consult-grep :which-key "grep")
+      "F l" '(consult-locate :which-key "locate")
       "r" '(consult-recent-file :which-key "recent")
       "/" '(consult-ripgrep :which-key "search")
       )
@@ -433,7 +435,7 @@ consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all ma
      consult-ripgrep consult-git-grep consult-grep
      consult-bookmark consult-recent-file
      consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
-     :preview-key (kbd "M-."))
+     :preview-key "M-.")
 
     (consult-customize
      consult-man :initial "")
@@ -598,7 +600,12 @@ Use `consult-line` search as last evil/isearch string copied from [[https://gith
 
     :config
     (general-def :keymaps 'embark-general-map
-      "y" 'embark-copy-as-kill)
+      "y" '(embark-copy-as-kill :general "yank")
+      "a" nil ; append
+      )
+
+    (general-def :keymaps 'embark-vc-file-map
+      "m" 'magit-file-dispatch)
 
     ;; Hide the mode line of the Embark live/completions buffers
     (add-to-list 'display-buffer-alist
@@ -1049,6 +1056,8 @@ https://github.com/noctuid/evil-guide
                                 ; use "<tab>" to bind to only the tab-key in gui mode
       "C-b" nil ; evil-scroll-page-up
       "C-f" nil ; evil-scroll-page-down
+      "C-<left>" 'evil-scroll-left
+      "<C-right>" 'evil-scroll-right
       )
     (general-nmap
       "C-." nil ;; evil-repeat-pop
@@ -3030,7 +3039,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     "H k" '(helpful-key :which-key "key")
     "H X" 'helpful-kill-buffers
     "H i" 'info
-    "H I" 'info-display-manual
+    "H I" 'consult-info
     ;; "H m" '(describe-mode :which-key "mode")
     "H m" '(woman :which-key "man-page")
     "H M" '(consult-man :which-key "search man-page")
@@ -3044,6 +3053,8 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
     "H d" '(:ignore t :which-key "Debug")
     "H d e" 'debug-on-entry
     "H d E" 'cancel-debug-on-entry
+    "H p" 'profiler-start
+    "H P" '(:ignore t :which-key "Profiler")
     "H P p" 'profiler-start
     "H P s" 'profiler-stop
     "H P r" 'profiler-report)
@@ -3613,6 +3624,7 @@ Highlight trailing whitespace
       "h" nil
       "l" nil
       "g" nil
+      "q" 'bury-buffer
       "C-o" 'devdocs-go-back
       "C-i" 'devdocs-go-forward)
     (evil-make-overriding-map devdocs-mode-map 'motion)
@@ -3821,8 +3833,9 @@ https://github.com/jyp/dante
 
 fork of intero
 
-** TODO Pdf/Latex
+** Pdf/Latex
 *** AUCTeX
+
 https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow-with-emacs
 
 #+BEGIN_SRC emacs-lisp
@@ -3935,7 +3948,8 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
 
       "y" 'pdf-view-kill-ring-save
 
-      "C-o" 'pdf-history-goto
+      "C-o" 'pdf-history-backward
+      "C-i" 'pdf-history-forward
 
       "<C-mouse-4>" '(lambda () (interactive) (pdf-view-enlarge 1.1))
       "<C-mouse-5>" '(lambda () (interactive) (pdf-view-shrink 1.1))
@@ -3965,9 +3979,12 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
       "k" 'pdf-annot-add-strikeout-markup-annotation
       "d" 'pdf-annot-delete
       "A" 'pdf-annot-display-attachment
-      "S" 'pdf-view-auto-slice-minor-mode
+      "S" '(pdf-view-auto-slice-minor-mode :which-key "auto-slice")
+      "w" 'pdf-view-fit-width-to-window
       "W" 'pdf-view-fit-width-to-window
+      ;; "h" 'pdf-view-fit-height-to-window
       "H" 'pdf-view-fit-height-to-window
+      "f" 'pdf-view-fit-page-to-window
       "T" 'pdf-view-themed-minor-mode
       "D" 'pdf-view-dark-minor-mode
       "M" 'pdf-view-midnight-minor-mode
@@ -3989,7 +4006,8 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
       "," 'pdf-annot-edit-contents-commit)
     (general-def
       :keymaps 'pdf-annot-edit-contents-minor-mode-map
-      ", ," 'pdf-annot-edit-contents-commit
+      ;; ", ," 'pdf-annot-edit-contents-commit
+      "C-c C-c" 'pdf-annot-edit-contents-commit
       "C-c C-k" 'pdf-annot-edit-contents-abort)
     (evil-make-overriding-map pdf-annot-edit-contents-minor-mode-map 'normal)
     ;; open annotation buffer when creating highlights
@@ -4708,7 +4726,6 @@ enjoy using a lot.
 ;; (f-string "${mm-url-timeout 1.2f}") $
 ;; (message (f-string "${mm-url-timeout 1.2f}"))
 #+end_src
-
 
 ** string matching
 
