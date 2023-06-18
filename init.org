@@ -257,14 +257,11 @@ Disable backup & auto save for remote files.
   (setq backup-enable-predicate
       (lambda (name)
         (and (normal-backup-enable-predicate name)
-             (not
-              (let ((method (file-remote-p name 'method)))
-                (when (stringp method)
-                  (member method '("su" "sudo"))))))))
+             (not (file-remote-p buffer-file-name)))))
 
   (defun maschm/conditionally-disable-auto-save ()
      (when (and (stringp buffer-file-name)
-                (string-equal (file-remote-p buffer-file-name 'user) "root"))
+                (file-remote-p buffer-file-name))
        (setq buffer-auto-save-file-name nil)))
 
   (add-hook 'find-file-hook #'maschm/conditionally-disable-auto-save)
