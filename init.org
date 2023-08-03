@@ -1286,7 +1286,7 @@ Use < in visual mode to continuously shift selection
       "nb" 'org-narrow-to-block
       "ne" 'org-narrow-to-element
       "nn" 'org-toggle-narrow-to-subtree
-      "s" 'org-sparse-tree
+      "s" 'org-insert-structure-template
       "t" 'org-insert-structure-template
       "T" '(:ignore t :which-key "toogle")
       "Tp" 'org-toggle-pretty-entities
@@ -1357,8 +1357,9 @@ Use < in visual mode to continuously shift selection
     (add-to-list 'org-structure-template-alist '("sy" . "src jupyter-python"))
 
     (setq org-src-window-setup 'current-window)
+    (setq org-src-preserve-indentation t)
 
-    ;; (require 'org-tempo)
+    (require 'org-tempo)
     ;;(add-to-list 'org-tempo-keywords-alist '("B" . "beamer"))
 
     (setq org-entities-user
@@ -1447,7 +1448,7 @@ Use < in visual mode to continuously shift selection
   (use-package ob-async
     :after ob
     :config
-    (setq ob-async-no-async-languages-alist '("jupyter-python" "jupyter-julia")))
+    (setq ob-async-no-async-languages-alist '("ipython" "jupyter-python" "jupyter-julia")))
 #+end_src
 
 ** org export
