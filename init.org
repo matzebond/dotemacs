@@ -903,8 +903,14 @@ use =/ C-j= or =~ //= to get to the local / directory
       "S n" 'symbol-overlay-jump-next
       "S p" 'symbol-overlay-jump-prev
       "S d" 'symbol-overlay-remove-all
-      "S r" 'symbol-overlay-rename))
+      "S r" 'symbol-overlay-rename)
+
+    (general-def
+      :keymaps 'symbol-overlay-map
+      "w" nil
+      "e" nil))
 #+end_src
+*** TODO use sticky keymap for next and previous
 *** TODO symbol-overlay hydra
     Or use swiper to got to symbol?
 ** Project Management
