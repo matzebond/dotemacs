@@ -2078,6 +2078,19 @@ add https://github.com/jgru/consult-org-roam ?
 
 #+end_src
 
+** org-appear
+
+#+begin_src emacs-lisp
+  (use-package org-appear
+    :after org
+    :hook (org-mode . org-appear-mode)
+    :custom
+    (org-appear-autolinks t)
+    (org-appear-autosubmarkers t))
+#+end_src
+
+[[test][testing]] an other /test/ and a last test_{test}^{test}
+
 * Git
 ** Magit
 
