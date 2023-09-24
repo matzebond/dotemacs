@@ -62,8 +62,6 @@ After startup reset it to reasonable value
 #+BEGIN_SRC emacs-lisp
   ;; (message (format "%s - %s" gc-cons-threshold gc-cons-percentage))
   (setq garbage-collection-messages t)
-
-  (add-hook 'focus-out-hook 'garbage-collect)
 #+END_SRC
 
 ** Package management
@@ -351,6 +349,56 @@ Disable backup & auto save for remote files.
     "W d" 'delete-window ;;evil-delete-window would rebalance siblings
     "W o" 'delete-other-windows
     "W =" 'balance-windows)
+#+end_src
+
+** i3
+https://github.com/junyi-hou/i3-mode
+
+#+begin_src emacs-lisp
+(use-package f)
+(use-package i3-mode
+  :straight (i3-mode :repo "junyi-hou/i3-mode" :host github
+                     :files ("i3-mode.el" "i3-call" "sway-call"))
+  :general
+  (general-def
+    "s-h" (lambda () (interactive) (my/emacs-i3-windmove 'left))  ;'evil-window-left
+    "s-l" (lambda () (interactive) (my/emacs-i3-windmove 'right)) ;'evil-window-right
+    "s-k" (lambda () (interactive) (my/emacs-i3-windmove 'up))    ;'evil-window-up
+    "s-j" (lambda () (interactive) (my/emacs-i3-windmove 'down))  ;'evil-window-down
+    )
+  :custom
+  (i3-flavor 'i3)
+  :init
+  (i3-mode 1))
+
+(defun my/emacs-i3-windmove (dir)
+  (let ((other-window (windmove-find-other-window dir)))
+    (if (or (null other-window) (window-minibuffer-p other-window))
+        (i3-msg "focus" (symbol-name dir))
+      (windmove-do-window-select dir))))
+
+(defun my/emacs-i3-direction-exists-p (dir)
+  (some (lambda (dir)
+          (let ((win (windmove-find-other-window dir)))
+            (and win (not (window-minibuffer-p win)))))
+        (pcase dir
+          ('width '(left right))
+          ('height '(up down)))))
+
+(defun my/emacs-i3-move-window (dir)
+  (let ((other-window (windmove-find-other-window dir))
+        (other-direction (my/emacs-i3-direction-exists-p
+                          (pcase dir
+                            ('up 'width)
+                            ('down 'width)
+                            ('left 'height)
+                            ('right 'height)))))
+    (cond
+     ((and other-window (not (window-minibuffer-p other-window)))
+      (window-swap-states (selected-window) other-window))
+     (other-direction
+      (evil-move-window dir))
+     (t (i3-msg "move" (symbol-name dir))))))
 #+end_src
 
 ** consult
