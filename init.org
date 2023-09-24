@@ -1559,9 +1559,12 @@ Use < in visual mode to continuously shift selection
 
   (with-eval-after-load 'ox-latex
     ;; TODO might be less flexible to just use latexmk org-latex-compiler is ignored
-    (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf -outdir=%o %f"))
+    ;; (setq org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf -outdir=%o %f"))
     (setq org-latex-caption-above nil)
     (setq org-latex-prefer-user-labels t)
+    (setq org-latex-src-block-backend 'listings)
+
+    (setq org-latex-packages-alist '(("" "listings")))
     (add-to-list 'org-latex-packages-alist '("" "tikz" t))
     ;; Danger this will need to be updates if upstream changes this variable
     (setq org-latex-default-packages-alist
@@ -1580,10 +1583,8 @@ Use < in visual mode to continuously shift selection
             ;; ("" "titletoc" nil) ;; disable for beamer
             ("" "hyperref" nil)))
 
-
+    (setq org-preview-latex-default-process 'dvisvgm)
     (setq org-format-latex-options (plist-put org-format-latex-options ':scale 2.0))
-
-    ;; (setq org-preview-latex-default-process)
 
     (add-to-list 'org-latex-classes
                  '("letter"
