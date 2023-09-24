@@ -1564,6 +1564,9 @@ Use < in visual mode to continuously shift selection
   ;;   :defer
   ;;   :config
 
+  (with-eval-after-load 'org
+    (require 'ox-md))
+
 
   (with-eval-after-load 'ox-latex
     ;; TODO might be less flexible to just use latexmk org-latex-compiler is ignored
