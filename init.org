@@ -4435,6 +4435,11 @@ then use with a window manager keybinding
 #+end_src
 
 ** Ukrainian Transliteration
+#+begin_src emacs-lisp
+  (setq default-input-method "cyrillic-my-ukrainian")
+  (my-menu-def
+   "T u" 'toggle-input-method)
+#+end_src
 
 #+begin_src emacs-lisp
   (quail-define-package
@@ -4453,9 +4458,10 @@ then use with a window manager keybinding
    ("ie" ?є) ("IE" ?Є) ("Ie" ?Є)
    ("ye" ?є) ("YE" ?Є) ("Ye" ?Є)
    ("je" ?є) ("JE" ?Є) ("Je" ?Є)
-   ;; ("yo" ?ё) ("jo" ?ё) ("Yo" ?Ё) ("YO" ?Ё) ("Jo" ?Ё) ("JO" ?Ё) ;russian?
+   ;; ("yo" ?ё) ("jo" ?ё) ("Yo" ?Ё) ("YO" ?Ё) ("Jo" ?Ё) ("JO" ?Ё) ;; russian
    ("zh" ?ж) ("Zh" ?Ж) ("ZH" ?Ж) ;sh
    ("jh" ?ж) ("Jh" ?Ж) ("JH" ?Ж) ;sh
+   ("jj" ?ж) ("JJ" ?Ж)
    ("z" ?з) ("Z" ?З) ("ß" ?з) ("ẞ" ?З) ;s
    ("e" ?и) ("E" ?И) ("y" ?и) ("y" ?И)
    ("i" ?і) ("I" ?І)
@@ -4476,8 +4482,8 @@ then use with a window manager keybinding
    ("x" ?х) ("X" ?Х)
    ("kh" ?х) ("Kh" ?Х) ("KH" ?Х)
    ("ch" ?х) ("Ch" ?Х) ("CH" ?Х)
-   ("c" ?ц) ("ts" ?ц) ("z" ?ц) ("C" ?Ц)("Ts" ?Ц) ("TS" ?Ц)
-   ("ch" ?ч) ("tsch" ?ч) ("Ch" ?Ч) ("CH" ?Ч)
+   ("ts" ?ц) ("tz" ?ц) ("Ts" ?Ц) ("TS" ?Ц) ("Tz" ?Ц) ("TZ" ?Ц)
+   ("tsh" ?ч) ("tsc" ?ч) ("tsch" ?ч) ("Tsh" ?Ч) ("Tsc" ?Ч) ("Tsch" ?Ч)
    ("sh" ?ш) ("sch" ?ш) ("Sh" ?Ш) ("SH" ?Ш)
 
    ("shch" ?щ) ("Shch" ?Щ) ("SHCH" ?Щ)
@@ -4485,17 +4491,16 @@ then use with a window manager keybinding
    ("schj" ?щ)
    ("schtsch" ?щ)
    ("schch" ?щ)
-   ("schtch" ?щ)
    ("schtsh" ?щ)
    ("Sj" ?Щ) ("SJ" ?Щ)
 
-   ("'" ?ь) ("`" ?ь) ("''" ?Ь)
+   ("'" ?ь) ("`" ?ь) ("''" ?')
    ("yu" ?ю) ("ju" ?ю) ("Yu" ?Ю) ("YU" ?Ю) ("Ju" ?Ю) ("JU" ?Ю)
    ("ya" ?я) ("ja" ?я) ("q" ?я) ("Ya" ?Я) ("YA" ?Я) ("Ja" ?Я) ("JA" ?Я) ("Q" ?Я)
 
    ("~" ?ъ) ("~~" ?Ъ)
    ;; ("y" ?ы) ("Y" ?Ы)
-   ("e\\" ?э) ("e'" ?э) ("e`" ?э) ("@" ?э) ("E\\" ?Э) ("E'" ?Э) ("E`" ?Э) ("@@" ?Э)
+   ("e\\" ?э) ("e'" ?э) ("e`" ?э) ("E\\" ?Э) ("E'" ?Э) ("E`" ?Э)
    ("u'" ?ў) ("u~" ?ў)
    ("/d" ?ђ) ("/ch" ?ћ)
    ("/g" ?ѓ) ("/s" ?ѕ) ("/k" ?ќ)
