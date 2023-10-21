@@ -739,11 +739,17 @@ https://github.com/oantolin/embark/wiki/Additional-Configuration#use-which-key-l
   :general
   (general-def
    :keymaps 'corfu-map
+   :states 'insert
+   "<escape>" 'corfu-quit
    "C-n" 'corfu-next
    "C-p" 'corfu-previous)
 
   :init
-  (global-corfu-mode))
+  (global-corfu-mode)
+
+  :config
+  (advice-add 'corfu--setup :after 'evil-normalize-keymaps)
+  (advice-add 'corfu--teardown :after 'evil-normalize-keymaps))
 
 ;; A few more useful configurations...
 (use-package emacs
@@ -1006,6 +1012,7 @@ use =/ C-j= or =~ //= to get to the local / directory
 
     (general-def
       :keymaps 'symbol-overlay-map
+      "h" nil
       "w" nil
       "e" nil))
 #+end_src
