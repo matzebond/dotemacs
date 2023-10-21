@@ -2813,8 +2813,11 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     (lsp-mode . lsp-enable-which-key-integration)
     :general
     (my-menu-def
+      "L" '(:ignore t :which-key "LSP")
       "L a" 'lsp-execute-code-action
-      "L d" 'consult-lsp-diagnostics
+      "L D" 'consult-lsp-diagnostics
+      "L d" 'lsp-goto-definition
+      "L r" 'lsp-rename
       "L t" 'lsp-find-type-definition
      )
     :custom
