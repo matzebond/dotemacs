@@ -3617,6 +3617,20 @@ emms-cache-set-from-mpd-all
     (keycast-mode-line-insert-after . 'minions-mode-line-modes))
 #+end_src
 
+** screencast gif
+#+begin_src emacs-lisp
+(use-package gif-screencast
+  :general
+  (my-menu-def
+    "X" 'gif-screencast-start-or-stop)
+  :custom
+  (gif-screencast-program "maim")
+  (gif-screencast-args ("--quality" "2" "--hidecursor"))
+  (gif-screencast-output-directory "/home/maschm/dld"))
+#+end_src
+
+(setq gif-screencast-args `("--quality" "2" "--window" ,(frame-parameter nil 'window-id) "--hidecursor"))
+
 ** drawing
 *** dot
 
