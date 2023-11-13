@@ -1357,7 +1357,6 @@ Use < in visual mode to continuously shift selection
     (add-to-list 'org-structure-template-alist '("sy" . "src jupyter-python"))
 
     (setq org-src-window-setup 'current-window)
-    (setq org-src-preserve-indentation t)
 
     (require 'org-tempo)
     ;;(add-to-list 'org-tempo-keywords-alist '("B" . "beamer"))
