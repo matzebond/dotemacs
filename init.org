@@ -3807,14 +3807,14 @@ Highlight trailing whitespace
     (apheleia-global-mode +1)
     :general
     (my-menu-def "B f" 'apheleia-format-buffer)
-    :config
-    (setf (alist-get 'yapf apheleia-formatters)
-          '("yapf" file))
-    (setf (alist-get 'python-mode apheleia-mode-alist)
-          '(yapf)))
+    (apheleia-formatters-respect-fill-column t)
+    )
 #+end_src
 
-** documentation
+*** folding
+hs-minor-mode for now
+waiting for folding package based on treesit
+** documentation / devdocs
 
 #+begin_src emacs-lisp
   (use-package devdocs
