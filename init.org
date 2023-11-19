@@ -3483,6 +3483,12 @@ recognize the OTP prompt of the KIT uni cluster
 
   (connection-local-set-profiles
    '(:application tramp :machine "pi") 'remote-zsh)
+
+
+  (setq vc-ignore-dir-regexp
+      (format "\\(%s\\)\\|\\(%s\\)"
+              vc-ignore-dir-regexp
+              tramp-file-name-regexp))
 #+end_src
 
 ** irc
