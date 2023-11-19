@@ -3854,12 +3854,25 @@ Highlight delimiters such as parentheses, brackets or braces according to their 
 #+END_SRC
 
 ** Lisp
-Use common-lips indent function because elisp is not nice with keywords
 
-#+BEGIN_SRC emacs-lisp
-  ;; (add-hook 'emacs-lisp-mode-hook
-  ;;           (lambda () (setq-local lisp-indent-function #'common-lisp-indent-function)))
-#+END_SRC
+#+begin_src emacs-lisp
+(use-package symex
+  :general
+  (general-def
+    :states 'motion
+    "\\" 'symex-mode-interface)
+  :config
+  (general-def
+    :states 'normal :keymaps 'symex-mode-map
+    "<escape>" 'symex-mode-interface)
+  (general-def
+    :states 'insert :keymaps 'symex-mode-map
+    "<escape>" (lambda () (interactive) (if (eq evil-previous-state 'symex) (symex-mode-interface) (evil-normal-state))))
+  (symex-initialize)
+  :local
+  (lisp-interaction-mode-hook . ((symex-mode)
+                                 (symex-mode-interface))))
+#+end_src
 
 *** TODO Common Lisp
     new: https://joaotavora.github.io/sly/
