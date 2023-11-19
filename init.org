@@ -755,7 +755,8 @@ https://github.com/oantolin/embark/wiki/Additional-Configuration#use-which-key-l
 (use-package emacs
   :init
   ;; TAB cycle if there are only few candidates
-  (setq completion-cycle-threshold 3)
+  ;; Prefere consistency and this was bypassing python lsp auto-import functionality
+  (setq completion-cycle-threshold nil)
 
   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
@@ -1312,6 +1313,8 @@ Use < in visual mode to continuously shift selection
 
   (use-package evil-owl
     :demand
+    :custom
+    (evil-owl-idle-delay 0.1)
     :config
     (setq evil-owl-display-method 'posframe
           evil-owl-extra-posframe-args '(:width 50 :height 20)
@@ -1421,6 +1424,8 @@ Use < in visual mode to continuously shift selection
     (setq org-image-actual-width 300)
     (setq org-export-with-smart-quotes t)
     (setq org-cite-global-bibliography '("~/zotero.bib"))
+    ; TODO change back to 'text-properties onces consult-outline works again
+    (setq org-fold-core-style 'overlays)
 
     (setq org-default-notes-file (expand-file-name "inbox.org" org-directory))
     (setq org-agenda-files '("~/org/inbox.org"
@@ -2816,7 +2821,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
       "L" '(:ignore t :which-key "LSP")
       "L a" 'lsp-execute-code-action
       "L D" 'consult-lsp-diagnostics
-      "L d" 'lsp-goto-definition
+      "L d" 'lsp-find-definition
       "L r" 'lsp-rename
       "L t" 'lsp-find-type-definition
      )
@@ -2891,6 +2896,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 
   (cond
    ((executable-find "hunspell")
+    (require 'ispell)
     (setq ispell-program-name "hunspell")
 
     ;; Please note that `ispell-local-dictionary` itself will be passed to hunspell cli with "-d"
@@ -3269,6 +3275,10 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   (evil-set-initial-state 'messages-buffer-mode 'motion)
   (with-current-buffer "*Messages*"
     (evil-motion-state))
+
+  (general-def
+    :keymaps ' minibuffer-inactive-mode-map
+    "<mouse-1>" nil)
 #+end_src
 
 ** comint
@@ -3298,7 +3308,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
       "g j" 'comint-next-prompt
       ))
 #+end_src
-
+*** TODO insert mode at newest prompt
 ** calc
 
 #+begin_src emacs-lisp
@@ -3490,8 +3500,8 @@ When compiling follow the buffer
   (setq compilation-scroll-output t)
   ;; Don't stop on info or warnings.
   (setq compilation-skip-threshold 2)
-  ;; Stop on the first error.
-  (setq compilation-auto-jump-to-first-error t)
+  ;; Stop on the first error with known location.
+  (setq compilation-auto-jump-to-first-error 'first-known)
 
   (add-hook 'compilation-mode-hook 'follow-mode)
 
@@ -3661,6 +3671,16 @@ emms-cache-set-from-mpd-all
   (use-package anki-editor)
 #+end_src
 
+** performance
+
+#+begin_src emacs-lisp
+(use-package explain-pause-mode
+  :straight (explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode")
+  ;; :config
+  ;; (explain-pause-mode)
+)
+#+end_src
+
 * Programming languages
 ** prog-mode
 
@@ -3805,7 +3825,8 @@ Use common-lips indent function because elisp is not nice with keywords
 #+END_SRC
 
 *** TODO Common Lisp
-    https://common-lisp.net/project/slime/
+    new: https://joaotavora.github.io/sly/
+    old: https://common-lisp.net/project/slime/
 
 *** TODO Closure
     https://cider.mx/
@@ -4352,18 +4373,13 @@ gradle-mode integrates gradle builds into emacs compilation feature
 #+end_src
 
 ** system & config
-*** systemd
 *** Docker
 
 #+begin_src emacs-lisp
   (use-package dockerfile-mode)
-
-
-  (use-package docker-tramp
-    :config
-    (setq docker-tramp-user "root"))
 #+end_src
 
+*** systemd
 
 #+begin_src emacs-lisp
   (use-package systemd)
@@ -4845,6 +4861,11 @@ then use with a window manager keybinding
 
 #+begin_src emacs-lisp
 (use-package heap :demand)
+
+(use-package dash
+  :config
+  (with-eval-after-load 'info-look
+    (dash-register-info-lookup)))
 #+end_src
 
 ** f-string
@@ -4905,3 +4926,6 @@ enjoy using a lot.
 [[info:elisp#Choosing Window][elisp#Choosing Window]]
 [[info:elisp#Mode Line Variables][elisp#Mode Line Variables]]
 [[info:elisp#Quitting Windows][elisp#Quitting Windows]]
+
+Shadow file
+https://www.emacswiki.org/emacs/ShadowFile
