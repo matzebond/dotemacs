@@ -3753,6 +3753,14 @@ emms-cache-set-from-mpd-all
     (indent-bars-highlight-current-depth '(:width 0.15 :blend 0.7)))
 #+END_SRC
 
+*** electric-pair
+
+Don't skip over newlines
+
+#+begin_src emacs-lisp
+(setq electric-pair-skip-whitespace-chars '(9 32))
+#+end_src
+
 *** electric-operator
 
 #+begin_src emacs-lisp
