@@ -2846,7 +2846,12 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     :local
     (lsp-completion-mode-hook . ((setf (alist-get 'styles
                                                   (alist-get 'lsp-capf completion-category-defaults))
-                                  '(flex)))))
+                                       '(flex))
+                                 (setq-local
+                                  evil-goto-definition-functions
+                                  '(evil-goto-definition-xref evil-goto-definition-search)
+                                  )
+                                 )))
 
   (use-package lsp-ui
     :commands lsp-ui-mode
