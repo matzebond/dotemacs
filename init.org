@@ -3692,6 +3692,21 @@ emms-cache-set-from-mpd-all
 )
 #+end_src
 
+** openai gpt chatgpt
+#+begin_src emacs-lisp
+(use-package gptel
+  :general
+  (general-def
+    :keymap gptel-mode-map
+    "C-c C-k" 'gptel-abort
+    )
+  :custom
+  (gptel-default-mode 'org-mode)
+  :config
+  ;;(add-to-list gptel-directives)
+)
+#+end_src
+
 * Programming languages
 ** prog-mode
 
