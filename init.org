@@ -3981,6 +3981,9 @@ was disabled with the switch to corfu
       (setq python-shell-interpreter "python")))
 
 
+    (add-to-list 'python-shell-setup-codes (concat "__file__ = \"" python-shell-interpreter "\""))
+
+
     (defun maschm/python-shell-other-scroll-end (&rest _)
       (interactive)
       (save-selected-window
@@ -3990,6 +3993,7 @@ was disabled with the switch to corfu
         )
       )
     (advice-add 'python-shell-send-string :after 'maschm/python-shell-other-scroll-end)
+    ;; (advice-remove 'python-shell-send-string 'maschm/python-shell-scroll-end)
 
     :local
     (setq-local compile-command (concat "python "
@@ -4004,14 +4008,61 @@ was disabled with the switch to corfu
     :config
     (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.venv"))
 
+  (with-eval-after-load 'dap-mode
+    (require 'dap-python)
+    (setq dap-python-debugger 'debugpy)
+    (defun dap-python--pyenv-executable-find (command)
+      (with-venv (executable-find "python"))))
+
+  (with-eval-after-load 'lsp-mode
+    ;; only use pylsp for rope (refactoring)
+    (setq lsp-pylsp-plugins-rope-autoimport-enabled t)
+    (setq lsp-pylsp-plugins-rope-completion-enabled nil)
+    (setq lsp-pylsp-rename-backend 'rope)
+    ;; disable all other plugins
+    (setq lsp-pylsp-plugins-autopep8-enabled nil)
+    (setq lsp-pylsp-plugins-black-enabled nil)
+    (setq lsp-pylsp-plugins-flake8-enabled nil)
+    (setq lsp-pylsp-plugins-isort-enabled nil)
+    (setq lsp-pylsp-plugins-jedi-completion-enabled nil)
+    (setq lsp-pylsp-plugins-jedi-definition-enabled nil)
+    (setq lsp-pylsp-plugins-jedi-hover-enabled nil)
+    (setq lsp-pylsp-plugins-jedi-references-enabled nil)
+    (setq lsp-pylsp-plugins-jedi-signature-help-enabled nil)
+    (setq lsp-pylsp-plugins-jedi-symbols-enabled nil)
+    (setq lsp-pylsp-plugins-mccabe-enabled nil)
+    (setq lsp-pylsp-plugins-preload-enabled nil)
+    (setq lsp-pylsp-plugins-pycodestyle-enabled nil)
+    (setq lsp-pylsp-plugins-pydocstyle-enabled nil)
+    (setq lsp-pylsp-plugins-pyflakes-enabled nil)
+    (setq lsp-pylsp-plugins-pylint-enabled nil)
+    (setq lsp-pylsp-plugins-yapf-enabled nil)
+    )
+
   (use-package pyenv
     :after python)
 
   (use-package pyvenv
     :after python
     :config
-    (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
+    (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[P:" pyvenv-virtual-env-name "] ")))
     (pyvenv-mode))
+
+  (use-package with-venv)
+#+end_src
+
+#+begin_src emacs-lisp
+(defun python-file-module-path ()
+  (let* ((root (project-root (project-current)))
+         (path (file-relative-name buffer-file-name root)))
+    (s-replace "/" "." (file-name-sans-extension path))))
+
+(defun copy-current-defun-path-as-kill ()
+  (interactive)
+  (let* ((module-path (python-file-module-path))
+         (cur-def (python-info-current-defun))
+         (path-with-line-number (concat module-path "." cur-def)))
+    (kill-new path-with-line-number)))
 #+end_src
 
 *** jupyter
