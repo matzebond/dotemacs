@@ -4502,13 +4502,14 @@ Recognize arch linux pgkbuild files
 #+END_SRC
 
 * Settings
-** editorconfig
+** TODO editorconfig
 
 #+begin_src emacs-lisp
   (use-package editorconfig
-    :hook (prog-mode . editorconfig-mode-apply)
+    ;; :hook (prog-mode . editorconfig-mode-apply)
     :config
-    (editorconfig-mode 1)
+    ;; (editorconfig-mode 1)
+    ;; disabled because of tramp slowdown
     (setq editorconfig-trim-whitespaces-mode 'ws-butler-mode))
 #+end_src
 
