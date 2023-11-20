@@ -3697,7 +3697,7 @@ emms-cache-set-from-mpd-all
 (use-package gptel
   :general
   (general-def
-    :keymap gptel-mode-map
+    :keymaps 'gptel-mode-map
     "C-c C-k" 'gptel-abort
     )
   :custom
