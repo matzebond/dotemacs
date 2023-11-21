@@ -230,7 +230,9 @@ https://github.com/purcell/exec-path-from-shell
 
 #+begin_src emacs-lisp
   (use-package no-littering
-    :demand)
+    :demand
+    :config
+    (no-littering-theme-backups))
 #+end_src
 
 ** TODO Backup
