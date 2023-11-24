@@ -2597,24 +2597,38 @@ from https://github.com/DiegoVicen/my-emacs#Fix-scroll
 
 #+begin_src emacs-lisp
   (setq scroll-conservatively 5
-        mouse-wheel-scroll-amount '(1 ((shift) . 5))
-        mouse-wheel-progressive-speed nil
+        mouse-wheel-scroll-amount '(1
+                                    ((shift) . 0.1)
+                                    ((control meta) . global-text-scale)
+                                    ((control) . text-scale))
+        mouse-wheel-tilt-scroll t
+        mouse-wheel-scroll-amount-horizontal 5
+        mouse-wheel-flip-direction t
+        hscroll-margin 2
+        hscroll-step 1
+        mouse-wheel-progressive-speed t
         mouse-wheel-follow-mouse t
         fast-but-imprecise-scrolling t
         jit-lock-defer-time 0.2)
 
-  (general-def
-    :keymaps 'global
-    "<left-margin><mouse-4>" 'mwheel-scroll
-    "<left-margin><mouse-5>" 'mwheel-scroll
-    "<right-margin><mouse-4>" 'mwheel-scroll
-    "<right-margin><mouse-5>" 'mwheel-scroll
-    "<left-fringe><mouse-4>" 'mwheel-scroll
-    "<left-fringe><mouse-5>" 'mwheel-scroll
-    "<right-fringe><mouse-4>" 'mwheel-scroll
-    "<right-fringe><mouse-5>" 'mwheel-scroll)
+  (mouse-wheel--setup-bindings)
+
+  ; possibly interresting for some modes
+  ; (setq auto-hscroll-mode 'current-line)
+
+  ;; (general-def
+  ;;   :keymaps 'global
+  ;;   "<left-margin><mouse-4>" 'mwheel-scroll
+  ;;   "<left-margin><mouse-5>" 'mwheel-scroll
+  ;;   "<right-margin><mouse-4>" 'mwheel-scroll
+  ;;   "<right-margin><mouse-5>" 'mwheel-scroll
+  ;;   "<left-fringe><mouse-4>" 'mwheel-scroll
+  ;;   "<left-fringe><mouse-5>" 'mwheel-scroll
+  ;;   "<right-fringe><mouse-4>" 'mwheel-scroll
+  ;;   "<right-fringe><mouse-5>" 'mwheel-scroll)
 #+end_src
 
+*** TODO can increase mouse-wheel-scroll-amount help scroll lagging
 ** Long lines
 *** Bidirectional Text
 
@@ -2909,6 +2923,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     (unless (file-exists-p ispell-personal-dictionary)
       (write-region "" nil ispell-personal-dictionary nil 0)))
    ((executable-find "aspell")
+    (require 'ispell)
     ;; you may also need `ispell-extra-args'
     (setq ispell-program-name "aspell"))
    (t
