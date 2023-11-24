@@ -2441,9 +2441,10 @@ https://github.com/oantolin/embark/issues/376
   (add-to-list 'default-frame-alist '(font . "Hack-12"))
 
   (defun maschm/init-fonts ()
-    (set-face-attribute 'default nil :font "Hack" :weight 'light :height 120)
-    (set-face-attribute 'fixed-pitch nil :font "Hack" :weight 'light :height 120)
-    (set-face-attribute 'variable-pitch nil :font "Noto Serif" :weight 'light :height 120)
+    (set-face-attribute 'default nil :family "Hack" :weight 'light)
+    (set-face-attribute 'fixed-pitch nil :family "Hack")
+    ;; (set-face-attribute 'fixed-pitch-serif nil :family "Hack Serif")
+    (set-face-attribute 'variable-pitch nil :family "Noto Serif")
 
     (set-fontset-font "fontset-default" 'han (font-spec :family "Noto Sans Mono CJK TC"))
     (set-fontset-font "fontset-default" 'kana (font-spec :family "Noto Sans Mono CJK JP"))
