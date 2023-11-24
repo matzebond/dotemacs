@@ -2104,6 +2104,7 @@ add https://github.com/jgru/consult-org-roam ?
     (my-menu-def
       "g" '(:ignore t :which-key "git/vc")
       "g s" 'magit-status
+      "g S" 'magit-status-here
       "g b" 'magit-branch
       "g B" 'magit-blame
       "g d" 'magit-diff-buffer-file
@@ -2111,6 +2112,8 @@ add https://github.com/jgru/consult-org-roam ?
       "g f" 'magit-find-file
       "g g" 'magit-file-dispatch
       "g G" 'magit-dispatch
+      "g ?" 'magit-dispatch
+      "g h" 'magit-dispatch
       "g c" 'magit-show-commit)
     (general-def
       :keymaps 'magit-mode-map
@@ -2130,6 +2133,8 @@ add https://github.com/jgru/consult-org-roam ?
     :custom
     (magit-diff-adjust-tab-width t)
     (magit-section-disable-line-numbers nil)
+    (magit-section-initial-visibility-alist '((stashes . hide) (untracked . hide)))
+    (magit-status-initial-section '(((unstaged) (status)) 1))
     :config
     (setq magit-diff-refine-hunk t)
     :local
