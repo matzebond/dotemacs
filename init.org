@@ -4098,6 +4098,8 @@ was disabled with the switch to corfu
     (kill-new path-with-line-number)))
 #+end_src
 
+*** TODO https://github.com/wbolster/emacs-python-pytest
+
 *** jupyter
 
 #+begin_src emacs-lisp
