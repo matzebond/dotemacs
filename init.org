@@ -3876,7 +3876,9 @@ waiting for folding package based on treesit
 
 #+end_src
 
-**** rainbow-delimiters
+*** TODO remove hard line breaks and relay on visual-line-mode instead
+
+** rainbow-delimiters
 
 Highlight delimiters such as parentheses, brackets or braces according to their depth
 
@@ -4444,14 +4446,7 @@ maybe look into lsp
     (setq android-mode-sdk-dir "/opt/android-sdk/"))
 #+end_src
 
-** Erlang
-
-#+begin_src emacs-lisp
-  (use-package erlang)
-#+end_src
-
 ** Java
-*** Android
 *** Gradle
 groovy-mode provides syntax highlighting for the groovy lang and thus for grade files
 
@@ -4461,6 +4456,12 @@ gradle-mode integrates gradle builds into emacs compilation feature
   (use-package groovy-mode)
 
   (use-package gradle-mode)
+#+end_src
+
+** Erlang
+
+#+begin_src emacs-lisp
+  (use-package erlang)
 #+end_src
 
 ** Sonic Pi
