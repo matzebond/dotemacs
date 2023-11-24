@@ -3694,7 +3694,33 @@ emms-cache-set-from-mpd-all
 )
 #+end_src
 
-** openai gpt chatgpt
+* AI
+** Speech recognition - speech to text - ASR
+*** whisper
+
+#+begin_src emacs-lisp
+  (use-package whisper
+    :straight (whisper :type git :host github :repo "natrys/whisper.el")
+    ;; :bind ("C-H-r" . whisper-run)
+    :config
+    (setq whisper-install-directory "/tmp/"
+          whisper-model "base"
+          whisper-language "en"
+          whisper-translate nil))
+#+end_src
+
+** TODO Speech synthesis - text to speech - TTS
+
+espeak, OpenAI, DeepL voice
+
+English, German, Ukrainian
+
+** Language modeling - text to text - LLM
+
+*** Generation / Conversation
+
+open ai, chat gpt
+
 #+begin_src emacs-lisp
 (use-package gptel
   :general
@@ -3709,6 +3735,11 @@ emms-cache-set-from-mpd-all
 )
 #+end_src
 
+*** Translation
+
+DeepL
+
+** TODO image generation
 * Programming languages
 ** prog-mode
 
