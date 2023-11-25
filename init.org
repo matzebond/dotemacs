@@ -2145,15 +2145,15 @@ add https://github.com/jgru/consult-org-roam ?
 
 #+BEGIN_SRC emacs-lisp
   (use-package ghub
-    :defer 30)
+    :after magit)
 
   (use-package forge
-    :defer 30
-    :after (magit ghub))
+    :after (magit)
+    :demand)
 
   (use-package github-review
-    :defer 30
-    :after forge)
+    :after forge
+    :defer 30)
 #+END_SRC
 
 ** Additional
