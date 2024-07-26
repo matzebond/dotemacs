@@ -130,24 +130,7 @@ of handy syntactic sugar and useful features.
 
 **** TODO use :ensure-system-package key word for system dependencies
 
-** Custom
-
-Don't clobber the init.el file
-use a own file for emacs custom definition
-
-#+BEGIN_SRC emacs-lisp
-  (setq custom-file (expand-file-name "emacs-custom.el" user-emacs-directory))
-  (load custom-file)
-#+END_SRC
-
-** Basic packages
-*** diminish
-
-#+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :demand)
-#+END_SRC
-
+** Keybindings
 *** general
 
 #+BEGIN_SRC emacs-lisp
@@ -180,6 +163,137 @@ use a own file for emacs custom definition
     (general-mmap
       "," nil ;evil-repeat-find-char-reverse
       ))
+#+END_SRC
+
+  (general-simulate-key "M-SPC" :state 'emacs :keymap global-map)
+  (general-simulate-M-SPC-in-emacs-state-in-global-map)
+
+  (general-key "M-SPC" :state 'emacs)
+
+(defun simulate-M-SPC ()
+  "Switch to Emacs state, simulate M-SPC, then switch back."
+  (interactive)
+  (evil-with-state 'emacs
+    (general-key "m-spc")))
+
+    (execute-kbd-macro (kbd "M-SPC"))))
+
+
+*** Buffer & Window menu
+
+#+BEGIN_SRC emacs-lisp
+  (my-menu-def
+    "<tab>" '(mode-line-other-buffer :which-key "last-buffer")
+    "<M-tab>" '((lambda ()
+                  (interactive)
+                  (switch-to-buffer-other-window (other-buffer)))
+                :which-key "last-buffer-other-window")
+
+    "B" '(:ignore t :which-key "Buffer")
+    "B m" '((lambda () (interactive) (switch-to-buffer "*Messages*"))
+        :which-key "messages")
+    "B M" '((lambda () (interactive) (switch-to-buffer-other-window "*Messages*"))
+        :which-key "messages-in-other")
+    "B s" '((lambda () (interactive) (switch-to-buffer "*scratch*"))
+        :which-key "scratch")
+    "B S" '((lambda () (interactive) (switch-to-buffer-other-window "*scratch*"))
+        :which-key "scratch-in-other")
+    "B w" '((lambda () (interactive) (switch-to-buffer "*Warnings*"))
+        :which-key "warnings")
+    "B W" '((lambda () (interactive) (switch-to-buffer-other-window "*Warnings*"))
+        :which-key "warnings-in-other")
+    "B d" 'kill-current-buffer
+    "B D" 'evil-delete-buffer
+    "B r" 'revert-buffer
+    "B q" 'quit-window
+    "B k" 'bury-buffer
+    "B c" 'clone-buffer
+    "B C" 'clone-indirect-buffer
+  ;;"B f" 'apheleia-format-buffer
+
+    "d" 'kill-current-buffer
+    "k" 'bury-buffer
+    "q" 'evil-window-delete
+
+    "x"  (general-simulate-key "C-x")
+
+    "w" 'other-window
+    ;; "W"  (general-simulate-key "C-w")
+    "W" '(:ignore t :which-key "Window")
+    "W w" 'ace-window
+    "W S" 'ace-swap-window
+    "W s" 'evil-window-split
+    "W v" 'evil-window-vsplit
+    "W -" 'evil-window-split
+    "W _" 'evil-window-split
+    "W |" 'evil-window-vsplit
+    "W d" 'delete-window ;;evil-delete-window would rebalance siblings
+    "W o" 'delete-other-windows
+    "W =" 'balance-windows)
+
+  (repeat-mode)
+#+end_src
+
+*** splitting
+
+#+begin_src emacs-lisp
+;; (setq split-height-threshold nil)
+;; (setq split-width-threshold nil)
+
+(defun split-window-sensibly-prefer-horizontal (&optional window)
+  "Based on split-window-sensibly, but designed to prefer a horizontal split,
+i.e. windows tiled side-by-side."
+  (let ((window (or window (selected-window))))
+    (or (and (window-splittable-p window t)
+             ;; Split window horizontally
+             (with-selected-window window
+               (split-window-right)))
+        (and (window-splittable-p window)
+             ;; Split window vertically
+             (with-selected-window window
+               (split-window-below)))
+        (and
+         ;; If WINDOW is the only usable window on its frame (it is
+         ;; the only one or, not being the only one, all the other
+         ;; ones are dedicated) and is not the minibuffer window, try
+         ;; to split it horizontally disregarding the value of
+         ;; `split-height-threshold'.
+         (let ((frame (window-frame window)))
+           (or
+            (eq window (frame-root-window frame))
+            (catch 'done
+              (walk-window-tree (lambda (w)
+                                  (unless (or (eq w window)
+                                              (window-dedicated-p w))
+                                    (throw 'done nil)))
+                                frame)
+              t)))
+         (not (window-minibuffer-p window))
+         (let ((split-width-threshold 0))
+           (when (window-splittable-p window t)
+             (with-selected-window window
+               (split-window-right))))))))
+
+(advice-add 'split-window-sensibly :override #'split-window-sensibly-prefer-horizontal)
+
+(setq window-combination-resize t)
+#+end_src
+
+** Custom
+Don't clobber the init.el file
+use a own file for emacs custom definition
+
+#+BEGIN_SRC emacs-lisp
+  (setq custom-file (expand-file-name "emacs-custom.el" user-emacs-directory))
+  (load custom-file)
+#+END_SRC
+
+** Basic packages
+*** diminish
+
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :demand)
 #+END_SRC
 
 *** which-key
@@ -223,6 +337,23 @@ https://github.com/purcell/exec-path-from-shell
     (add-to-list 'exec-path-from-shell-variables '"MOZ_ENABLE_WAYLAND")
     (add-to-list 'exec-path-from-shell-variables '"QT_QPA_PLATFORM")
     (exec-path-from-shell-initialize))
+#+end_src
+
+** better debugging
+
+#+begin_src emacs-lisp
+  ;; (setq debug-on-quit t)
+  (setq debug-on-error t)
+  ;; (setq debug-on-error nil)
+  (add-to-list 'debug-ignored-errors 'minibuffer-quit)
+  ;; (add-to-list 'debug-ignored-errors 'quit)
+  ;; (setq debug-ignored-errors (remove 'minibuffer-quit debug-ignored-errors))
+  ;; (setq debug-ignored-errors (remove 'quit debug-ignored-errors))
+#+end_src
+
+#+begin_src emacs-lisp
+  (setq eval-expression-print-level 20)
+  (setq eval-expression-print-length 100)
 #+end_src
 
 * Saving, Backup & History
@@ -300,60 +431,7 @@ Disable backup & auto save for remote files.
 #+end_src
 
 * Navigation & Minibuffer & Search
-** Buffer & Window menu
-
-#+BEGIN_SRC emacs-lisp
-  (my-menu-def
-    "<tab>" '(mode-line-other-buffer :which-key "last-buffer")
-    "<M-tab>" '((lambda ()
-                  (interactive)
-                  (switch-to-buffer-other-window (other-buffer)))
-                :which-key "last-buffer-other-window")
-
-    "B" '(:ignore t :which-key "Buffer")
-    "B m" '((lambda () (interactive) (switch-to-buffer "*Messages*"))
-        :which-key "messages")
-    "B M" '((lambda () (interactive) (switch-to-buffer-other-window "*Messages*"))
-        :which-key "messages-in-other")
-    "B s" '((lambda () (interactive) (switch-to-buffer "*scratch*"))
-        :which-key "scratch")
-    "B S" '((lambda () (interactive) (switch-to-buffer-other-window "*scratch*"))
-        :which-key "scratch-in-other")
-    "B w" '((lambda () (interactive) (switch-to-buffer "*Warnings*"))
-        :which-key "warnings")
-    "B W" '((lambda () (interactive) (switch-to-buffer-other-window "*Warnings*"))
-        :which-key "warnings-in-other")
-    "B d" 'kill-current-buffer
-    "B D" 'evil-delete-buffer
-    "B r" 'revert-buffer
-    "B q" 'quit-window
-    "B k" 'bury-buffer
-    "B c" 'clone-buffer
-    "B C" 'clone-indirect-buffer
-  ;;"B f" 'apheleia-format-buffer
-
-    "d" 'kill-current-buffer
-    "k" 'bury-buffer
-    "q" 'evil-window-delete
-
-    "x"  (general-simulate-key "C-x")
-
-    "w" 'other-window
-    ;; "W"  (general-simulate-key "C-w")
-    "W" '(:ignore t :which-key "Window")
-    "W w" 'ace-window
-    "W S" 'ace-swap-window
-    "W s" 'evil-window-split
-    "W v" 'evil-window-vsplit
-    "W -" 'evil-window-split
-    "W _" 'evil-window-split
-    "W |" 'evil-window-vsplit
-    "W d" 'delete-window ;;evil-delete-window would rebalance siblings
-    "W o" 'delete-other-windows
-    "W =" 'balance-windows)
-#+end_src
-
-** i3
+** TODO i3
 https://github.com/junyi-hou/i3-mode
 
 #+begin_src emacs-lisp
@@ -401,6 +479,39 @@ https://github.com/junyi-hou/i3-mode
      (other-direction
       (evil-move-window dir))
      (t (i3-msg "move" (symbol-name dir))))))
+#+end_src
+
+** Minibuffer
+
+#+begin_src emacs-lisp
+  (defun maschm/switch-to-minibuffer-window ()
+    "switch to minibuffer window (if active)"
+    (interactive)
+    (if-let ((mb (active-minibuffer-window)))
+        (select-window mb)))
+
+
+  (defun maschm/quit-minibuffer ()
+    "quite the top-most minibuffer"
+    (interactive)
+    (if-let ((mb (active-minibuffer-window)))
+        (progn (select-window mb)
+               (abort-minibuffers))))
+
+  (defun maschm/my-quit ()
+    "quite the top-most minibuffer"
+    (interactive)
+    (if (minibuffer-window-active-p (selected-window))
+        (exit-minibuffer)
+      (if-let ((mb (active-minibuffer-window)))
+          (with-selected-window mb
+            (let ((inhibit-message t)
+                  (minibuffer-message-timeout 0))
+                (abort-minibuffers)))
+        (keyboard-quit))))
+
+  (general-def 'global "C-g" 'maschm/my-quit)
+  (general-def :states 'visual "C-g" 'evil-normal-state)
 #+end_src
 
 ** consult
@@ -652,6 +763,12 @@ Use `consult-line` search as last evil/isearch string copied from [[https://gith
     (general-def :keymaps 'embark-general-map
       "y" '(embark-copy-as-kill :general "yank")
       "a" nil ; append
+      )
+
+    (general-def :keymaps 'embark-file-map
+      "Y" '(embark-copy-as-kill :general "yank full")
+      "y" '(embark-copy-as-kill :general "yank local")
+      "k" '(embark-copy-as-kill :general "yank local")
       )
 
     (general-def :keymaps 'embark-vc-file-map
@@ -951,13 +1068,6 @@ use =/ C-j= or =~ //= to get to the local / directory
       "g o" 'avy-goto-char-timer))
 #+end_src
 
-*** hydra
-
-#+begin_src emacs-lisp
-  (use-package hydra
-    :defer 15)
-#+end_src
-
 *** ace-window
 
 #+begin_src emacs-lisp
@@ -966,6 +1076,13 @@ use =/ C-j= or =~ //= to get to the local / directory
     (general-def
       :keymaps 'global
       "M-o" 'ace-window))
+#+end_src
+
+*** hydra
+
+#+begin_src emacs-lisp :tangle yes
+  (use-package hydra
+    :defer 15)
 #+end_src
 
 ** winner
@@ -1214,7 +1331,7 @@ evil shifting (bound to < and >) will stay in visual mode
   ;; (advice-remove 'evil-shift-right #'maschm/visual-restore-after-shift)
 #+end_src
 
-** Evil packages
+** evil-collection
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-collection
@@ -1222,6 +1339,8 @@ evil shifting (bound to < and >) will stay in visual mode
     :config
     (evil-collection-init '(magit forge calendar consult)))
 #+END_SRC
+
+** evil-commentary
 
 #+BEGIN_SRC emacs-lisp
   (use-package evil-commentary
@@ -1235,7 +1354,11 @@ evil shifting (bound to < and >) will stay in visual mode
     (general-def
       :keymaps 'evil-outer-text-objects-map
       "u" 'evil-commentary/a-comment-block))
+#+END_SRC
 
+** evil-surround
+
+#+BEGIN_SRC emacs-lisp
   (use-package evil-surround
     :general
     (general-def
@@ -1245,7 +1368,19 @@ evil shifting (bound to < and >) will stay in visual mode
     (general-vmap
       "S" 'evil-surround-region
       "gS" 'evil-Surround-region))
+#+END_SRC
 
+** evil-matchit
+
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-matchit
+    :demand
+    :config (global-evil-matchit-mode 1))
+#+END_SRC
+
+** evil-numbers
+
+#+BEGIN_SRC emacs-lisp
   (use-package evil-numbers
     :init
     (defhydra hydra-numbers ()
@@ -1264,17 +1399,21 @@ evil shifting (bound to < and >) will stay in visual mode
     (advice-add 'evil-numbers/inc-at-pt :after #'maschm/visual-restore-after-shift)
     (advice-add 'evil-numbers/inc-at-pt-incremental :after #'maschm/visual-restore-after-shift)
     )
+#+END_SRC
 
-  (use-package evil-matchit
-    :demand
-    :config (global-evil-matchit-mode 1))
+** evil-smartparens
 
+#+BEGIN_SRC emacs-lisp
   (use-package smartparens)
 
   (use-package evil-smartparens
     :after (smartparens evil)
     :hook (smartparens-enabled . evil-smartparens-mode))
+#+END_SRC
 
+** evil-mc multiple cursors
+
+#+BEGIN_SRC emacs-lisp
   (use-package evil-mc
     :diminish emc
     :config
@@ -1283,25 +1422,41 @@ evil shifting (bound to < and >) will stay in visual mode
     (advice-add 'evil-mc-define-vars :after
                 (lambda ()
                   (add-to-list 'evil-mc-incompatible-minor-modes 'auto-fill-mode))))
+#+END_SRC
 
+** evil-visualstar
+
+#+BEGIN_SRC emacs-lisp
   (use-package evil-visualstar
     :demand
     :config (global-evil-visualstar-mode))
+#+END_SRC
 
+** evil-lion
+
+#+BEGIN_SRC emacs-lisp
   (use-package evil-lion
     :general
     (general-def
       :keymaps 'visual
       "gl" 'evil-lion-left
       "gL" 'evil-lion-right))
+#+END_SRC
 
+** evil-exchange
+
+#+BEGIN_SRC emacs-lisp
   (use-package evil-exchange
     :general
     (nmap "gx" 'evil-exchange)
     (vmap "gx" 'evil-exchange)
     (nmap "gX" 'evil-exchange-cancel)
     (vmap "gX" 'evil-exchange-cancel))
+#+END_SRC
 
+** evil-owl
+
+#+BEGIN_SRC emacs-lisp
   (use-package evil-owl
     :demand
     :custom
@@ -1313,7 +1468,7 @@ evil shifting (bound to < and >) will stay in visual mode
     (evil-owl-mode))
 #+END_SRC
 
-** Evil text-object
+** evil text-object
 
 #+begin_src emacs-lisp
   (use-package evil-args
@@ -1491,6 +1646,8 @@ evil shifting (bound to < and >) will stay in visual mode
             ("Z" "\\mathbb{Z}" t "Z" "[Z]" "[Z]" "ℤ")
             ("exp" "\\mathbb{Z}" t "Z" "[Z]" "[Z]" "")
             ("sqrt" "\\sqrt{\\,}" t "&radic;" "[square root]" "[square root]" "√")
+            ("log" "\\log" t "log" "log" "log" "log")
+            ("ln" "\\ln" t "ln" "ln" "ln" "𝐥𝐧")
             ("del" "\\partial" t "&part;" "[del]" "[del]" "∂") ; alternative name for partial
             ("mean" "\\mu" t "&mu;" "mu" "mu" "μ")
             ("std" "\\sigma" t "&sigma;" "sigma" "sigma" "σ")
@@ -2442,8 +2599,10 @@ https://github.com/oantolin/embark/issues/376
 * Visual
 ** Font
 
+[[info:emacs#Fonts][emacs#Fonts]]
+
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'default-frame-alist '(font . "Hack-12"))
+  (add-to-list 'default-frame-alist '(font . "Hack 12"))
 
   (defun maschm/init-fonts ()
     (set-face-attribute 'default nil :family "Hack" :weight 'light)
@@ -2451,6 +2610,8 @@ https://github.com/oantolin/embark/issues/376
     ;; (set-face-attribute 'fixed-pitch-serif nil :family "Hack Serif")
     (set-face-attribute 'variable-pitch nil :family "Noto Serif")
 
+    ;; "Latin Modern Math" had weirdly much vertical space
+    (set-fontset-font "fontset-default" 'mathematical (font-spec :family "FreeSerif"))
     (set-fontset-font "fontset-default" 'han (font-spec :family "Noto Sans Mono CJK TC"))
     (set-fontset-font "fontset-default" 'kana (font-spec :family "Noto Sans Mono CJK JP"))
     (set-fontset-font "fontset-default" 'hangul (font-spec :family "Noto Sans Mono CJK KR")))
