@@ -1336,6 +1336,10 @@ evil shifting (bound to < and >) will stay in visual mode
 #+BEGIN_SRC emacs-lisp
   (use-package evil-collection
     :demand
+    :init
+    (add-hook 'after-init-hook
+              (lambda ()
+                (add-to-list 'warning-suppress-types '(evil-collection))))
     :config
     (evil-collection-init '(magit forge calendar consult)))
 #+END_SRC
