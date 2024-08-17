@@ -3875,6 +3875,45 @@ Content-Type: application/json
 // Request duration: 0.201149s
 #+END_SRC
 
+* Web
+** TODO shr / simple html rendering
+
+Disable hard line wrapping when parsing html documents like websites, mail or devdocs.
+This should eventually be contributed as a feature to shr. Port to new adivce-add [[info:elisp#Porting Old Advice][elisp#Porting Old Advice]].
+
+#+begin_src emacs-lisp
+(setq shr-width -1)
+(setq shr-max-width -1)
+
+(defun shr-no-fill-text-advice (orig-fun &rest args)
+  "Do not fill text when `shr-no-fill-mode' is enabled."
+  (if (bound-and-true-p shr-no-fill-mode)
+      (car args) ; what?
+    (apply orig-fun args)))
+
+(defun shr-no-fill-lines-advice (orig-fun &rest args)
+  "Do not fill text when `shr-no-fill-mode' is enabled."
+  (unless (bound-and-true-p shr-no-fill-mode)
+    (apply orig-fun args)))
+
+(defun shr-no-fill-line-advice (orig-fun &rest args)
+  "Do not fill text when `shr-no-fill-mode' is enabled."
+  (unless (bound-and-true-p shr-no-fill-mode)
+    (apply orig-fun args)))
+
+(advice-add 'shr-fill-text :around #'shr-no-fill-text-advice)
+(advice-add 'shr-fill-lines :around #'shr-no-fill-lines-advice)
+;; (advice-remove 'shr-fill-lines #'shr-no-fill-lines-advice)
+(advice-add 'shr-fill-line :around #'shr-no-fill-line-advice)
+
+(define-minor-mode shr-no-fill-mode
+  "Global minor mode which prevents `shr` and `eww` from filling text output."
+  ;; :lighter (:eval (if (derived-mode-p 'eww-mode) " ShrNoFill"))
+  :global t)
+
+(shr-no-fill-mode -1)
+#+end_src
+
 ** eww
 
 #+begin_src emacs-lisp
@@ -4100,7 +4139,22 @@ waiting for folding package based on treesit
   )
 #+end_src
 
-*** TODO remove hard line breaks and relay on visual-line-mode instead
+ugly hack:
+visual-line-mode triggers some kind of redrawing or recalculation of word wrap
+and thus makes the unsplited shr long lines render properly.
+devdocs-mode-map is also broken not called when the buffer is filled with the
+
+
+#+begin_src emacs-lisp
+(add-hook 'devdocs-mode-hook
+          (defun maschm/test-hook-devdocs ()
+            (run-with-idle-timer
+             0.1 nil
+             (lambda ()
+               (with-current-buffer "*devdocs*"
+                 (visual-line-mode -1)
+                 (visual-line-mode +1))))))
+#+end_src
 
 ** rainbow-delimiters
 
