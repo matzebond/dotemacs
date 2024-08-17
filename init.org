@@ -178,7 +178,6 @@ of handy syntactic sugar and useful features.
 
     (execute-kbd-macro (kbd "M-SPC"))))
 
-
 *** Buffer & Window menu
 
 #+BEGIN_SRC emacs-lisp
@@ -657,6 +656,7 @@ Use `consult-line` search as last evil/isearch string copied from [[https://gith
   (advice-add #'consult-line :after #'maschm/consult-line-evil-history)
 #+end_src
 
+*** custom
 ** vertico
 
 #+begin_src emacs-lisp
@@ -1053,6 +1053,8 @@ use =/ C-j= or =~ //= to get to the local / directory
       (swiper)))
 #+end_src
 
+** abo-abo
+[[http://oremacs.com/swiper/][ivy & swiper manual]]
 *** avy
 
 #+begin_src emacs-lisp
@@ -3224,45 +3226,74 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
     "DEL" nil)
 #+end_src
 
+** custom
+
+#+begin_src emacs-lisp
+  (general-def
+    :keymaps 'custom-mode-map
+    "SPC" nil)
+#+end_src
+
 ** dired
 https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-collection-dired.el
 
 #+BEGIN_SRC emacs-lisp
-  (my-menu-def
-    "D" '(dired-jump :which-key "dired"))
+(my-menu-def
+  "D" '(dired-jump :which-key "dired"))
 
-  (general-def
-   :keymaps 'global
-   "C-c d" 'dired-jump
-   "C-c D" 'dired)
+(general-def
+ :keymaps 'global
+ "C-c d" 'dired-jump
+ "C-c D" 'dired)
 
+(general-def
+ :keymaps 'dired-mode-map
+ "SPC" nil
+ "I" 'wdired-change-to-wdired-mode
+ "j" 'dired-next-line
+ "k" 'dired-previous-line
+ "h" 'dired-up-directory
+ "l" 'dired-find-file
+ "N" 'dired-next-subdir ; dired-man
+ "P" 'dired-prev-subdir ; dired-do-print
+ "<normal-state> j" nil
+ "<normal-state> k" nil
+ "<normal-state> h" nil
+ "<normal-state> l" nil
+ "<normal-state> r" nil
+ "y" 'dired-copy-filename-as-kill
+ "w" 'dired-show-file-type
+ "g" nil
+ "g r" 'revert-buffer
+ "g j" 'dired-next-dirline
+ "g k" 'dired-prev-dirline
+ "g g" 'maschm/dired-first-file
+ "G" 'maschm/dired-last-file ;; dired-do-chgrp
+ "F" 'find-file
+ "Y" 'maschm/dired-copy-absolute-filename-as-kill)
 
-  (general-def
-   :keymaps 'dired-mode-map
-   "SPC" nil
-   "I" 'wdired-change-to-wdired-mode
-   "j" 'dired-next-line
-   "k" 'dired-previous-line
-   "h" 'dired-up-directory
-   "l" 'dired-find-file
-   "N" 'dired-next-subdir ; dired-man
-   "P" 'dired-prev-subdir ; dired-do-print
-   "<normal-state> j" nil
-   "<normal-state> k" nil
-   "<normal-state> h" nil
-   "<normal-state> l" nil
-   "<normal-state> r" nil
-   "y" 'dired-copy-filename-as-kill
-   "w" 'dired-show-file-type
-   "g" nil
-   "g r" 'revert-buffer
-   "g j" 'dired-next-dirline
-   "g k" 'dired-prev-dirline
-   "F" 'find-file)
+(setq dired-listing-switches "-v --group-directories-first -alh")
+(setq dired-create-destination-dirs t)
+(setq dired-dwim-target t)
+(setq dired-vc-rename-file t)
 
-  (setq dired-listing-switches "-v --group-directories-first -alh")
-  (setq dired-create-destination-dirs t)
-  (setq dired-dwim-target t)
+(defun maschm/dired-first-file ()
+  (interactive)
+  (beginning-of-buffer)
+  (while (and (not (eobp))
+              (or (bolp)
+                  (member (dired-get-filename 'no-dir t)
+                          '("." ".."))))
+      (dired-next-line 1)))
+
+(defun maschm/dired-last-file ()
+  (interactive)
+  (end-of-buffer)
+  (dired-next-line -1))
+
+(defun maschm/dired-copy-absolute-filename-as-kill ()
+  (interactive)
+  (dired-copy-filename-as-kill 0))
 #+END_SRC
 
 *** wdired
@@ -3684,6 +3715,8 @@ recognize the OTP prompt of the KIT uni cluster
 When compiling follow the buffer
 
 #+BEGIN_SRC emacs-lisp
+  (evil-set-initial-state 'compilation-mode 'motion)
+
   (setq compilation-scroll-output t)
   ;; Don't stop on info or warnings.
   (setq compilation-skip-threshold 2)
@@ -3693,9 +3726,8 @@ When compiling follow the buffer
   (add-hook 'compilation-mode-hook 'follow-mode)
 
   (defun colorize-compilation-buffer ()
-    (toggle-read-only)
-    (ansi-color-apply-on-region compilation-filter-start (point))
-    (toggle-read-only))
+    (let ((buffer-read-only nil))
+        (ansi-color-apply-on-region compilation-filter-start (point))))
   (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
   (general-def
@@ -3844,18 +3876,16 @@ emms-cache-set-from-mpd-all
     (setq plantuml-default-exec-mode 'jar))
 #+end_src
 
-** mediawiki
-
-#+begin_src emacs-lisp
-  (use-package mediawiki
-    :config
-    (add-to-list 'mediawiki-site-alist '("Fachschaft" "https://wiki.fsmi.uni-karlsruhe.de/" "username" "password" nil "Main Page")))
-#+end_src
-
 ** anki
 
 #+begin_src emacs-lisp :tangle no
   (use-package anki-editor)
+#+end_src
+
+** speed-type
+
+#+begin_src emacs-lisp
+(use-package speed-type)
 #+end_src
 
 ** performance
@@ -3890,10 +3920,10 @@ espeak, OpenAI, DeepL voice
 English, German, Ukrainian
 
 ** Language modeling - text to text - LLM
-
-*** Generation / Conversation
+*** Generation / Conversation / gptel
 
 open ai, chat gpt
+
 
 #+begin_src emacs-lisp
 (use-package gptel
@@ -3902,10 +3932,33 @@ open ai, chat gpt
     :keymaps 'gptel-mode-map
     "C-c C-k" 'gptel-abort
     )
+  (my-menu-def
+    "RET" 'gptel-send
+    "M-RET" (lambda () (interactive) (gptel-send t))
+    "A" '(:ignore t :which-key "AI")
+    "A i" '(gptel :which-key "chat" )
+    "A I" '((lambda () (interactive)
+              (display-buffer
+               (gptel (generate-new-buffer-name
+                        (concat "*" (gptel-backend-name gptel-backend) "*")))
+               gptel-display-buffer-action))
+            :which-key "new chat")
+    "A p" '(gptel-menu :which-key "prompt")
+    "A m" 'gptel-menu
+    "A s" 'gptel-menu
+    "A a" 'gptel-add
+    "A c" 'gptel-add
+    "A r" 'gptel-rewrite-menu)
   :custom
   (gptel-default-mode 'org-mode)
+  (gptel-model "gpt-4o")
+  (gptel-expert-commands t)
   :config
-  ;;(add-to-list gptel-directives)
+
+  (setf (alist-get 'ukrainian gptel-directives) "You are a language expert helping a student fluent in German and English to learn Ukrainian. You never transliterate the Cyrillic script.")
+
+  (setf (alist-get 'org-mode gptel-response-prefix-alist) "* AI\n")
+  (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "* USER\n")
 )
 #+end_src
 
@@ -3981,6 +4034,7 @@ Don't skip over newlines
     (electric-operator-add-rules-for-mode 'emacs-lisp-mode
       (cons "-" nil)))
 #+end_src
+
 *** line numbers
 
 #+BEGIN_SRC emacs-lisp
@@ -4022,6 +4076,7 @@ Highlight trailing whitespace
     (apheleia-global-mode +1)
     :general
     (my-menu-def "B f" 'apheleia-format-buffer)
+    :custom
     (apheleia-formatters-respect-fill-column t)
     )
 #+end_src
@@ -4094,6 +4149,18 @@ Highlight delimiters such as parentheses, brackets or braces according to their 
 
 [[info:elisp#Backtraces][elisp#Backtraces]]
 [[info:elisp#Debugger Commands][elisp#Debugger Commands]]
+
+** json
+
+#+begin_src emacs-lisp
+  (add-hook 'js-json-mode-hook #'flycheck-mode)
+#+end_src
+
+*** jq
+
+#+begin_src emacs-lisp
+(use-package jq-mode)
+#+end_src
 
 ** C/C++
 https://github.com/realgud/realgud
@@ -4174,6 +4241,8 @@ was disabled with the switch to corfu
     :mode
     ("SConstruct" . python-mode)
     ("SConscript" . python-mode)
+    :custom
+    (python-shell-dedicated 'project)
     :config
     ;; Use IPython when available or fall back to regular Python
     (cond
@@ -4210,8 +4279,7 @@ was disabled with the switch to corfu
                                          (or buffer-file-name "")))))
 
   (use-package lsp-pyright
-    :hook ((python-mode . (lambda () (require 'lsp-pyright) (lsp-deferred))) ; or lsp
-           (python-ts-mode . (lambda () (require 'lsp-pyright) (lsp-deferred)))) ; or lsp
+    :hook ((python-base-mode . (lambda () (require 'lsp-pyright) (lsp-deferred)))) ; or lsp
     :init
     (setq lsp-pyright-multi-root nil) ;; disable to use different python venv
     :config
@@ -4382,6 +4450,8 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
 
 *** latex-preview-pane
 
+https://github.com/TobiasZawada/preview-dvisvgm
+
 #+begin_src emacs-lisp
   (use-package latex-preview-pane
     :after tex
@@ -4399,106 +4469,149 @@ https://tex.stackexchange.com/questions/50827/a-simpletons-guide-to-tex-workflow
 *** pdf-tools
 
 #+begin_src emacs-lisp
+(add-to-list 'revert-without-query "\.pdf$")
+
+(use-package pdf-tools
+  ;; manually update
+  ;; :pin manual
+  :defer 15
+  :mode ("\\.pdf\\'" . pdf-view-mode)
+  :init
+  (evil-set-initial-state 'pdf-view-mode 'motion)
+  :config
+  (pdf-tools-install t)
+
+  (general-def
+    :keymaps 'pdf-view-mode-map
+    "j" 'pdf-view-next-line-or-next-page
+    "k" 'pdf-view-previous-line-or-previous-page
+    "C-e" 'pdf-view-next-line-or-next-page
+    "C-y" 'pdf-view-previous-line-or-previous-page
+    "C-d" 'pdf-view-scroll-up-or-next-page
+    "C-u" 'pdf-view-scroll-down-or-previous-page
+    "<prior>" 'pdf-view-scroll-down-or-previous-page
+    "<next>" 'pdf-view-scroll-up-or-next-page
+    "h" 'pdf-highlight-or-image-backward-hscroll
+    "l" 'image-forward-hscroll
+    "RET" 'pdf-view-next-page
+    "DEL" 'pdf-view-previous-page
+
+    "G" 'pdf-view-last-page
+    "g" nil
+    "gg" 'pdf-view-first-page
+    "gt" 'pdf-view-goto-page
+    "gl" 'pdf-view-goto-label
+    "gr" 'revert-buffer
+
+    "y" 'pdf-view-kill-ring-save
+
+    "C-o" 'pdf-history-backward
+    "C-i" 'pdf-history-forward
+
+    "<C-mouse-4>" '(lambda () (interactive) (pdf-view-enlarge 1.1))
+    "<C-mouse-5>" '(lambda () (interactive) (pdf-view-shrink 1.1))
+    "<mouse-6>" 'image-backward-hscroll
+    "<mouse-7>" 'image-forward-hscroll
+    "=" 'pdf-view-scale-reset
+    "sw" 'pdf-view-fit-width-to-window
+    "sh" 'pdf-view-fit-height-to-window
+    "sp" 'pdf-view-fit-page-to-window
+    "sr" 'pdf-view-scale-reset
+    "ss" 'pdf-view-auto-slice-minor-mode
+
+    "C-s" 'isearch-forward
+
+    "SPC" nil)
+
+  (my-leader-def
+    :keymaps 'pdf-view-mode-map
+    ;; evil state mode bindings are only active after the first mode change
+    :states nil
+    "a" 'pdf-annot-list-annotations
+    "m" 'pdf-annot-add-markup-annotation
+    "h" 'pdf-annot-add-highlight-markup-annotation
+    "t" 'pdf-annot-add-text-annotation
+    "u" 'pdf-annot-add-underline-markup-annotation
+    "s" 'pdf-annot-add-squiggly-markup-annotation
+    "k" 'pdf-annot-add-strikeout-markup-annotation
+    "d" 'pdf-annot-delete
+    "A" 'pdf-annot-display-attachment
+    "S" '(pdf-view-auto-slice-minor-mode :which-key "auto-slice")
+    "w" 'pdf-view-fit-width-to-window
+    "W" 'pdf-view-fit-width-to-window
+    ;; "h" 'pdf-view-fit-height-to-window
+    "H" 'pdf-view-fit-height-to-window
+    "f" 'pdf-view-fit-page-to-window
+    "T" 'pdf-view-themed-minor-mode
+    "D" 'pdf-view-dark-minor-mode
+    "M" 'pdf-view-midnight-minor-mode
+    "P" 'pdf-view-printer-minor-mode)
+
+  (evil-make-overriding-map pdf-view-mode-map 'motion)
+  (evil-set-initial-state 'pdf-view-mode 'motion)
+
+  ;; open pdfs scaled to fit page
+  (setq-default pdf-view-display-size 'fit-width)
+  ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
   (add-to-list 'revert-without-query "\.pdf$")
+  (setq TeX-view-program-list '(("pdf-tools" TeX-pdf-tools-sync-view)))
 
-  (use-package pdf-tools
-    ;; manually update
-    ;; :pin manual
-    :defer 15
-    :mode ("\\.pdf\\'" . pdf-view-mode)
-    :config
-    (pdf-tools-install t)
+  (remove-from-list 'pdf-tools-enabled-modes 'pdf-sync-minor-mode)
 
-    (general-def
-      :keymaps 'pdf-view-mode-map
-      "j" 'pdf-view-next-line-or-next-page
-      "k" 'pdf-view-previous-line-or-previous-page
-      "C-e" 'pdf-view-next-line-or-next-page
-      "C-y" 'pdf-view-previous-line-or-previous-page
-      "C-d" 'pdf-view-scroll-up-or-next-page
-      "C-u" 'pdf-view-scroll-down-or-previous-page
-      "h" 'image-backward-hscroll
-      "l" 'image-forward-hscroll
-      "RET" 'pdf-view-next-page
-      "DEL" 'pdf-view-previous-page
-
-      "G" 'pdf-view-last-page
-      "g" nil
-      "gg" 'pdf-view-first-page
-      "gt" 'pdf-view-goto-page
-      "gl" 'pdf-view-goto-label
-      "gr" 'revert-buffer
-
-      "y" 'pdf-view-kill-ring-save
-
-      "C-o" 'pdf-history-backward
-      "C-i" 'pdf-history-forward
-
-      "<C-mouse-4>" '(lambda () (interactive) (pdf-view-enlarge 1.1))
-      "<C-mouse-5>" '(lambda () (interactive) (pdf-view-shrink 1.1))
-      "<mouse-6>" 'image-backward-hscroll
-      "<mouse-7>" 'image-forward-hscroll
-      "=" 'pdf-view-scale-reset
-      "sw" 'pdf-view-fit-width-to-window
-      "sh" 'pdf-view-fit-height-to-window
-      "sp" 'pdf-view-fit-page-to-window
-      "sr" 'pdf-view-scale-reset
-      "ss" 'pdf-view-auto-slice-minor-mode
-
-      "C-s" 'isearch-forward
-
-      "SPC" nil)
-
-    (my-leader-def
-      :keymaps 'pdf-view-mode-map
-      ;; evil state mode bindings are only active after the first mode change
-      :states nil
-      "a" 'pdf-annot-list-annotations
-      "m" 'pdf-annot-add-markup-annotation
-      "h" 'pdf-annot-add-highlight-markup-annotation
-      "t" 'pdf-annot-add-text-annotation
-      "u" 'pdf-annot-add-underline-markup-annotation
-      "s" 'pdf-annot-add-squiggly-markup-annotation
-      "k" 'pdf-annot-add-strikeout-markup-annotation
-      "d" 'pdf-annot-delete
-      "A" 'pdf-annot-display-attachment
-      "S" '(pdf-view-auto-slice-minor-mode :which-key "auto-slice")
-      "w" 'pdf-view-fit-width-to-window
-      "W" 'pdf-view-fit-width-to-window
-      ;; "h" 'pdf-view-fit-height-to-window
-      "H" 'pdf-view-fit-height-to-window
-      "f" 'pdf-view-fit-page-to-window
-      "T" 'pdf-view-themed-minor-mode
-      "D" 'pdf-view-dark-minor-mode
-      "M" 'pdf-view-midnight-minor-mode
-      "P" 'pdf-view-printer-minor-mode)
-
-    (evil-make-overriding-map pdf-view-mode-map 'motion)
-    (evil-set-initial-state 'pdf-view-mode 'motion)
-
-    ;; open pdfs scaled to fit page
-    (setq-default pdf-view-display-size 'fit-width)
-    ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools")))
-    (setq TeX-view-program-list '(("pdf-tools" TeX-pdf-tools-sync-view))))
-
-  (with-eval-after-load 'pdf-annot
-    (my-leader-def
-      :keymaps 'pdf-annot-edit-contents-minor-mode-map
-      ;; evil state mode bindings are only active after the first mode change
-      :states nil
-      "," 'pdf-annot-edit-contents-commit)
-    (general-def
-      :keymaps 'pdf-annot-edit-contents-minor-mode-map
-      ;; ", ," 'pdf-annot-edit-contents-commit
-      "C-c C-c" 'pdf-annot-edit-contents-commit
-      "C-c C-k" 'pdf-annot-edit-contents-abort)
-    (evil-make-overriding-map pdf-annot-edit-contents-minor-mode-map 'normal)
-    ;; open annotation buffer when creating highlights
-    ;; (setq pdf-annot-activate-created-annotations t)
+  :local
+  (pdf-view-mode-hook . ((blink-cursor-mode -1)
+                         ;;(setq-local window-scroll-functions (list (lambda (&optional _) (pdf-view-align-left))))
+                         ;; (make-local-variable 'window-size-change-functions)
+                         (setq-local window-size-change-functions (list (lambda (_) (pdf-view-center-in-window))))
+                         )
+                      )
   )
 
-  (use-package saveplace-pdf-view
-    :defer 15)
+(defun pdf-highlight-or-image-backward-hscroll ()
+  (interactive)
+  (if (pdf-view-active-region-p)
+      (call-interactively 'pdf-annot-add-highlight-markup-annotation)
+    (call-interactively 'image-backward-hscroll)))
+
+(with-eval-after-load 'pdf-annot
+  (my-leader-def
+    :keymaps 'pdf-annot-edit-contents-minor-mode-map
+    ;; evil state mode bindings are only active after the first mode change
+    ;; :states nil
+    "," 'pdf-annot-edit-contents-commit)
+  (general-def
+    :keymaps 'pdf-annot-edit-contents-minor-mode-map
+    ;; ", ," 'pdf-annot-edit-contents-commit
+    "C-c C-c" 'pdf-annot-edit-contents-commit
+    "C-c C-k" 'pdf-annot-edit-contents-abort)
+  (evil-make-overriding-map pdf-annot-edit-contents-minor-mode-map 'normal)
+  ;; open annotation buffer when creating highlights
+  ;; (setq pdf-annot-activate-created-annotations t)
+  )
+
+(use-package saveplace-pdf-view
+  :defer 15)
+
+(use-package image-roll
+  :straight (image-roll :type git :host github :repo "dalanicolai/image-roll.el")
+  ;; :config (message "test")
+  )
+#+end_src
+
+*** qpdf
+
+#+begin_src emacs-lisp :tangle no
+(use-package qpdf.el
+  :straight (:host github :repo "orgtre/qpdf.el")
+  :commands qpdf)
+#+end_src
+
+*** doc-tools
+
+#+begin_src emacs-lisp
+  (use-package doc-tools
+    :straight (doc-tools :type git :host github :repo "dalanicolai/doc-tools")
+  )
 #+end_src
 
 ** Shell script
@@ -4549,7 +4662,10 @@ alternatively enable only 'flycheck-mode
 https://github.com/NicolasPetton/Indium
 
 #+begin_src emacs-lisp
-  (use-package web-mode)
+  (use-package web-mode
+    :mode "\\.html?\\'")
+
+  (use-package npm)
 #+end_src
 
 look into
@@ -4559,7 +4675,9 @@ when writing lots of html code
 ** TODO Typescript
 
 #+begin_src emacs-lisp
-
+  (use-package typescript-mode
+    :hook
+    (typescript-ts-base-mode . lsp-deferred))
 #+end_src
 
 ** Elm
@@ -4762,7 +4880,14 @@ Edit textareas of the browser in emacs
 
 #+begin_src emacs-lisp
   (use-package emacs-everywhere
-    :defer 20)
+    :defer 20
+    :general
+    (general-def
+      :keymaps 'emacs-everywhere-mode-map
+      "C-c C-c" 'emacs-everywhere-finish)
+    (my-leader-def
+      :keymaps 'emacs-everywhere-mode-map
+      "," 'emacs-everywhere-finish))
 #+end_src
 
 then use with a window manager keybinding
@@ -4794,6 +4919,8 @@ then use with a window manager keybinding
    "T u" 'toggle-input-method)
 #+end_src
 
+My Ukrainian input method maps German sounds to Ukrainian Cyrillic letters. I don't have a need for russian Cyrillic letters.
+
 #+begin_src emacs-lisp
   (quail-define-package
    "cyrillic-my-ukrainian" "Cyrillic[UK]" "Ук" t
@@ -4807,7 +4934,7 @@ then use with a window manager keybinding
    ("h" ?г) ("H" ?Г)
    ("g" ?ґ) ("G" ?Ґ) ("h'" ?ґ) ("H'" ?Ґ)
    ("d" ?д) ("D" ?Д)
-   ("ä" ?е) ("Ä" ?Е)
+   ("ä" ?е) ("Ä" ?Е) ("ee" ?е) ("Ee" ?е)
    ("ie" ?є) ("IE" ?Є) ("Ie" ?Є)
    ("ye" ?є) ("YE" ?Є) ("Ye" ?Є)
    ("je" ?є) ("JE" ?Є) ("Je" ?Є)
@@ -4815,10 +4942,11 @@ then use with a window manager keybinding
    ("zh" ?ж) ("Zh" ?Ж) ("ZH" ?Ж) ;sh
    ("jh" ?ж) ("Jh" ?Ж) ("JH" ?Ж) ;sh
    ("jj" ?ж) ("JJ" ?Ж)
-   ("z" ?з) ("Z" ?З) ("ß" ?з) ("ẞ" ?З) ;s
+   ("z" ?з) ("Z" ?З) ("ss" ?з) ("Ss" ?з) ("SS" ?З) ("ß" ?з) ("ẞ" ?З) ;s
    ("e" ?и) ("E" ?И) ("y" ?и) ("y" ?И)
    ("i" ?і) ("I" ?І)
    ("ji" ?ї) ("Ji" ?Ї) ("JI" ?Ї)
+   ("ii" ?ї) ("Ii" ?Ї) ("II" ?Ї)
    ("yi" ?ї) ("Yi" ?Ї) ("YI" ?Ї)
    ("j" ?й) ("J" ?Й)
    ("k" ?к) ("K" ?К)
@@ -4836,23 +4964,29 @@ then use with a window manager keybinding
    ("kh" ?х) ("Kh" ?Х) ("KH" ?Х)
    ("ch" ?х) ("Ch" ?Х) ("CH" ?Х)
    ("ts" ?ц) ("tz" ?ц) ("Ts" ?Ц) ("TS" ?Ц) ("Tz" ?Ц) ("TZ" ?Ц)
+   ("zz" ?ц) ("Zz" ?Ц) ("ZZ" ?Ц)
    ("tsh" ?ч) ("tsc" ?ч) ("tsch" ?ч) ("Tsh" ?Ч) ("Tsc" ?Ч) ("Tsch" ?Ч)
-   ("sh" ?ш) ("sch" ?ш) ("Sh" ?Ш) ("SH" ?Ш)
+   ("sh" ?ш) ("sch" ?ш) ("Sh" ?Ш) ("SH" ?Ш) ("Sch" ?Ш) ("SCh" ?Ш) ("SCH" ?Ш)
 
    ("shch" ?щ) ("Shch" ?Щ) ("SHCH" ?Щ)
-   ("schtch" ?щ)
-   ("schj" ?щ)
-   ("schtsch" ?щ)
-   ("schch" ?щ)
-   ("schtsh" ?щ)
+   ("schtch" ?щ) ("Schtch" ?Щ) ("SChtch" ?Щ) ("SCHtch" ?Щ)
+   ("schj" ?щ) ("Schj" ?Щ) ("SChj" ?Щ) ("SCHj" ?Щ)
+   ("schtsch" ?щ) ("Schtsch" ?Щ) ("SChtsch" ?Щ)
+   ("schch" ?щ) ("Schch" ?Щ) ("SChch" ?Щ)
+   ("schtsh" ?щ) ("Schtsh" ?Щ) ("SChtsh" ?Щ)
    ("Sj" ?Щ) ("SJ" ?Щ)
 
-   ("'" ?ь) ("`" ?ь) ("''" ?')
    ("yu" ?ю) ("ju" ?ю) ("Yu" ?Ю) ("YU" ?Ю) ("Ju" ?Ю) ("JU" ?Ю)
    ("ya" ?я) ("ja" ?я) ("q" ?я) ("Ya" ?Я) ("YA" ?Я) ("Ja" ?Я) ("JA" ?Я) ("Q" ?Я)
 
-   ("~" ?ъ) ("~~" ?Ъ)
+   ("'" ?')
+   ("''" ?ь) ("`" ?ь) ("bb" ?ь)
+   ;; ("~" ?ъ) ("~~" ?Ъ)
    ;; ("y" ?ы) ("Y" ?Ы)
+
+   ;; Combining accents as a separate character
+   ("//'" ?́) ("//`" ?̀) ("``" ?̀)
+
    ("e\\" ?э) ("e'" ?э) ("e`" ?э) ("E\\" ?Э) ("E'" ?Э) ("E`" ?Э)
    ("u'" ?ў) ("u~" ?ў)
    ("/d" ?ђ) ("/ch" ?ћ)
@@ -4862,9 +4996,6 @@ then use with a window manager keybinding
    ("/D" ?Ђ) ("/Ch" ?Ћ) ("/CH" ?Ћ)
    ("/G" ?Ѓ) ("/S" ?Ѕ) ("/K" ?Ќ)
    ("/I" ?І) ("/J" ?Ј) ("/L" ?Љ) ("/N" ?Њ) ("/Z" ?Џ)
-
-   ;; Combining accents as a separate character
-   ("//'" ?́) ("//`" ?̀)
 
    ;; In the following two rules the accent is not a separate character
    ;; ("i`" ?ѝ) ("I`" ?Ѝ)
@@ -4929,8 +5060,6 @@ then use with a window manager keybinding
    ("/rxii" ?ⅻ)
   )
 #+end_src
-
-#+RESULTS:
 
 ** Korean hangul/jamo conversion
 
@@ -5035,25 +5164,9 @@ then use with a window manager keybinding
 
 * Functions
 ** current-file
+
 #+BEGIN_SRC emacs-lisp
-  (defun rename-current-file ()
-    "Renames both current buffer and the file it's visiting."
-    (interactive)
-    (unless (buffer-file-name)
-      (error "Buffer '%s' is not visiting a file!" (buffer-name)))
-    (let* ((new-file-name
-            (read-file-name "Rename current file to: "
-                            (file-name-directory buffer-file-name)))
-           (new-dir (f-parent new-file-name)))
-      (unless (f-dir? new-dir)
-        (make-directory new-dir t)
-        (message "Create dir %s." new-dir))
-      (rename-file buffer-file-name new-file-name)
-      (rename-buffer new-file-name)
-      (set-visited-file-name new-file-name)
-      (set-buffer-modified-p nil)
-      (setq-local default-directory (file-name-directory new-file-name))
-      (message "Current file renamed to %s." new-file-name)))
+  (defalias 'rename-current-file 'rename-visited-file)
 
   (defun delete-current-file ()
     "Deletes the current buffer and the file it's visiting."
@@ -5063,16 +5176,73 @@ then use with a window manager keybinding
     (delete-file buffer-file-name)
     (kill-buffer))
 
+  (defun link-file-to (target linkname )
+    "Soft link at LINKENAME to TARGET"
+    (interactive (list
+                  (or buffer-file-name (read-file-name "target: " default-directory))
+                  (read-file-name "linkname: " default-directory)))
+    (when (or (not (file-exists-p linkname)) (y-or-n-p (format "Override existing file at %S" linkname)))
+      (make-symbolic-link target linkname t)))
+
   (defun copy-current-filename-as-kill ()
     "Copy the current file-name into the kill ring."
     (interactive)
-    (kill-new buffer-file-name))
+    (kill-new (or buffer-file-name default-directory)))
 
   (defun copy-current-dir-as-kill ()
     "Copy the current file-name into the kill ring."
     (interactive)
     (kill-new default-directory))
+
+  (defun copy-current-line-position-as-kill ()
+    "Copy current line in file as '</path/to/file>:<line-number>' into the kill ring."
+    (interactive)
+    (let* ((root (project-root (project-current)))
+           (path (file-relative-name buffer-file-name root))
+           (path-with-line-number
+            (concat path ":" (number-to-string (line-number-at-pos)))))
+      (kill-new path-with-line-number)))
+
+  (defun copy-absolute-current-line-position-as-kill ()
+    "Copy current line in file as '</path/to/file>:<line-number>' into the kill ring."
+    (interactive)
+    (let ((path-with-line-number
+           (concat (buffer-file-name) ":" (number-to-string (line-number-at-pos)))))
+      (kill-new path-with-line-number)))
 #+END_SRC
+
+** remote
+
+#+begin_src emacs-lisp
+  (defvar-local maschm/remote-directory nil
+    "Like default-directory but the remote path when there exists a remote that mirrors this file.
+    `nil` if there is no such remote.")
+
+  (defvar-local maschm/project-current-tramp-root nil
+    "The remote path mirroring the current project i.e. the root of the current project on a remote.")
+
+  (defun maschm/project-make-remote-file-path (path)
+    (if (tramp-tramp-file-p path)
+        path
+      (file-name-concat maschm/project-current-tramp-root
+                        (maschm/project-make-relative-to-root path))))
+
+  (add-hook 'find-file-hook (defun maschm/maybe-set-remote-directory ()
+                              (when maschm/project-current-tramp-root
+                                (setq-local maschm/remote-directory
+                                            (file-name-parent-directory
+                                             (maschm/project-make-remote-file-path buffer-file-name)))
+                                )))
+#+end_src
+
+** kill
+
+#+begin_src emacs-lisp
+  (defun maschm/tramp-file-local-current-kill ()
+    (interactive)
+      (kill-new (tramp-file-local-name (car kill-ring)) t)
+    )
+#+end_src
 
 ** macro execute
 #+BEGIN_SRC emacs-lisp
@@ -5091,12 +5261,6 @@ then use with a window manager keybinding
 
 ** dir-local reload
 #+BEGIN_SRC emacs-lisp
-  (defun reload-dir-locals-for-current-buffer ()
-    "reload dir locals for the current buffer"
-    (interactive)
-    (let ((enable-local-variables :all))
-      (hack-dir-local-variables-non-file-buffer)))
-
   (defun reload-dir-locals-for-current-buffer ()
     "reload dir locals for the current buffer"
     (interactive)
@@ -5178,6 +5342,10 @@ then use with a window manager keybinding
   :config
   (with-eval-after-load 'info-look
     (dash-register-info-lookup)))
+
+(use-package plz)
+(use-package ht)
+(use-package s)
 #+end_src
 
 ** f-string
@@ -5233,11 +5401,35 @@ enjoy using a lot.
     (when m (string-to-number m))))
 #+end_src
 
+** remove-from-list
+
+#+begin_src emacs-lisp
+  (defun remove-from-list (list-var element)
+    "Remove ELEMENT from the list stored in the variable LIST-VAR."
+    (set list-var (remove element (symbol-value list-var))))
+#+end_src
+
+** reload library
+
+#+begin_src emacs-lisp
+(defun reload-library ()
+  "Prompt user to select a loaded library and reload it."
+  (interactive)
+  (let ((library (completing-read
+                  "Reload library: "
+                  (mapcar #'symbol-name features)
+                  nil t)))
+    (unload-feature (intern library) t)
+    (require (intern library))))
+#+end_src
+
 * to read
 [[info:elisp#Completion][elisp#Completion]]
 [[info:elisp#Choosing Window][elisp#Choosing Window]]
 [[info:elisp#Mode Line Variables][elisp#Mode Line Variables]]
 [[info:elisp#Quitting Windows][elisp#Quitting Windows]]
+
+[[info:eww#Advanced][eww#Advanced]]
 
 Shadow file
 https://www.emacswiki.org/emacs/ShadowFile
