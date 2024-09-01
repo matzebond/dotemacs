@@ -2753,8 +2753,7 @@ https://github.com/emacs-dashboard/emacs-dashboard
             (lambda ()
               (if init-file-had-error
                   (setq dashboard-init-info (concat dashboard-init-info
-                                                    "\n !!init file had error!!")))))
-  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))))
+                                                    "\n !!init file had error!!"))))))
 #+end_src
 
 ** Other
