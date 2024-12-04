@@ -152,6 +152,10 @@ of handy syntactic sugar and useful features.
   (general-def
     :keymaps 'global
     my-non-normal-menu-key nil)
+  (general-def
+    :keymaps 'minibuffer-mode-map
+    "<mouse-4>" 'next-line-or-history-element
+    "<mouse-5>" 'next-line-or-history-element)
   (defconst my-leader-key ",")
   (defconst my-non-normal-leader-key "M-,")
   (general-create-definer my-leader-def
@@ -189,17 +193,21 @@ of handy syntactic sugar and useful features.
 
   "B" '(:ignore t :which-key "Buffer")
   "B m" '((lambda () (interactive) (switch-to-buffer "*Messages*"))
-      :which-key "messages")
+          :which-key "messages")
   "B M" '((lambda () (interactive) (switch-to-buffer-other-window "*Messages*"))
-      :which-key "messages-in-other")
-  "B s" '((lambda () (interactive) (switch-to-buffer "*scratch*"))
-      :which-key "scratch")
+          :which-key "messages-in-other")
+  "B s" (list
+         (defun maschm/scratch-buffer (arg)
+           (interactive "P")
+           (let ((name (if arg (generate-new-buffer-name "*scratch*") "*scratch*")))
+             (switch-to-buffer name)))
+         :which-key "scratch")
   "B S" '((lambda () (interactive) (switch-to-buffer-other-window "*scratch*"))
-      :which-key "scratch-in-other")
+          :which-key "scratch-in-other")
   "B w" '((lambda () (interactive) (switch-to-buffer "*Warnings*"))
-      :which-key "warnings")
+          :which-key "warnings")
   "B W" '((lambda () (interactive) (switch-to-buffer-other-window "*Warnings*"))
-      :which-key "warnings-in-other")
+          :which-key "warnings-in-other")
   "B d" 'kill-current-buffer
   "B D" 'evil-delete-buffer
   "B r" 'revert-buffer
@@ -420,6 +428,18 @@ Disable backup & auto save for remote files.
 (add-to-list 'recentf-exclude no-littering-etc-directory)
 
 (run-at-time t (* 5 60) 'recentf-save-list)
+
+
+(defun my/list-recent-directories ()
+  "Return a list of recent directories from the recent files."
+  (delete-dups (mapcar 'file-name-directory recentf-list)))
+
+(defun my/recent-directory ()
+  "Prompt user to select a recent directory using completing-read."
+  (interactive)
+  (let ((dir (completing-read "Select recent directory: " (my/list-recent-directories))))
+    (when dir
+      (dired dir))))
 #+end_src
 
 ** Lockfile
@@ -534,11 +554,20 @@ consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all ma
     "F t" '((lambda () (interactive) (find-file (read-file-name "Find file(remote): " "/ssh:")))
             :which-key "tramp")
     "F r" '(consult-recent-file :which-key "recent")
+    "F R" '(my/recent-directory :which-key "recent dir")
     "F f" '(consult-find :which-key "recent")
     "F g" '(consult-grep :which-key "grep")
     "F l" '(consult-locate :which-key "locate")
     "r" '(consult-recent-file :which-key "recent")
-    "/" '(consult-ripgrep :which-key "search")
+    "R" '(my/recent-directory :which-key "recent dir")
+    "/" '(consult-ripgrep :which-key "search proj")
+    "\\" (list
+          (defun maschm/consult-ripgrep-here ()
+            (interactive)
+            (if current-prefix-arg
+                (call-interactively 'consult-ripgrep)
+              (funcall 'consult-ripgrep default-directory "")))
+          :which-key "search here")
     )
 
   (general-nmap
@@ -760,14 +789,18 @@ This only works with orderless and for the first component of the search."
 
   :config
   (general-def :keymaps 'embark-general-map
-    "y" '(embark-copy-as-kill :general "yank")
+    "y" '(embark-copy-as-kill :which-key "yank")
     "a" nil ; append
+    "w" nil ; copy-as-kill
+    )
+
+  (general-def :keymaps 'embark-function-map
+    "D" '(debug-on-entry :which-key "debug")
     )
 
   (general-def :keymaps 'embark-file-map
-    "Y" '(embark-copy-as-kill :general "yank full")
-    "y" '(embark-copy-as-kill :general "yank local")
-    "k" '(embark-copy-as-kill :general "yank local")
+    "Y" '(embark-copy-as-kill :which-key "yank full")
+    "y" '(copy-relative-file-as-kill :which-key "yank")
     )
 
   (general-def :keymaps 'embark-vc-file-map
@@ -908,7 +941,9 @@ targets."
   (general-def
     :states 'motion
     "g O" 'avy-goto-char-2
-    "g o" 'avy-goto-char-timer))
+    "g o" 'avy-goto-char-timer
+    "g l" 'avy-goto-line
+    "g L" 'avy-goto-line))
 #+end_src
 
 *** ace-window
@@ -1149,11 +1184,25 @@ https://github.com/noctuid/evil-guide
     "C-a" nil ; evil-paste-last-insertion
     "C-e" nil ; evil-copy-from-below
     "C-y" nil ; evil-copy-from-above
+    "C-d" nil  ; evil-shift-left-line
     )
   )
 #+END_SRC
 
 ** evil config & vim goodies
+*** toogle beginig of line
+#+begin_src emacs-lisp
+(evil-define-motion maschm/beginning-of-line-or-non-empty ()
+  "Move to the beginning of the line, or the first non-blank character if already at the beginning."
+  :type exclusive
+  (if (= (point) (line-beginning-position))
+      (evil-first-non-blank)
+    (evil-beginning-of-line)))
+
+(general-mmap
+  "0" 'maschm/beginning-of-line-or-non-empty
+  "^" nil)
+#+end_src
 *** visual line
 
 #+begin_src emacs-lisp
@@ -1399,6 +1448,7 @@ evil shifting (bound to < and >) will stay in visual mode
     "T" '(:ignore t :which-key "toogle")
     "Tp" 'org-toggle-pretty-entities
     "Ti" 'org-toggle-inline-images
+    "i" 'org-toggle-inline-images
     "Tl" 'org-latex-preview
     "l" 'org-latex-preview
     "," 'org-edit-special)
@@ -2705,6 +2755,8 @@ alternative https://github.com/Malabarba/beacon
                      evil-scroll-line-to-top
                      evil-scroll-line-to-bottom
                      evilmi-jump-items
+                     evil-search-next
+                     evil-search-previous
                      ;; mouse-set-point
                      ))
     (advice-add command :after #'pulse-line))
@@ -2973,7 +3025,8 @@ provides =consult-lsp-diagnostics=
 
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell
-  :hook (text-mode . flyspell-mode)
+  :hook ((text-mode . flyspell-mode)
+         (prog-mode . flyspell-prog-mode))
   :general
   (general-def :keymaps 'flyspell-mode-map
     "C-." nil ; flyspell-auto-correct-word
@@ -3125,6 +3178,9 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
  :keymaps 'global
  "C-c d" 'dired-jump
  "C-c D" 'dired)
+
+(general-mmap
+ "^" 'dired-jump)
 
 (general-def
  :keymaps 'dired-mode-map
@@ -3557,13 +3613,13 @@ https://github.com/ahyatt/emacs-calc-tutorials
 
 ** tramp
 
+(setq tramp-verbose 9)
+(setq tramp-verbose 6)
+
 recognize the OTP prompt of the KIT uni cluster
 
 #+begin_src emacs-lisp
-  (setq tramp-password-prompt-regexp
-        (format "^.*\\(%s\\).*:\^@? *" (regexp-opt
-                                        (cons "OTP"
-                                              password-word-equivalents))))
+(add-to-list 'password-word-equivalents "OTP")
 #+end_src
 
 #+begin_src emacs-lisp
@@ -3823,7 +3879,7 @@ emms-cache-set-from-mpd-all
 )
 #+end_src
 
-** http requests
+** http requests / restcient
 
 #+begin_src emacs-lisp
 (use-package restclient)
@@ -3888,17 +3944,20 @@ This should eventually be contributed as a feature to shr. Port to new adivce-ad
   "Do not fill text when `shr-no-fill-mode' is enabled."
   (if (bound-and-true-p shr-no-fill-mode)
       (car args) ; what?
-    (apply orig-fun args)))
+    (apply orig-fun args)
+    (visual-line-mode +1)))
 
 (defun shr-no-fill-lines-advice (orig-fun &rest args)
   "Do not fill text when `shr-no-fill-mode' is enabled."
   (unless (bound-and-true-p shr-no-fill-mode)
-    (apply orig-fun args)))
+    (apply orig-fun args)
+    (visual-line-mode +1)))
 
 (defun shr-no-fill-line-advice (orig-fun &rest args)
   "Do not fill text when `shr-no-fill-mode' is enabled."
   (unless (bound-and-true-p shr-no-fill-mode)
-    (apply orig-fun args)))
+    (apply orig-fun args)
+    (visual-line-mode +1)))
 
 (advice-add 'shr-fill-text :around #'shr-no-fill-text-advice)
 (advice-add 'shr-fill-lines :around #'shr-no-fill-lines-advice)
@@ -4125,6 +4184,7 @@ waiting for folding package based on treesit
     "h" nil
     "l" nil
     "g" nil
+    "w" nil
     "q" 'bury-buffer
     "C-o" 'devdocs-go-back
     "C-i" 'devdocs-go-forward)
@@ -4136,23 +4196,6 @@ waiting for folding package based on treesit
   ;;         (direction . right)
   ;;         (reusable-frames . visible))
   )
-#+end_src
-
-ugly hack:
-visual-line-mode triggers some kind of redrawing or recalculation of word wrap
-and thus makes the unsplited shr long lines render properly.
-devdocs-mode-map is also broken not called when the buffer is filled with the
-
-
-#+begin_src emacs-lisp
-(add-hook 'devdocs-mode-hook
-          (defun maschm/test-hook-devdocs ()
-            (run-with-idle-timer
-             0.1 nil
-             (lambda ()
-               (with-current-buffer "*devdocs*"
-                 (visual-line-mode -1)
-                 (visual-line-mode +1))))))
 #+end_src
 
 ** rainbow-delimiters
@@ -4193,7 +4236,14 @@ Highlight delimiters such as parentheses, brackets or braces according to their 
 *** TODO Closure
     https://cider.mx/
 
-*** elisp debug
+*** elisp emacs lisp
+
+#+begin_src emacs-lisp
+(general-def :keymaps 'emacs-lisp-mode-map
+  "C-c C-c" 'eval-buffer)
+#+end_src
+
+**** debug
 
 [[info:elisp#Backtraces][elisp#Backtraces]]
 [[info:elisp#Debugger Commands][elisp#Debugger Commands]]
@@ -5318,6 +5368,17 @@ My Ukrainian input method maps German sounds to Ukrainian Cyrillic letters. I do
     (kill-new path-with-line-number)))
 #+END_SRC
 
+** copy
+
+#+begin_src emacs-lisp
+(defun copy-relative-file-as-kill (file)
+  "Copy the relative path of FILE with respect to the current buffer's directory to the kill ring."
+  (interactive "fFile: ")
+  (let* ((current-dir (file-name-directory (or (buffer-file-name) default-directory)))
+         (relative-path (file-relative-name file current-dir)))
+    (kill-new relative-path)))
+#+end_src
+
 ** remote
 
 #+begin_src emacs-lisp
@@ -5556,6 +5617,41 @@ If ARG is non-nil but not a number, return nil."
                   nil t)))
     (unload-feature (intern library) t)
     (require (intern library))))
+#+end_src
+
+** ansi-color
+
+#+begin_src emacs-lisp
+(defun display-ansi-colors ()
+  (interactive)
+  (require 'ansi-color)
+  (ansi-color-apply-on-region (point-min) (point-max)))
+#+end_src
+
+** debug
+
+#+begin_src emacs-lisp
+(defun debug-on-entry-p (function)
+  "Check if FUNCTION is set to invoke debugger each time it is called."
+  (interactive "aFunction: ")
+  (advice-member-p #'debug--implement-debug-on-entry function))
+
+(defun toggle-debug-on-entry (func)
+  "Toggle `debug-on-entry` for the given function FUNC."
+  (interactive "aFunction: ")
+  (if (debug-on-entry-p func)
+        (cancel-debug-on-entry func)
+    (debug-on-entry func)))
+#+end_src
+
+** random
+
+#+begin_src emacs-lisp
+(defun goto-line-random ()
+  "Go to a random line in the current buffer."
+  (interactive)
+  (let ((total-lines (count-lines (point-min) (point-max))))
+    (goto-line (1+ (random total-lines)))))
 #+end_src
 
 * to read
