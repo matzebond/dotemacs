@@ -4012,48 +4012,226 @@ English, German, Ukrainian
 
 open ai, chat gpt
 
-
 #+begin_src emacs-lisp
 (use-package gptel
+  :defer 5
   :general
   (general-def
     :keymaps 'gptel-mode-map
     "C-c C-k" 'gptel-abort
+    "C-c <return>" 'gptel-send
+    "C-c C-<return>" 'gptel-send
+    "C-<return>" 'gptel-send
+    [remap evil-org-org-insert-heading-respect-content-below] 'maschm/gptel-org-send
+    [remap org-insert-heading-respect-content-below] 'maschm/gptel-org-send
     )
   (my-menu-def
     "RET" 'gptel-send
     "M-RET" (lambda () (interactive) (gptel-send t))
-    "A" '(:ignore t :which-key "AI")
-    "A i" '(gptel :which-key "chat" )
-    "A I" '((lambda () (interactive)
-              (display-buffer
-               (gptel (generate-new-buffer-name
-                        (concat "*" (gptel-backend-name gptel-backend) "*")))
-               gptel-display-buffer-action))
-            :which-key "new chat")
-    "A p" '(gptel-menu :which-key "prompt")
-    "A m" 'gptel-menu
-    "A s" 'gptel-menu
-    "A a" 'gptel-add
-    "A c" 'gptel-add
-    "A r" 'gptel-rewrite-menu)
+
+    "G" '(:ignore t :which-key "gptel")
+    "G g" 'gptel-menu
+    "G i" (defun maschm/gptel-scratch-ai ()
+            (interactive)
+            (gptel "*gptel-scratch*" nil nil t))
+    "G I" (list
+           (defun maschm/gptel-new ()
+             (interactive)
+             (display-buffer
+              (gptel (generate-new-buffer-name
+                      (concat "*" (gptel-backend-name gptel-backend) "*")))
+              gptel-display-buffer-action))
+           :which-key "new chat")
+    "G q" (list
+           (defun maschm/gptel-quick-question ()
+             (interactive)
+             (funcall-interactively 'gptel--suffix-send '("m" "e")))
+            :which-key "quick question")
+    "G p" '(gptel-menu :which-key "prompt")
+    "G m" (list
+           (defun maschm/gptel-choose-backend ()
+             (interactive)
+             (setq gptel-backend (car (transient-infix-read 'gptel--infix-provider))))
+           :which-key "model")
+    "G a" 'gptel-add
+    "G C" 'gptel-add
+    "G c" 'gptel-add
+    "G +" 'gptel-add
+    "G r" (list
+           (defun maschm/gptel-refactor ()
+             (interactive)
+             (gptel-rewrite-menu))
+            :which-key "quick question")
+
+    "+" 'gptel-add
+    "." (list
+         (defun maschm/gptel-at-point ()
+           (interactive)
+           (if (and (derived-mode-p 'prog-mode) (use-region-p))
+               (maschm/gptel-refactor)
+             (gptel-menu)))
+         :which-key "gptel-at-point")
+    )
+
+
+  (my-leader-def
+    "q" 'gptel-quick-question)
+
   :custom
   (gptel-default-mode 'org-mode)
-  (gptel-model "gpt-4o")
-  (gptel-expert-commands t)
+  (gptel-model 'gpt-4o)
+  (gptel-track-media t)
+
   :config
-  (setf (alist-get 'ukrainian gptel-directives) "You are a language expert helping a student fluent in German and English to learn Ukrainian. You never transliterate the Cyrillic script.")
+  (setq gptel-expert-commands t)
+  (setq-default gptel-org-branching-context nil)
+  (setf (alist-get 'ukrainian gptel-directives) "You are a multilingual language expert helping a German student learn Ukrainian. Your student is already fluent in English, but the optimal approach is to communicate in all three languages simultaneously to promote the formation of new cross-linguistic neural connections. By default, you don't translate the Cyrillic script unless requested.")
+
+  ;;(setf (alist-get 'default gptel-directives) "You are a multilingual language expert helping a German student learn Ukrainian. Your student is already fluent in English, but the optimal approach is to communicate in all three languages simultaneously to promote the formation of new cross-linguistic neural connections. By default, you don't translate the Cyrillic script unless requested.")
 
   (setf (alist-get 'org-mode gptel-response-prefix-alist) "* AI\n")
   (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "* USER\n")
-)
+  (defun maschm/gptel-org-send ()
+    (interactive)
+    (org-next-visible-heading 1)
+    (unless (eq (point) (point-max))
+      (backward-char))
+    (gptel-send))
+
+  :local
+  (prog-mode-hook . ((setq-local gptel--system-message (maschm/build-prog-message))
+                     (add-hook 'gptel-rewrite-directives-hook 'maschm/build-prog-message nil t)
+                     ))
+  (gptel-mode-hook . ((general-def
+                        :keymaps 'override
+                        "C-<return>" 'maschm/gptel-org-send))))
 #+end_src
+
+#+begin_src emacs-lisp
+(defun maschm/build-prog-message ()
+  (let ((lang-name (major-mode-to-language-name))
+        (script-name (major-mode-to-markdown-syntax)))
+    (concat "You are a careful expert " lang-name " programming assistant editing a code base through the Emacs editor.
+You are expected to answer differently depending on the type of user input you receive.
+The user will ask for your help in different ways:
+- by inserting comments, TODOS etc. into valid %0$s
+  - in this case you must change the code to address the users notes. You should output only vaild " lang-name " code. Don's use ticks.
+- by writing a mix of example " lang-name " code, natural language description and optionally pseudo code.
+  - in this case you should answer the question more general. Provide examples in " lang-name ". If it seems useful please write" (when (eq major-mode 'emacs-lisp-mode) "additional") " Emacs Lisp code to control the editor. Use markdown syntax.")))
+
+(defun major-mode-to-language-name (&optional mode)
+  "Return a human-readable language name for the given major MODE.
+If MODE is nil, use the current buffer's major mode."
+  (let ((mode (or mode major-mode)))
+    (cond
+     ((provided-mode-derived-p mode 'emacs-lisp-mode) "Emacs Lisp")
+     ((provided-mode-derived-p mode 'c-mode) "C")
+     ((provided-mode-derived-p mode 'c++-mode) "C++")
+     ((provided-mode-derived-p mode 'java-mode) "Java")
+     ((provided-mode-derived-p mode 'perl-mode) "Perl")
+     ((provided-mode-derived-p mode 'haskell-mode) "Haskell")
+     ((provided-mode-derived-p mode 'typescript-mode) "TypeScript")
+     ((provided-mode-derived-p mode 'r-mode) "R")
+     ((provided-mode-derived-p mode 'sh-mode) "shell script")
+     ((provided-mode-derived-p mode 'html-mode) "HTML")
+     ((provided-mode-derived-p mode 'css-mode) "CSS")
+     ((provided-mode-derived-p mode 'markdown-mode) "Markdown")
+     ((provided-mode-derived-p mode 'go-mode) "Go")
+     ((provided-mode-derived-p mode 'rust-mode) "Rust")
+     ((provided-mode-derived-p mode 'swift-mode) "Swift")
+     ((provided-mode-derived-p mode 'scala-mode) "Scala")
+     ((provided-mode-derived-p mode 'kotlin-mode) "Kotlin")
+     ((provided-mode-derived-p mode 'julia-mode) "Julia")
+     ((provided-mode-derived-p mode 'pascal-mode) "Pascal")
+     ((provided-mode-derived-p mode 'lua-mode) "Lua")
+     ((provided-mode-derived-p mode 'tsx-ts-mode) "TypeScript")
+     ((provided-mode-derived-p mode 'css-ts-mode) "CSS")
+     ((provided-mode-derived-p mode 'c-ts-mode) "C")
+     ((provided-mode-derived-p mode 'c++-ts-mode) "C++")
+     ((provided-mode-derived-p mode 'python-base-mode) "Python")
+     ((provided-mode-derived-p mode 'ruby-base-mode) "Ruby")
+     ((provided-mode-derived-p mode 'js-base-mode) "JavaScript")
+     ((provided-mode-derived-p mode 'web-mode) "JavaScript")
+     ((provided-mode-derived-p mode 'php-base-mode) "PHP")
+     ((provided-mode-derived-p mode 'typescript-ts-base-mode) "TypeScript")
+     ((provided-mode-derived-p mode 'r-mode) "R")
+     ((provided-mode-derived-p mode 'sh-mode) "Bash")
+     (t "Unknown Language"))))
+
+
+(defun major-mode-to-markdown-syntax (&optional mode)
+  "Return the Markdown syntax name for the given major MODE.
+If MODE is nil, use the current buffer's major mode."
+  (let ((mode (or mode major-mode)))
+    (cond
+     ((provided-mode-derived-p mode 'emacs-lisp-mode) "elisp")
+     ((provided-mode-derived-p mode 'c-mode) "c")
+     ((provided-mode-derived-p mode 'c++-mode) "cpp")
+     ((provided-mode-derived-p mode 'java-mode) "java")
+     ((provided-mode-derived-p mode 'java-ts-mode) "java")
+     ((provided-mode-derived-p mode 'perl-mode) "perl")
+     ((provided-mode-derived-p mode 'haskell-mode) "haskell")
+     ((provided-mode-derived-p mode 'typescript-mode) "typescript")
+     ((provided-mode-derived-p mode 'r-mode) "R")
+     ((provided-mode-derived-p mode 'sh-mode) "shell script")
+     ((provided-mode-derived-p mode 'html-mode) "html")
+     ((provided-mode-derived-p mode 'css-mode) "css")
+     ((provided-mode-derived-p mode 'markdown-mode) "markdown")
+     ((provided-mode-derived-p mode 'go-mode) "go")
+     ((provided-mode-derived-p mode 'rust-mode) "rust")
+     ((provided-mode-derived-p mode 'swift-mode) "swift")
+     ((provided-mode-derived-p mode 'scala-mode) "scala")
+     ((provided-mode-derived-p mode 'kotlin-mode) "kotlin")
+     ((provided-mode-derived-p mode 'julia-mode) "julia")
+     ((provided-mode-derived-p mode 'pascal-mode) "pascal")
+     ((provided-mode-derived-p mode 'lua-mode) "lua")
+     ((provided-mode-derived-p mode 'tsx-ts-mode) "typescript")
+     ((provided-mode-derived-p mode 'css-ts-mode) "css")
+     ((provided-mode-derived-p mode 'c-ts-mode) "c")
+     ((provided-mode-derived-p mode 'c++-ts-mode) "cpp")
+     ((provided-mode-derived-p mode 'python-base-mode) "python")
+     ((provided-mode-derived-p mode 'ruby-base-mode) "ruby")
+     ((provided-mode-derived-p mode 'js-base-mode) "javascript")
+     ((provided-mode-derived-p mode 'web-mode) "javascript")
+     ((provided-mode-derived-p mode 'php-base-mode) "php")
+     ((provided-mode-derived-p mode 'typescript-ts-base-mode) "typescript")
+     ((provided-mode-derived-p mode 'sh-mode) "bash")
+     (t ""))))
+#+end_src
+
+*** Coding / Software Development / aider
+#+begin_src
+(use-package aide
+  :straight (aide :host github
+                  :repo "junjizhi/aide.el"))
+#+end_src
+*** functions
+
+
 
 *** Translation
 
 DeepL
 
 ** TODO image generation
+** Programming
+*** aider
+#+begin_src emacs-lisp
+(use-package aider
+  :straight (:host github :repo "tninja/aider.el" :files ("aider.el"))
+  :general
+  (my-menu-def
+    "A" 'aider-transient-menu)
+  :config
+  ;; Use claude-3-5-sonnet cause it is best in aider benchmark
+  ;; (setq aider-args '("--model" "anthropic/claude-3-5-sonnet-20241022"))
+  ;; (setenv "ANTHROPIC_API_KEY" anthropic-api-key)
+  ;; Or use chatgpt model since it is most well known
+  ;; (setq aider-args '("--model" "gpt-4o-mini"))
+  ;; (setenv "OPENAI_API_KEY" <your-openai-api-key>)
+  (setq aider-args '("--model" "gpt-4o"))
+  )
+#+end_src
 * Programming languages
 ** prog-mode
 
