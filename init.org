@@ -4340,6 +4340,10 @@ was disabled with the switch to corfu
   :mode
   ("SConstruct" . python-mode)
   ("SConscript" . python-mode)
+  :general
+  (my-leader-def
+    :keymaps 'python-base-mode-map
+    "d" 'pdb)
   :custom
   (python-shell-dedicated 'project)
   :config
@@ -4361,8 +4365,27 @@ was disabled with the switch to corfu
    (t
     (setq python-shell-interpreter "python")))
 
+  (defcustom python-shell-setup-imports
+    '("import sys"
+      "import os"
+      "from pathlib import Path"
+      "import shutil"
+      "import json"
+      "import random"
+      "import math"
+      "from copy import deepcopy"
+      "from typing import *")
+    "List of Python imports to be used when setting up the Python shell."
+    :type '(repeat string)
+    :risky 't
+    :set (lambda (symbol value)
+           (add-to-list 'python-shell-setup-codes
+                        (mapconcat 'identity
+                                   (cons "\n" value) ;; work around a bug in how python-shell-setup-codes is used
+                                   "\n"))
+           (set-default-toplevel-value symbol value)))
 
-  (add-to-list 'python-shell-setup-codes (concat "__file__ = \"" python-shell-interpreter "\""))
+  (add-to-list 'python-shell-setup-codes (concat "\n__file__ = \"" python-shell-interpreter "\"\n"))
 
 
   (defun maschm/python-shell-other-scroll-end (&rest _)
@@ -4386,8 +4409,12 @@ was disabled with the switch to corfu
                                                  (run-python (python-shell-calculate-command) python-shell-dedicated t)))
 
   :local
-  (setq-local compile-command (concat "python " (shell-quote-argument (or buffer-file-name "")))))
+  (python-base-mode-hook . ((setq-local compile-command (concat "python " (shell-quote-argument (or buffer-file-name "")))))))
+#+end_src
 
+*** completion
+
+#+begin_src emacs-lisp
 (use-package lsp-pyright
   :hook ((python-base-mode . (lambda () (require 'lsp-pyright) (lsp-deferred)))) ; or lsp
   :init
@@ -4426,8 +4453,18 @@ was disabled with the switch to corfu
   (setq lsp-pylsp-plugins-yapf-enabled nil)
   )
 
+
+(use-package pdb-capf)
+
+#+end_src
+
+*** TODO environment
+look into poetry-tracking-mode and poetry-tracking-strategy
+
+#+begin_src emacs-lisp
 (use-package pyvenv
   :after python
+  :commands (pyvenv-track-virtualenv)
   :config
   (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("P:" (string-remove-prefix ".venv-" pyvenv-virtual-env-name))))
   (pyvenv-mode)
@@ -4439,16 +4476,26 @@ was disabled with the switch to corfu
   :ensure t)
 #+end_src
 
-**** TODO poetry
-look into poetry-tracking-mode and poetry-tracking-strategy
-
 *** pytest
 
 #+begin_src emacs-lisp
-(use-package python-pytest)
+(use-package python-pytest
+  :general
+  (my-leader-def
+    :keymaps 'python-base-mode-map
+    "t" 'python-pytest-dispatch)
+
+  )
+
+(add-hook 'python-pytest-mode-hook
+          (lambda ()
+            (add-hook 'completion-at-point-functions
+                      'pdb-capf nil t)))
 #+end_src
 
-*** misc
+wbolster/emacs-python-coverage seems interesting as well
+
+*** custom python related functions
 
 #+begin_src emacs-lisp
 ;; (require 'project) ; to load  maschm/project-make-relative-to-root
@@ -4460,10 +4507,10 @@ look into poetry-tracking-mode and poetry-tracking-strategy
 (defun python-current-defun ()
   (or (python-info-current-defun)
       (save-excursion
-      ;; As a fallback, jumping seems to make it work on empty lines.
-      (python-nav-beginning-of-defun)
-      (python-nav-forward-statement)
-      (python-info-current-defun))
+        ;; As a fallback, jumping seems to make it work on empty lines.
+        (python-nav-beginning-of-defun)
+        (python-nav-forward-statement)
+        (python-info-current-defun))
       (user-error "No class/function found")))
 
 (defun python-defun-path ()
@@ -4471,12 +4518,19 @@ look into poetry-tracking-mode and poetry-tracking-strategy
         (cur-def (python-current-defun))) ;; todo improve with treesit knowledge
     (concat module-path "." cur-def)))
 
+(defun python-pytest-path ()
+  (let ((path (maschm/project-make-relative-to-root buffer-file-name))
+        (cur-def (python-current-defun))) ;; todo improve with treesit knowledge
+    (concat path "::" cur-def)))
+
 (defun copy-current-defun-path-as-kill ()
   (interactive)
   (kill-new (python-defun-path)))
-#+end_src
 
-*** TODO https://github.com/wbolster/emacs-python-pytest
+(defun copy-current-pytest-path-as-kill ()
+  (interactive)
+  (kill-new (python-pytest-path)))
+#+end_src
 
 *** jupyter
 
