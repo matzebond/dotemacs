@@ -3384,9 +3384,11 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   (defalias 'describe-symbol 'helpful-symbol)
   (defalias 'describe-key 'helpful-key)
 
-  ;; pay initial cost early
-  (require 'info-look)
-  (info-lookup-setup-mode 'symbol 'emacs-lisp-mode))
+  :local
+  (emacs-startup-hook . ((require 'info-look)
+                         ;; pay initial cost early
+                        (info-lookup-setup-mode 'symbol 'emacs-lisp-mode)
+                        )))
 #+END_SRC
 
 *** embark become keymap for helpful commands
@@ -3656,6 +3658,16 @@ recognize the OTP prompt of the KIT uni cluster
     (format "\\(%s\\)\\|\\(%s\\)"
             vc-ignore-dir-regexp
             tramp-file-name-regexp))
+#+end_src
+
+*** disable slow function on remote
+
+#+begin_src emacs-lisp
+(defun execute-only-local-advice (orig-fun &rest args)
+  (unless (file-remote-p default-directory)
+    (apply orig-fun args)))
+
+(advice-add 'magit-turn-on-auto-revert-mode-if-desired :around 'execute-only-local-advice)
 #+end_src
 
 *** TODO project-remote
@@ -3930,6 +3942,30 @@ Content-Type: application/json
 // Request duration: 0.201149s
 #+END_SRC
 
+#+begin_src restclient
+GET http://tt-agent-service.k.fal-dev.deepl.dev/api/task?userId=d3cb8bfd-acdd-4c22-8876-2971953f6d51
+GET http://tt-agent-web.k.fal-dev.deepl.dev/api
+#+end_src
+
+#+RESULTS:
+#+BEGIN_SRC html
+<html>
+<head><title>503 Service Temporarily Unavailable</title></head>
+<body>
+<center><h1>503 Service Temporarily Unavailable</h1></center>
+<hr><center>nginx</center>
+</body>
+</html>
+
+<!-- GET http://tt-agent-service.k.fal-dev.deepl.dev/api/task?userId=d3cb8bfd-acdd-4c22-8876-2971953f6d51 -->
+<!-- HTTP/1.1 503 Service Temporarily Unavailable -->
+<!-- Date: Wed, 09 Oct 2024 16:12:28 GMT -->
+<!-- Content-Type: text/html -->
+<!-- Content-Length: 190 -->
+<!-- Connection: keep-alive -->
+<!-- Request duration: 0.135381s -->
+#+END_SRC
+
 * Web
 ** TODO shr / simple html rendering
 
@@ -3984,6 +4020,21 @@ This should eventually be contributed as a feature to shr. Port to new adivce-ad
   :config
   ()
   )
+#+end_src
+
+** browse-url
+
+#+begin_src emacs-lisp
+(setq browse-url-handlers '(("wiktionary" . eww-browse-url)))
+#+end_src
+
+** webjump
+
+#+begin_src emacs-lisp
+(use-package webjumb
+  :straight nil
+  :config
+  (add-to-list 'webjump-sites '("Wiktionary" . [simple-query "en.wiktionary.org" "https://en.wiktionary.org/wiki/" ""])))
 #+end_src
 
 * AI
