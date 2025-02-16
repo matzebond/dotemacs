@@ -454,6 +454,7 @@ https://github.com/junyi-hou/i3-mode
 
 #+begin_src emacs-lisp
 (use-package f)
+(require 'windmove)
 (use-package i3-mode
   :straight (i3-mode :repo "junyi-hou/i3-mode" :host github
                      :files ("i3-mode.el" "i3-call" "sway-call"))
@@ -517,16 +518,45 @@ https://github.com/junyi-hou/i3-mode
              (abort-minibuffers))))
 
 (defun maschm/my-quit ()
-  "quite the top-most minibuffer"
+  "Quit the top-most minibuffer or annoying buffer"
   (interactive)
-  (if (minibuffer-window-active-p (selected-window))
-      (exit-minibuffer)
-    (if-let ((mb (active-minibuffer-window)))
-        (with-selected-window mb
-          (let ((inhibit-message t)
-                (minibuffer-message-timeout 0))
-              (abort-minibuffers)))
-      (keyboard-quit))))
+  (cond
+   ((minibuffer-window-active-p (selected-window))
+    (debug)
+    (exit-minibuffer))
+   ((active-minibuffer-window)
+    (with-selected-window (active-minibuffer-window)
+      (let ((inhibit-message t)
+            (minibuffer-message-timeout 0))
+        (abort-minibuffers))))
+   ((get-buffer-window "*Help*")
+    (quit-windows-on "*Help*"))
+   ((get-buffer-window "*Backtrace*")
+    (quit-windows-on "*Backtrace*"))
+   ((get-buffer-window "*Warnings*")
+    (quit-windows-on "*Warnings*"))
+   ((get-buffer-window "*Diff*")
+    (quit-windows-on "*Diff*"))
+   ((if-let ((buffer (get-buffer-window "*devdocs*")))
+        (quit-windows-on buffer)))
+   ((if-let ((buffer (get-buffer-window-by-regex "^magit")))
+        (quit-windows-on buffer)))
+   ((if-let ((buffer (get-buffer-window-by-regex "^\\*helpful")))
+        (quit-windows-on buffer)))
+   ((if-let ((buffer (get-buffer-window-by-regex "^\\*info")))
+        (quit-windows-on buffer)))
+   ((if-let ((buffer (get-buffer-window-by-regex "^\\*")))
+        (quit-windows-on buffer)))
+                                        ; not sure when this is triggered
+   (t (keyboard-quit))))
+
+(defun get-buffer-window-by-regex (regex)
+  "Return first visible buffer whose name matches REGEX.
+Visible means the buffer is currently displayed in some window."
+  (cl-find-if
+   (lambda (buf)
+     (string-match-p regex (buffer-name buf)))
+   (mapcar #'window-buffer (window-list))))
 
 (general-def 'global "C-g" 'maschm/my-quit)
 (general-def :states 'visual "C-g" 'evil-normal-state)
