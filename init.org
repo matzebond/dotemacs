@@ -3404,7 +3404,14 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   "H d" '(:ignore t :which-key "Debug")
   "H d e" 'debug-on-entry
   "H d E" 'cancel-debug-on-entry
-  "H p" 'profiler-start
+  "H p" (list
+         (defun maschm/profiler-toogle ()
+           (interactive)
+           (if (not (profiler-running-p))
+               (call-interactively 'profiler-start)
+             (profiler-stop)
+             (profiler-report)))
+         :which-key "profiler")
   "H P" '(:ignore t :which-key "Profiler")
   "H P p" 'profiler-start
   "H P s" 'profiler-stop
