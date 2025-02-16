@@ -697,7 +697,7 @@ Use `consult-line` search as last evil/isearch string copied from [[https://gith
   "Add latest `consult-line' search pattern to the evil search history ring.
 This only works with orderless and for the first component of the search."
   (when (bound-and-true-p evil-mode)
-    (let ((pattern (car (orderless-pattern-compiler (car consult--line-history)))))
+    (let ((pattern (cadr (orderless-compile (car consult--line-history)))))
       (add-to-history
        'regexp-search-ring
        pattern
