@@ -3848,12 +3848,15 @@ When compiling follow the buffer
 #+begin_src emacs-lisp
 (use-package calendar
   :custom
+  (calendar-date-style 'european)
   (calendar-week-start-day 1)
   (calendar-latitude 50.775556)
   (calendar-longitude 6.083611)
-  ;; (calendar-time-zone 60)
-  ;; (calendar-standard-time-zone-name "CET")
-  ;; (calendar-daylight-time-zone-name "CEST")
+  (calendar-time-zone 60)
+  (calendar-standard-time-zone-name "CET")
+  (calendar-daylight-time-zone-name "CEST")
+  :config
+  (add-hook 'calendar-today-visible-hook 'calendar-mark-today)
   )
 #+end_src
 
