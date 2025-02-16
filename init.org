@@ -1251,12 +1251,36 @@ evil shifting (bound to < and >) will stay in visual mode
 (defun maschm/visual-restore-after-shift (&rest _)
   "Restore visual selection."
   (if (evil-visual-state-p)
-  (progn
-      (evil-normal-state)
-    (evil-visual-restore))))
-
+      (progn
+        (evil-normal-state)
+        (evil-visual-restore))))
 (advice-add 'evil-shift-right :after #'maschm/visual-restore-after-shift)
 ;; (advice-remove 'evil-shift-right #'maschm/visual-restore-after-shift)
+
+(advice-add 'evil-org-> :after #'maschm/visual-restore-after-shift)
+#+end_src
+
+*** evil read only adjust insert position
+
+#+begin_src emacs-lisp
+(defun maschm/adjust-point-for-readonly (&rest _)
+  (let* ((pos (point))
+         (before-readonly (and (> pos (point-min))
+                             (get-text-property (1- pos) 'read-only)))
+         (at-readonly (get-text-property pos 'read-only))
+         (after-readonly (and (< pos (point-max))
+                            (get-text-property (1+ pos) 'read-only))))
+
+    (cond
+     ;; check if current pos is readonly
+     (at-readonly
+      (while (and (< pos (point-max))
+                  (get-text-property pos 'read-only))
+        (setq pos (1+ pos)))
+      (goto-char pos))
+     )))
+
+(add-hook 'evil-insert-state-entry-hook 'maschm/adjust-point-for-readonly )
 #+end_src
 
 ** evil-collection
