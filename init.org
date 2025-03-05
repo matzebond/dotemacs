@@ -2974,10 +2974,11 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
   (lsp-file-watch-threshold 1500)
   (lsp-disabled-clients '((python-mode . (pylsp pyls))
                           (python-ts-mode . (pylsp pyls))))
+  (lsp-auto-register-remote-clients nil)
   :config
   (setq lsp-idle-delay 0.500)
   (setq lsp-log-io nil)
-  (setq lsp--client-packages-required t) ;; fixes error when requiring
+  ;; (setq lsp--client-packages-required t) ;; fixes error when requiring
 
   ;; :local
   ;; (lisp-interaction-mode-hook . ((symex-mode)
@@ -3520,6 +3521,7 @@ Sends an EOF only if point is at the end of the buffer and there is no input."
   (setq-default comint-input-ignoredups t)
   (setq-default comint-scroll-to-bottom-on-input t)
   (setq comint-buffer-maximum-size 4048)
+  (setq comint-terminfo-terminal "xterm-256color")
 
   (general-def
     :keymaps 'comint-mode-map
