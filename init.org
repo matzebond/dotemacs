@@ -339,9 +339,15 @@ https://github.com/purcell/exec-path-from-shell
   :if (daemonp)
   :demand
   :config
-  (add-to-list 'exec-path-from-shell-variables '"SSH_AUTH_SOCK")
-  (add-to-list 'exec-path-from-shell-variables '"MOZ_ENABLE_WAYLAND")
-  (add-to-list 'exec-path-from-shell-variables '"QT_QPA_PLATFORM")
+  (add-to-list 'exec-path-from-shell-variables "SSH_AUTH_SOCK")
+  (add-to-list 'exec-path-from-shell-variables "MOZ_ENABLE_WAYLAND")
+  (add-to-list 'exec-path-from-shell-variables "QT_QPA_PLATFORM")
+  (add-to-list 'exec-path-from-shell-variables "ANTHROPIC_API_KEY")
+  (add-to-list 'exec-path-from-shell-variables "GOOGLE_API_KEY")
+  (add-to-list 'exec-path-from-shell-variables "OPENAI_API_KEY")
+  (add-to-list 'exec-path-from-shell-variables "OPENAI_RSPROXY_TT_API_KEY")
+  (add-to-list 'exec-path-from-shell-variables "OPENAI_UNDERLYING_API_KEY")
+  (add-to-list 'exec-path-from-shell-variables "PERPLEXITY_API_KEY")
   (exec-path-from-shell-initialize))
 #+end_src
 
