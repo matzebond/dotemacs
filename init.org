@@ -5431,9 +5431,8 @@ My Ukrainian input method maps German sounds to Ukrainian Cyrillic letters. I do
 
 #+begin_src emacs-lisp
 (quail-define-package
- "cyrillic-my-ukrainian" "Cyrillic[UK]" "Ук" t
- "My Ukrainian layout."
- nil t t t t nil nil nil nil nil t)
+ "cyrillic-my-ukrainian" "Cyrillic[UK]" "🇺🇦"
+ t "My Ukrainian layout." nil t t t t nil nil nil nil nil t)
 
 (quail-define-rules
  ("a" ?а) ("A" ?А)
@@ -5495,15 +5494,15 @@ My Ukrainian input method maps German sounds to Ukrainian Cyrillic letters. I do
  ;; Combining accents as a separate character
  ("//'" ?́) ("//`" ?̀) ("``" ?̀)
 
- ("e\\" ?э) ("e'" ?э) ("e`" ?э) ("E\\" ?Э) ("E'" ?Э) ("E`" ?Э)
- ("u'" ?ў) ("u~" ?ў)
- ("/d" ?ђ) ("/ch" ?ћ)
- ("/g" ?ѓ) ("/s" ?ѕ) ("/k" ?ќ)
- ("/j" ?ј) ("/l" ?љ) ("/n" ?њ) ("/z" ?џ)
- ("U'" ?Ў) ("U~" ?Ў)
- ("/D" ?Ђ) ("/Ch" ?Ћ) ("/CH" ?Ћ)
- ("/G" ?Ѓ) ("/S" ?Ѕ) ("/K" ?Ќ)
- ("/I" ?І) ("/J" ?Ј) ("/L" ?Љ) ("/N" ?Њ) ("/Z" ?Џ)
+ ;; ("e\\" ?э) ("e'" ?э) ("e`" ?э) ("E\\" ?Э) ("E'" ?Э) ("E`" ?Э)
+ ;; ("u'" ?ў) ("u~" ?ў)
+ ;; ("/d" ?ђ) ("/ch" ?ћ)
+ ;; ("/g" ?ѓ) ("/s" ?ѕ) ("/k" ?ќ)
+ ;; ("/j" ?ј) ("/l" ?љ) ("/n" ?њ) ("/z" ?џ)
+ ;; ("U'" ?Ў) ("U~" ?Ў)
+ ;; ("/D" ?Ђ) ("/Ch" ?Ћ) ("/CH" ?Ћ)
+ ;; ("/G" ?Ѓ) ("/S" ?Ѕ) ("/K" ?Ќ)
+ ;; ("/I" ?І) ("/J" ?Ј) ("/L" ?Љ) ("/N" ?Њ) ("/Z" ?Џ)
 
  ;; In the following two rules the accent is not a separate character
  ;; ("i`" ?ѝ) ("I`" ?Ѝ)
