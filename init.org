@@ -4690,8 +4690,14 @@ was disabled with the switch to corfu
       "import json"
       "import random"
       "import math"
-      "from copy import deepcopy"
-      "from typing import *")
+      "import time"
+      "import datetime"
+      "from copy import deepcopy, copy"
+      "from collections import defaultdict"
+      "from typing import *"
+      "from rich import print, print_json"
+      "import numpy as np"
+      "import pandas as pd")
     "List of Python imports to be used when setting up the Python shell."
     :type '(repeat string)
     :risky 't
@@ -4800,9 +4806,16 @@ look into poetry-tracking-mode and poetry-tracking-strategy
   :general
   (my-leader-def
     :keymaps 'python-base-mode-map
-    "t" 'python-pytest-dispatch)
-
+    "r" 'python-pytest-repeat
+    "t" 'python-pytest-run-def-or-class-at-point-dwim
+    "T" 'python-pytest-dispatch
+    "F" 'python-pytest-file-dwim)
+  (my-leader-def
+    "r" 'python-pytest-repeat)
+  :custom
+  (python-pytest-unsaved-buffers-behavior' save-all)
   )
+
 
 (add-hook 'python-pytest-mode-hook
           (lambda ()
