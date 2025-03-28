@@ -3487,6 +3487,22 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    Intentionally disable anyway?
    Which buffer are in view mode?
 
+** olivetti
+
+#+begin_src emacs-lisp
+(use-package olivetti
+  :custom
+  (olivetti-body-width 150)
+  )
+
+(use-package auto-olivetti
+  :straight (auto-olivetti :host sourcehut :repo "ashton314/auto-olivetti")
+  :custom
+  (auto-olivetti-enabled-modes '(text-mode prog-mode Info-mode))
+  :config
+  (auto-olivetti-mode))
+#+end_src
+
 ** messages-buffer
    enable "q" to burry-window in messages-buffer-mode and more generally
    special mode
