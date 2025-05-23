@@ -3821,25 +3821,100 @@ recognize the OTP prompt of the KIT uni cluster
 When compiling follow the buffer
 
 #+BEGIN_SRC emacs-lisp
-(evil-set-initial-state 'compilation-mode 'motion)
+(use-package compile
+  :general
+  (general-def
+    :keymaps 'compilation-mode-map
+    "g" nil
+    "gr" 'recompile)
 
-(setq compilation-scroll-output t)
-;; Don't stop on info or warnings.
-(setq compilation-skip-threshold 2)
-;; Stop on the first error with known location.
-(setq compilation-auto-jump-to-first-error 'first-known)
+  :config
+  (evil-set-initial-state 'compilation-mode 'motion)
 
-(add-hook 'compilation-mode-hook 'follow-mode)
+  (setq compilation-scroll-output t)
+  ;; Don't stop on info or warnings.
+  (setq compilation-skip-threshold 2)
+  ;; Stop on the first error with known location.
+  (setq compilation-auto-jump-to-first-error 'first-known)
 
-(defun colorize-compilation-buffer ()
-  (let ((buffer-read-only nil))
-      (ansi-color-apply-on-region compilation-filter-start (point))))
-(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+  (add-hook 'compilation-mode-hook 'follow-mode)
 
-(general-def
-  :keymaps 'compilation-mode-map
-  "g" nil
-  "gr" 'recompile)
+  (defcustom compilation-auto-jump-ignored-file-regexes nil
+    "List of regular expressions for files to ignore in compilation buffers.
+When a file name matches any of these regexes, `compilation--file-known-p'
+will return nil even if the file can be found."
+    :type '(repeat regexp)
+    :group 'compilation)
+
+  (setq compilation-auto-jump-ignored-file-regexes '("python*/site-packages"))
+
+  (defun compilation--file-known-p ()
+    "Say whether the file under point can be found.
+Return nil if the file matches any regex in `compilation-ignored-file-regexes'."
+    (when-let* ((msg (get-text-property (point) 'compilation-message))
+		(loc (compilation--message->loc msg))
+		(file-name (cadr (car (compilation--loc->file-struct loc))))
+		(not-ignored (not (seq-some (lambda (regex)
+                                              (string-match-p regex file-name))
+                                            compilation-auto-jump-ignored-file-regexes)))
+		(elem (compilation-find-file-1
+                       (point-marker)
+                       (caar (compilation--loc->file-struct loc))
+                       file-name
+                       (compilation--file-struct->formats
+			(compilation--loc->file-struct loc)))))
+      (car elem)))
+
+  (add-to-list 'compilation-error-regexp-alist-alist
+               `(python-stacktrace
+                 ,(rx (group "/" (+ (not (in "(")))) ; file path
+                     "("
+                     (group (+ digit))          ; line number
+                     ")"
+                     (? (+ (not (in ")"))))     ; optional function name
+                     )
+		 1 2))
+
+  (add-to-list 'compilation-error-regexp-alist 'python-stacktrace)
+  )
+#+END_SRC
+
+*** color
+https://github.com/atomontage/xterm-color
+
+#+begin_src emacs-lisp
+(setq compilation-environment '("TERM=xterm-256color"))
+
+(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
+(add-hook 'compilation-filter-hook 'ansi-osc-compilation-filter)
+
+;; look into xterm-color
+
+;; (setq comint-output-filter-functions
+;;       (remove 'ansi-color-process-output comint-output-filter-functions))
+
+;; (add-hook 'shell-mode-hook
+;;           (lambda ()
+;;             ;; Disable font-locking in this buffer to improve performance
+;;             (font-lock-mode -1)
+;;             ;; Prevent font-locking from being re-enabled in this buffer
+;;             (make-local-variable 'font-lock-function)
+;;             (setq font-lock-function (lambda (_) nil))
+;;             (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t)))
+
+;; Also set TERM accordingly (xterm-256color) in the shell itself.
+#+end_src
+
+*** fancy-compilation
+
+ansi filter look better?
+
+#+BEGIN_SRC emacs-lisp :tangle no
+(use-package fancy-compilation
+  :commands (fancy-compilation-mode))
+
+;; (with-eval-after-load 'compile
+;;   (fancy-compilation-mode))
 #+END_SRC
 
 ** image
