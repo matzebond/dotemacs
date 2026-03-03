@@ -1,3 +1,25 @@
-alias l ls -lAh $*
-alias ssh cd /ssh:$1:~
+alias .. cd ..
+alias ... cd ../..
+alias .... cd ../../..
+
+alias ls ls -v --group-directories-first --color=auto
+alias l ls -alh $*
 alias ll ls -alh $*
+alias ssh cd /ssh:$1:~
+
+alias cp cp -i
+alias rmf rm -rf
+alias rm rm -i
+alias df df -h
+alias tree tree -C
+alias split split -d -a 3
+alias fuck sudo !!
+alias rg rg --hidden --glob '!.git'
+alias pkill pkill -f 
+
+# python
+alias my_pdb "python -m ipdb -c continue "
+
+# git
+alias ga git add 
+alias gcm git commit -m 
