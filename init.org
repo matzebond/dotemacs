@@ -3241,68 +3241,27 @@ provides =consult-lsp-diagnostics=
 #+end_src
 
 ** TODO Spelling
-*** ispell
+*** jinx
 
-#+BEGIN_SRC emacs-lisp
-(setq ispell-dictionary "en")
-
-(cond
- ((executable-find "hunspell")
-  (require 'ispell)
-  (setq ispell-program-name "hunspell")
-
-  ;; Please note that `ispell-local-dictionary` itself will be passed to hunspell cli with "-d"
-  ;; it's also used as the key to lookup ispell-local-dictionary-alist
-  ;; if we use different dictionary
-  (setq ispell-dictionary "de_DE,en_US-large") ; ,uk_UA
-  ;; (setq-default ispell-local-dictionary "en_US")
-  ;; (setq ispell-local-dictionary-alist
-  ;;   '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
-  ;; ispell-set-spellchecker-params has to be called
-  ;; before ispell-hunspell-add-multi-dic will work
-  (ispell-set-spellchecker-params)
-  (ispell-hunspell-add-multi-dic "de_DE,en_US-large") ; ,uk_UA
-  (setq ispell-personal-dictionary "~/.hunspell_personal")
-  (unless (file-exists-p ispell-personal-dictionary)
-    (write-region "" nil ispell-personal-dictionary nil 0)))
- ((executable-find "aspell")
-  (require 'ispell)
-  ;; you may also need `ispell-extra-args'
-  (setq ispell-program-name "aspell"))
- (t
-  (message "no ispell program")
-  (setq ispell-program-name nil)))
-#+END_SRC
-
-*** flyspell
-
-#+BEGIN_SRC emacs-lisp
-(use-package flyspell
-  :hook ((text-mode . flyspell-mode)
-         (prog-mode . flyspell-prog-mode))
+#+begin_src emacs-lisp
+(use-package jinx
+  :hook (emacs-startup . global-jinx-mode)
   :general
-  (general-def :keymaps 'flyspell-mode-map
-    "C-." nil ; flyspell-auto-correct-word
-    "C-;" nil ;flyspell-auto-correct-previous-word
-    "C-," nil ;flyspell-goto-next-error
-    "C-M-i" nil ;flyspell-auto-correct-word
-    )
-  :config
-  ;; do flyspell-buffer after changing the dictionary
-  (defun flyspell-buffer-after-change-dict (&rest args)
-    (if (< (count-words (point-min) (point-max)) 1000) (flyspell-buffer)))
-  (advice-add 'ispell-change-dictionary :after #'flyspell-buffer-after-change-dict)
-
-  ;; ommit error messages on spell checking for performance sake
-  (setq flyspell-issue-message-flag nil))
-
-(use-package flyspell-correct
-  :after flyspell
-  :general
-  (general-nmap
-    "z =" 'flyspell-correct-wrapper)
+  (general-def :keymaps 'global
+    "M-$" 'jinx-correct-word
+    "C-M-$" #'jinx-languages)
+  (general-nmap "z =" 'jinx-correct-word)
+  :custom
+  (jinx-languages "en_US-large de_DE")
+  ;; looks like uk_UA hides English errors
+  ;; (jinx-languages "en_US-large de_DE uk_UA")
   )
-#+End_SRC
+
+#+end_src
+
+(defun flyspell-buffer-after-change-dict (&rest args)
+  (if (< (count-words (point-min) (point-max)) 1000) (flyspell-buffer))))
+(advice-add 'ispell-change-dictionary :after #'flyspell-buffer-after-change-dict)
 
 ** Thesaurus
 
