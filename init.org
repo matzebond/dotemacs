@@ -1281,9 +1281,22 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 #+end_src
 
 * Evil
-** undo-tree
+** undo
+*** undo-fu
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
+(use-package undo-fu)
+#+end_src
+
+*** vundo
+
+#+begin_src emacs-lisp
+(use-package vundo)
+#+end_src
+
+*** undo-tree (DEPRECATED)
+
+#+BEGIN_SRC emacs-lisp :tangle no
 (use-package undo-tree
   :demand
   :diminish undo-tree-mode
@@ -1317,7 +1330,7 @@ https://github.com/noctuid/evil-guide
   (setq evil-want-C-u-scroll t)
   (setq evil-want-Y-yank-to-eol t)
   :custom
-  (evil-undo-system 'undo-tree)
+  (evil-undo-system 'undo-fu)
   (evil-symbol-word-search t) ; * and # search for symbols
   :config
   (evil-mode 1)
