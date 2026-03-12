@@ -2396,10 +2396,33 @@ add https://github.com/jgru/consult-org-roam ?
   (magit-section-disable-line-numbers nil)
   (magit-section-initial-visibility-alist '((stashes . hide) (untracked . hide)))
   (magit-status-initial-section '(((unstaged) (status)) 1))
+  (magit-commit-ask-to-stage 'stage)
+  (magit-list-refs-sortby "-creatordate")
   :config
   (setq magit-diff-refine-hunk t)
-  :local
-  (git-commit-mode-hook . ((setq-local ispell-local-dictionary "en_US-large"))))
+
+  (transient-append-suffix 'magit-push '(0 -1)
+    '("=s" "Skip gitlab pipeline" "--push-option=ci.skip"))
+
+  (transient-append-suffix 'magit-push "-F"
+    `("-o" "Transmit string" ("-o" "--push-option=")
+      :multi-value repeat
+      :choices ,(map-apply (lambda (str suf)
+                             (let ((fmt #("%s (%s)" 2 7
+                                          (face completions-annotations))))
+                               (propertize str 'display (format fmt str suf))))
+                           '(("skip-ci" . "SourceHut")
+                             ("ci.skip" . "GitLab")
+                             ;; ("merge_request.create --push-option=merge_request.auto_merge" . "MR")
+                             ("merge_request.create" . "MR-c")
+                             ("merge_request.auto_merge" . "MR-a")
+                             ("merge_request.target=main" . "MR-m")
+                             ("merge_request.squash" . "MR-s")
+                             ("merge_request.draft" . "MR-d")
+                             ("merge_request.remove_source_branch". "MR-x")
+                           ;; (merge_request.title=". "MR-t")
+                           ))))
+  )
 #+END_SRC
 
 ** Forge
@@ -3123,6 +3146,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-use-plists t)
   :hook
   (rust-mode . lsp-deferred)
   ;; if you want which-key integration
@@ -3157,14 +3181,16 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
   ;;                                 (symex-mode-interface)))
 
   :local
-  (lsp-completion-mode-hook . ((setf (alist-get 'styles
-                                                (alist-get 'lsp-capf completion-category-defaults))
-                                     '(flex))
-                               (setq-local
-                                evil-goto-definition-functions
-                                '(evil-goto-definition-xref evil-goto-definition-search)
-                                )
-                               )))
+  (lsp-completion-mode-hook
+   . ((setf (alist-get
+             'styles
+             (alist-get 'lsp-capf completion-category-defaults))
+            '(orderless))
+      (setq-local
+       evil-goto-definition-functions
+       '(evil-goto-definition-xref evil-goto-definition-search)
+       )
+      )))
 
 (use-package lsp-ui
   :commands lsp-ui-mode
@@ -3287,47 +3313,13 @@ provides =consult-lsp-diagnostics=
   (synosaurus-choose-method 'default))
 #+end_src
 
-* Semantic
-** TODO srefactor
-
-#+BEGIN_SRC emacs-lisp :tangle no
-(use-package srefactor
-  :defer
-  ;;:general
-)
-#+END_SRC
-
-** tree-sitter
+** Copilot
 
 #+begin_src emacs-lisp
-(setq treesit-language-source-alist
-      '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-        (cmake "https://github.com/uyha/tree-sitter-cmake")
-        (css "https://github.com/tree-sitter/tree-sitter-css")
-        (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-        (go "https://github.com/tree-sitter/tree-sitter-go")
-        (html "https://github.com/tree-sitter/tree-sitter-html")
-        (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-        (json "https://github.com/tree-sitter/tree-sitter-json")
-        (make "https://github.com/alemuller/tree-sitter-make")
-        (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-        (python "https://github.com/tree-sitter/tree-sitter-python")
-        (rust "https://github.com/tree-sitter/tree-sitter-rust")
-        (toml "https://github.com/tree-sitter/tree-sitter-toml")
-        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-        (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-
-;; (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
-
-(setq major-mode-remap-alist
- '((yaml-mode . yaml-ts-mode)
-   (bash-mode . bash-ts-mode)
-   (js2-mode . js-ts-mode)
-   (typescript-mode . typescript-ts-mode)
-   (json-mode . json-ts-mode)
-   (css-mode . css-ts-mode)
-   (python-mode . python-ts-mode)))
+(use-package copilot
+  :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+  :commands (copilot-diagnose copilot-login)
+  )
 #+end_src
 
 * Modes
@@ -3861,17 +3853,10 @@ Sends an EOF only if point is at the end of the buffer and there is no input."
     ))
 #+end_src
 
+*** color
+look into https://github.com/atomontage/xterm-color
+
 *** TODO insert mode at newest prompt
-** calc
-
-#+begin_src emacs-lisp
-(my-menu-def
-  "c" '(quick-calc :which-key "calc")
-  "C" '(calc-dispatch :which-key "calc-dispatch"))
-#+end_src
-
-https://github.com/ahyatt/emacs-calc-tutorials
-
 ** eshell
 
 #+BEGIN_SRC emacs-lisp
