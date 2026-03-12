@@ -4,7 +4,7 @@
 #+OPTIONS: toc:nil
 #+PROPERTY: header-args:emacs-lisp :tangle yes :comments link :results silent
 
-This is my emacs configuration file in literate style as an org mode file.
+This is my Emacs configuration file in literate style as an org mode file.
 
 * Preface
 
@@ -147,7 +147,7 @@ of handy syntactic sugar and useful features.
     :prefix my-menu-key
     :non-normal-prefix my-non-normal-menu-key)
   (my-menu-def
-    "?" '(general-describe-keybindings :which-key "show bindings")
+    "H ?" '(general-describe-keybindings :which-key "show bindings")
     "u" '(universal-argument :which-key "C-u"))
   (general-def
     :keymaps 'global
@@ -181,15 +181,20 @@ of handy syntactic sugar and useful features.
 
     (execute-kbd-macro (kbd "M-SPC"))))
 
-*** Buffer & Window menu
+*** Window & Buffer management
+*** Window & Buffer keybindings menu - SPC B
 
 #+BEGIN_SRC emacs-lisp
 (my-menu-def
   "<tab>" '(mode-line-other-buffer :which-key "last-buffer")
+  "TAB" '(mode-line-other-buffer :which-key "last-buffer") ;; for terminal?
   "<M-tab>" '((lambda ()
                 (interactive)
                 (switch-to-buffer-other-window (other-buffer)))
               :which-key "last-buffer-other-window")
+
+;;"b" 'consult-buffer
+;;"B b" 'consult-buffer
 
   "B" '(:ignore t :which-key "Buffer")
   "B m" '((lambda () (interactive) (switch-to-buffer "*Messages*"))
@@ -280,7 +285,7 @@ i.e. windows tiled side-by-side."
              (with-selected-window window
                (split-window-right))))))))
 
-(advice-add 'split-window-sensibly :override #'split-window-sensibly-prefer-horizontal)
+(setopt split-window-preferred-function #'split-window-sensibly-prefer-horizontal)
 
 (setq window-combination-resize t)
 #+end_src
@@ -331,6 +336,24 @@ use a own file for emacs custom definition
   :defer 30)
 #+end_src
 
+** better debugging
+
+#+begin_src emacs-lisp
+;; (setq debug-on-quit t)
+(setq debug-on-error t)
+;; (setq debug-on-error nil)
+(add-to-list 'debug-ignored-errors 'minibuffer-quit)
+;; (add-to-list 'debug-ignored-errors 'quit)
+;; (setq debug-ignored-errors (remove 'minibuffer-quit debug-ignored-errors))
+;; (setq debug-ignored-errors (remove 'quit debug-ignored-errors))
+#+end_src
+
+#+begin_src emacs-lisp
+(setq eval-expression-print-level 20)
+(setq eval-expression-print-length 100)
+#+end_src
+
+** environment
 *** exec-path-from-shell
 https://github.com/purcell/exec-path-from-shell
 
@@ -348,24 +371,15 @@ https://github.com/purcell/exec-path-from-shell
   (add-to-list 'exec-path-from-shell-variables "OPENAI_RSPROXY_TT_API_KEY")
   (add-to-list 'exec-path-from-shell-variables "OPENAI_UNDERLYING_API_KEY")
   (add-to-list 'exec-path-from-shell-variables "PERPLEXITY_API_KEY")
+  (add-to-list 'exec-path-from-shell-variables "MISTRAL_API_KEY")
+  (add-to-list 'exec-path-from-shell-variables "JSON_BASED_PYTHON_LOGGING")
   (exec-path-from-shell-initialize))
 #+end_src
 
-** better debugging
+*** inherit environment
 
 #+begin_src emacs-lisp
-;; (setq debug-on-quit t)
-(setq debug-on-error t)
-;; (setq debug-on-error nil)
-(add-to-list 'debug-ignored-errors 'minibuffer-quit)
-;; (add-to-list 'debug-ignored-errors 'quit)
-;; (setq debug-ignored-errors (remove 'minibuffer-quit debug-ignored-errors))
-;; (setq debug-ignored-errors (remove 'quit debug-ignored-errors))
-#+end_src
-
-#+begin_src emacs-lisp
-(setq eval-expression-print-level 20)
-(setq eval-expression-print-length 100)
+(use-package inheritenv)
 #+end_src
 
 * Saving, Backup & History
@@ -454,9 +468,17 @@ Disable backup & auto save for remote files.
 (setq create-lockfiles nil)
 #+end_src
 
-* Navigation & Minibuffer & Search
-** TODO i3
+* Navigation & Minibuffer & Search & CAPF
+** i3
 https://github.com/junyi-hou/i3-mode
+
+i3 config:
+#+begin_src i3
+bindsym $mod+$up exec ~/.local/bin/i3-call focus up "C-w $up"
+bindsym $mod+$down exec ~/.local/bin/i3-call focus down "C-w $down"
+bindsym $mod+$left exec ~/.local/bin/i3-call focus left "C-w $left"
+bindsym $mod+$right exec ~/.local/bin/i3-call focus right "C-w $right"
+#+end_src
 
 #+begin_src emacs-lisp
 (use-package f)
@@ -536,24 +558,28 @@ https://github.com/junyi-hou/i3-mode
             (minibuffer-message-timeout 0))
         (abort-minibuffers))))
    ((get-buffer-window "*Help*")
-    (quit-windows-on "*Help*"))
+    (quit-closest-window "*Help*"))
    ((get-buffer-window "*Backtrace*")
-    (quit-windows-on "*Backtrace*"))
+    (quit-closest-window "*Backtrace*"))
    ((get-buffer-window "*Warnings*")
-    (quit-windows-on "*Warnings*"))
+    (quit-closest-window "*Warnings*"))
    ((get-buffer-window "*Diff*")
-    (quit-windows-on "*Diff*"))
+    (quit-closest-window "*Diff*"))
+   ((string-match-p "^magit: " (buffer-name))
+    (keyboard-quit))
    ((if-let ((buffer (get-buffer-window "*devdocs*")))
-        (quit-windows-on buffer)))
+        (progn (quit-closest-window buffer) t)))
    ((if-let ((buffer (get-buffer-window-by-regex "^magit")))
-        (quit-windows-on buffer)))
+        (progn (quit-closest-window buffer) t)))
    ((if-let ((buffer (get-buffer-window-by-regex "^\\*helpful")))
-        (quit-windows-on buffer)))
+        (progn (quit-closest-window buffer) t)))
    ((if-let ((buffer (get-buffer-window-by-regex "^\\*info")))
-        (quit-windows-on buffer)))
+        (progn (quit-closest-window buffer) t)))
    ((if-let ((buffer (get-buffer-window-by-regex "^\\*")))
-        (quit-windows-on buffer)))
-                                        ; not sure when this is triggered
+        (progn (quit-closest-window buffer) t)))
+   ((if-let ((buffer (get-buffer-window-by-regex "init.org")))
+        (progn (quit-closest-window buffer) t)))
+    ; not sure when this is triggered
    (t (keyboard-quit))))
 
 (defun get-buffer-window-by-regex (regex)
@@ -564,8 +590,48 @@ Visible means the buffer is currently displayed in some window."
      (string-match-p regex (buffer-name buf)))
    (mapcar #'window-buffer (window-list))))
 
+(defun quit-closest-window (buffer-or-name)
+  "Quit the window displaying BUFFER-OR-NAME.
+If the current window displays BUFFER-OR-NAME, delete it if there are more than one window, otherwise quit it.
+Otherwise, find and quit the first window that displays the buffer."
+  ;; Ensure that buffer-or-name is converted to a buffer object.
+  (if-let ((buffer (get-buffer buffer-or-name)))
+      ;; Check if current window is displaying the buffer.
+      (if (eq (current-buffer) buffer)
+          ;; Delete the current window. if there are more than one
+          (if (> (count-windows) 1)
+              (delete-window)
+            (quit-window))
+        ;; Otherwise, find and delete the first window that displays the buffer.
+        (if-let ((window (get-buffer-window buffer))) ;; Get window showing the buffer
+            (with-selected-window window
+              (quit-window))))))
+
+
 (general-def 'global "C-g" 'maschm/my-quit)
 (general-def :states 'visual "C-g" 'evil-normal-state)
+
+;; UNUSED
+;; this is an atept to find temporary buffers
+;; maybe improve this by giving it a time limit for how recent a buffer must be
+;; then use it with different thresholds in my-quit
+(defun maschm/get-latest-temp-output-buffer ()
+  "Find the most recently created buffer from `with-output-to-temp-buffer`.
+Returns the buffer object or nil if none found."
+  (let ((newest-buffer nil)
+        (newest-time 0)
+        (temp-buffer-modes '(help-mode special-mode compilation-mode)))
+    (dolist (buf (buffer-list))
+      (with-current-buffer buf
+        (when (and (memq major-mode temp-buffer-modes)
+                   (or (string-prefix-p "*" (buffer-name)) ;; naja
+                       (string-suffix-p "*" (buffer-name))))
+          (let ((buffer-time (or (buffer-local-value 'buffer-display-time buf)
+                                 (current-time))))
+            (when (time-less-p newest-time buffer-time)
+              (setq newest-time buffer-time)
+              (setq newest-buffer buf))))))
+    newest-buffer))
 #+end_src
 
 ** consult
@@ -596,6 +662,7 @@ consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all ma
     "F l" '(consult-locate :which-key "locate")
     "r" '(consult-recent-file :which-key "recent")
     "R" '(my/recent-directory :which-key "recent dir")
+    "i" 'consult-imenu
     "/" '(consult-ripgrep :which-key "search proj")
     "\\" (list
           (defun maschm/consult-ripgrep-here ()
@@ -611,10 +678,12 @@ consult-grep -> embark-export to grep-mode buffer -> wgrep for editing of all ma
 
   (general-def
     :keymaps 'global
-    :states 'motion
     "C-s" 'consult-line
     "C-x f" 'find-file ;; replace set-fill-colum
-    "C-x C-r" 'consult-recent-file)
+    "C-x C-r" 'consult-recent-file
+    "<M-tab>" 'nil
+    "<C-tab>" 'mode-line-other-buffer
+    "C-x <tab>" 'mode-line-other-buffer)
 
   (general-def
     :keymaps 'comint-mode-map
@@ -747,7 +816,10 @@ This only works with orderless and for the first component of the search."
     ;; "M-DEL" 'vertico-directory-delete-word
     ;; "C-l" 'vertico-directory-enter
     ;; "C-h" 'vertico-directory-delete-word
-    ))
+    "C-w" #'vertico-directory-delete-word
+    )
+  :config
+  (vertico-mouse-mode))
 
 (use-package vertico-directory
   :straight nil
@@ -756,13 +828,22 @@ This only works with orderless and for the first component of the search."
   (general-def
     :keymaps 'vertico-map
     "RET" #'vertico-directory-enter
-    "DEL" 'vertico-directory-delete-char
-    "M-DEL" 'vertico-directory-delete-word
+    "<backspace>" 'vertico-directory-delete-char
+    "C-<backspace>" 'delete-backward-char
+    "M-<backspace>" 'vertico-directory-delete-word
     "C-l" 'vertico-directory-enter
-    "C-h" 'vertico-directory-delete-word
-    )
+    "C-h" 'vertico-directory-delete-word)
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
+(defun vertico-directory-delete-char (&optional n)
+  "Delete N directories or chars before point."
+  (interactive "p")
+  (unless (and (or (eq (char-before) ?/)
+                   ;; also delete the file if it fully matches candidate
+                   (string= (buffer-substring-no-properties (minibuffer-prompt-end) (point)) (vertico--candidate))
+                   (string= (concat (buffer-substring-no-properties (minibuffer-prompt-end) (point)) "/") (vertico--candidate)))
+               (vertico-directory-up n))
+    (delete-char (- n))))
 
 (setq enable-recursive-minibuffers t)
 ;; Do not allow the cursor in the minibuffer prompt
@@ -836,6 +917,13 @@ This only works with orderless and for the first component of the search."
   (general-def :keymaps 'embark-function-map
     "D" '(debug-on-entry :which-key "debug")
     )
+
+  (general-def :keymaps 'embark-identifier-map
+    "b" 'consult-buffer
+    )
+
+  (general-def :keymaps 'embark-buffer-map
+    "p" 'pop-to-buffer)
 
   (general-def :keymaps 'embark-file-map
     "Y" '(embark-copy-as-kill :which-key "yank full")
@@ -968,6 +1056,7 @@ targets."
 #+end_src
 
 ** cape
+
 #+begin_src emacs-lisp
 (use-package cape
   ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
@@ -991,6 +1080,7 @@ targets."
   ;; ...
 )
 #+end_src
+
 ** abo-abo
 [[http://oremacs.com/swiper/][ivy & swiper manual]]
 *** avy
@@ -1079,6 +1169,7 @@ targets."
     "e" nil
     "N" 'symbol-overlay-jump-prev))
 #+end_src
+
 *** TODO use sticky keymap for next and previous
 *** TODO symbol-overlay hydra
     Or use swiper to got to symbol?
@@ -1087,6 +1178,7 @@ targets."
 
 #+begin_src emacs-lisp
 (use-package project
+  :straight (:type built-in)
   :config
   (defun maschm/project-find-function-transient (dir)
     (let ((root (or (locate-dominating-file dir ".root")
@@ -1135,7 +1227,7 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
     "p" 'consult-projectile
     "P d" 'consult-projectile-find-dir
     "P f" 'consult-projectile-find-file
-    "P r" 'consult-projectile-recentf
+    ;; "P r" 'consult-projectile-recentf
     "P p" 'consult-projectile-switch-project
     "P b" 'consult-projectile-switch-to-buffer))
 
@@ -1182,6 +1274,12 @@ TODO [[https://github.com/technomancy/find-file-in-project][find-file-in-project
 
 ** TODO pair programming
    https://github.com/tjim/lockstep
+** transient
+
+#+begin_src
+(use-package transient)
+#+end_src
+
 * Evil
 ** undo-tree
 
@@ -1254,7 +1352,8 @@ https://github.com/noctuid/evil-guide
 #+END_SRC
 
 ** evil config & vim goodies
-*** toogle beginig of line
+*** toggle beginning of line
+
 #+begin_src emacs-lisp
 (evil-define-motion maschm/beginning-of-line-or-non-empty ()
   "Move to the beginning of the line, or the first non-blank character if already at the beginning."
@@ -1267,6 +1366,7 @@ https://github.com/noctuid/evil-guide
   "0" 'maschm/beginning-of-line-or-non-empty
   "^" nil)
 #+end_src
+
 *** visual line
 
 #+begin_src emacs-lisp
@@ -1543,6 +1643,7 @@ evil shifting (bound to < and >) will stay in visual mode
 
   (setq org-special-ctrl-a/e t)
   (setq org-insert-heading-respect-content t)
+  (setq org-imenu-depth 99)
 
   (general-def
     :keymaps 'org-src-mode-map
@@ -1694,6 +1795,8 @@ evil shifting (bound to < and >) will stay in visual mode
   (add-to-list 'org-babel-load-languages '(gnuplot . t))
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
   (add-to-list 'org-babel-load-languages '(plantuml . t))
+
+  (add-to-list 'org-src-lang-modes '("tsx" . typescript-ts))
 
 
   (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages))
@@ -2311,12 +2414,12 @@ add https://github.com/jgru/consult-org-roam ?
   :after (org magit))
 #+END_SRC
 
-*** Git Highlight Fringe
+*** Git diff highlight fringe
 config taken from https://github.com/jimeh/.emacs.d/blob/master/modules/version-control/siren-diff-hl.el
 
 #+BEGIN_SRC emacs-lisp
 (use-package diff-hl
-  :demand
+  :defer 15
   :hook
   (magit-pre-refresh . diff-hl-magit-pre-refresh)
   (magit-post-refresh . diff-hl-magit-post-refresh)
@@ -2599,7 +2702,7 @@ https://github.com/oantolin/embark/issues/376
 * Visual
 ** Font
 
-[[info:emacs#Fonts][emacs#Fonts]]
+[[info:emacs#Fonts]] [[info:elisp#Fonts]]
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'default-frame-alist '(font . "Hack 12"))
@@ -2619,7 +2722,19 @@ https://github.com/oantolin/embark/issues/376
 (if (daemonp)
     (add-hook 'server-after-make-frame-hook 'maschm/init-fonts)
   (maschm/init-fonts))
+#+end_src
+
+*** mixed pitch
+
+#+begin_src 
+(use-package mixed-pitch
+  :hook
+  (info-mode . mixed-pitch-mode)
+  (org-mode . mixed-pitch-mode)
+  (markdown-mode . mixed-pitch-mode))
 #+END_SRC
+
+text-mode hook was to much why is e.g. yaml derived from text mode...
 
 ** Theme
 
@@ -2629,10 +2744,6 @@ https://github.com/oantolin/embark/issues/376
 ;; (setq frame-background-mode nil)
 ;; (setq frame-background-mode 'dark)
 ;; (mapc 'frame-set-background-mode (frame-list))
-
-
-
-
 #+END_SRC
 
 ** Icons
@@ -2640,6 +2751,12 @@ https://github.com/oantolin/embark/issues/376
 #+begin_src emacs-lisp
 (use-package all-the-icons
   :if (display-graphic-p))
+
+(use-package all-the-icons-completion
+  :after (marginalia all-the-icons)
+  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+  :init
+  (all-the-icons-completion-mode))
 #+end_src
 
 ** Cursor
@@ -2751,12 +2868,17 @@ _=_: zoom reset     _r_: scale reset
 "
     ("+" default-text-scale-increase nil)
     ("-" default-text-scale-decrease nil)
+    ("C-+" default-text-scale-increase nil)
+    ("C--" default-text-scale-decrease nil)
     ("=" default-text-scale-reset nil)
     ("i" text-scale-increase nil)
+    ("C-i" text-scale-increase nil)
     ("d" text-scale-decrease nil)
     ("r" (text-scale-increase 0) nil))
 
   (my-menu-def "T z" '(hydra-zoom/body :which-key "Zooming/Scaling"))
+  (general-def :keymaps 'global
+    "C-+" 'hydra-zoom/body)
 #+END_SRC
 
 ** Scrolling
@@ -2845,6 +2967,9 @@ alternative https://github.com/Malabarba/beacon
                      evilmi-jump-items
                      evil-search-next
                      evil-search-previous
+                     evil-window-vsplit
+                     evil-window-split
+                     evil-window-delete
                      ;; mouse-set-point
                      ))
     (advice-add command :after #'pulse-line))
@@ -2981,7 +3106,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion-in-Buffers.
 (setq read-process-output-max (* 1024 1024))
 
 (use-package lsp-mode
-  :commands (lsp lsp-deferred)
+  :commands (lsp lsp-deferred lsp-mode)
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
@@ -3238,6 +3363,7 @@ provides =consult-lsp-diagnostics=
 *** TODO auto fill on paste
 *** TODO fill commands in local menu
 ** special-mode
+enable "q" to burry-window in special-mode
 
 #+begin_src emacs-lisp
 (general-def
@@ -3246,6 +3372,8 @@ provides =consult-lsp-diagnostics=
   "SPC" nil
   "S-SPC" nil
   "DEL" nil)
+
+(evil-set-initial-state 'special-mode 'motion)
 #+end_src
 
 ** custom
@@ -3295,7 +3423,10 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
  "g g" 'maschm/dired-first-file
  "G" 'maschm/dired-last-file ;; dired-do-chgrp
  "F" 'find-file
- "Y" 'maschm/dired-copy-absolute-filename-as-kill)
+ "Y" 'maschm/dired-copy-absolute-filename-as-kill
+ "C-o" nil ;dired-display-file
+ "C-<return>" 'dired-display-file
+ )
 
 (setq dired-listing-switches "-v --group-directories-first -alh")
 (setq dired-create-destination-dirs t)
@@ -3338,7 +3469,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 #+END_SRC
 
 *** dired hacks
-    by [[https://github.com/Fuco1/dired-hacks][Fuco1 @ github]]
+by [[https://github.com/Fuco1/dired-hacks][Fuco1 @ github]]
 
 #+begin_src emacs-lisp
 (use-package dired-collapse
@@ -3354,6 +3485,11 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   (general-def
     :keymaps 'dired-mode-map
     "/" 'dired-narrow))
+#+end_src
+
+*** dired open with
+#+begin_src emacs-lisp
+(use-package dired-open-with)
 #+end_src
 
 ** info
@@ -3442,7 +3578,7 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   "H p" (list
          (defun maschm/profiler-toogle ()
            (interactive)
-           (if (not (profiler-running-p))
+           (if (not (or (profiler-cpu-running-p) (profiler-memory-running-p)))
                (call-interactively 'profiler-start)
              (profiler-stop)
              (profiler-report)))
@@ -3484,7 +3620,10 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   (emacs-startup-hook . ((require 'info-look)
                          ;; pay initial cost early
                         (info-lookup-setup-mode 'symbol 'emacs-lisp-mode)
-                        )))
+                        ))
+  (helpful-mode-hook . ((setq-local eval-expression-print-length nil)
+                        (setq-local eval-expression-print-level nil)
+                         )))
 #+END_SRC
 
 *** embark become keymap for helpful commands
@@ -3508,6 +3647,16 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
 
 *** TODO think at point in org-mode src environment
 
+** man
+
+woman > man
+
+#+begin_src emacs-lisp
+(defalias 'man 'woman)
+(with-eval-after-load 'woman
+  (customize-set-variable 'woman-fill-frame t))
+#+end_src
+
 ** TODO customize
 ** TODO view
    [[info:emacs#View%20Mode][info:emacs#View Mode]]
@@ -3515,28 +3664,10 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
    Intentionally disable anyway?
    Which buffer are in view mode?
 
-** olivetti
-
-#+begin_src emacs-lisp
-(use-package olivetti
-  :custom
-  (olivetti-body-width 150)
-  )
-
-(use-package auto-olivetti
-  :straight (auto-olivetti :host sourcehut :repo "ashton314/auto-olivetti")
-  :custom
-  (auto-olivetti-enabled-modes '(text-mode prog-mode Info-mode))
-  :config
-  (auto-olivetti-mode))
-#+end_src
-
 ** messages-buffer
-   enable "q" to burry-window in messages-buffer-mode and more generally
-   special mode
+enable "q" to burry-window in messages-buffer-mode
 
 #+begin_src emacs-lisp
-(evil-set-initial-state 'special-mode 'motion)
 (evil-set-initial-state 'messages-buffer-mode 'motion)
 (with-current-buffer "*Messages*"
   (evil-motion-state))
@@ -3545,6 +3676,137 @@ https://github.com/emacs-evil/evil-collection/blob/master/modes/dired/evil-colle
   :keymaps ' minibuffer-inactive-mode-map
   "<mouse-1>" nil)
 #+end_src
+
+** compilation
+When compiling follow the buffer
+
+#+BEGIN_SRC emacs-lisp
+(use-package compile
+  :general
+  (general-def
+    :keymaps 'compilation-mode-map
+    "g" nil
+    "gr" 'recompile)
+
+  :config
+  (evil-set-initial-state 'compilation-mode 'motion)
+
+  (setq compilation-scroll-output t)
+  ;; Don't stop on info or warnings.
+  (setq compilation-skip-threshold 2)
+  ;; Stop on the first error with known location.
+  (setq compilation-auto-jump-to-first-error 'first-known)
+
+  (add-hook 'compilation-mode-hook 'follow-mode)
+
+  (defcustom compilation-auto-jump-ignored-file-regexes nil
+    "List of regular expressions for files to ignore in compilation buffers.
+When a file name matches any of these regexes, `compilation--file-known-p'
+will return nil even if the file can be found."
+    :type '(repeat regexp)
+    :group 'compilation)
+
+  (setq compilation-auto-jump-ignored-file-regexes '("python*/site-packages"))
+
+  (defun compilation--file-known-p ()
+    "Say whether the file under point can be found.
+Return nil if the file matches any regex in `compilation-ignored-file-regexes'."
+    (when-let* ((msg (get-text-property (point) 'compilation-message))
+		(loc (compilation--message->loc msg))
+		(file-name (cadr (car (compilation--loc->file-struct loc))))
+		(not-ignored (not (seq-some (lambda (regex)
+                                              (string-match-p regex file-name))
+                                            compilation-auto-jump-ignored-file-regexes)))
+		(elem (compilation-find-file-1
+                       (point-marker)
+                       (caar (compilation--loc->file-struct loc))
+                       file-name
+                       (compilation--file-struct->formats
+			(compilation--loc->file-struct loc)))))
+      (car elem)))
+
+  (add-to-list 'compilation-error-regexp-alist-alist
+               `(python-stacktrace
+                 ,(rx (group "/" (+ (not (in "(\n")))) ; file path
+                     "("
+                     (group (+ digit))          ; line number
+                     ")"
+                     (? (+ (not (in ")"))))     ; optional function name
+                     )
+		 1 2))
+  (add-to-list 'compilation-error-regexp-alist 'python-stacktrace)
+
+  ;; /.../python/libs/streaming-parse/src/streaming_parse/json.py:362:19 - error: Argument of ...
+  (add-to-list 'compilation-error-regexp-alist-alist
+               `(pyright
+                 ,(rx (group "/" (+ (not (in ":\n"))))  ; file path
+                     ":"
+                     (group (+ digit))            ; line number
+                     ":"
+                     (group (+ digit))            ; column
+                     " - "
+                     (or (group "error")          ; group 4: error
+                         (group "warning")        ; group 5: warning
+                         (group "info"))          ; group 6: info
+                     ": "
+                     (* nonl))                    ; error message
+                 1 2 nil                          ; FILE LINE COLUMN
+                 (5 . 6)                          ; TYPE: warning=5, info=6, else error
+                 1))                              ; HYPERLINK: highlight file only
+  (add-to-list 'compilation-error-regexp-alist 'pyright)
+
+  (add-to-list 'compilation-error-regexp-alist-alist
+               `(ruff
+                 ,(rx (or "  -->" "   -->")  ; Ruff uses arrows with indentation
+                      " "
+                      (group (+ (not (in ":\n"))))  ; file path
+                      ":"
+                      (group (+ digit))             ; line number
+                      ":"
+                      (group (+ digit))             ; column
+                      (* nonl))
+                 1 2 3))  ; FILE LINE COLUMN
+  (add-to-list 'compilation-error-regexp-alist 'ruff)
+  )
+#+END_SRC
+
+*** color
+https://github.com/atomontage/xterm-color
+
+#+begin_src emacs-lisp
+(setq compilation-environment '("TERM=xterm-256color"))
+
+(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
+(add-hook 'compilation-filter-hook 'ansi-osc-compilation-filter)
+
+;; look into xterm-color
+
+;; (setq comint-output-filter-functions
+;;       (remove 'ansi-color-process-output comint-output-filter-functions))
+
+;; (add-hook 'shell-mode-hook
+;;           (lambda ()
+;;             ;; Disable font-locking in this buffer to improve performance
+;;             (font-lock-mode -1)
+;;             ;; Prevent font-locking from being re-enabled in this buffer
+;;             (make-local-variable 'font-lock-function)
+;;             (setq font-lock-function (lambda (_) nil))
+;;             (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t)))
+
+;; Also set TERM accordingly (xterm-256color) in the shell itself.
+#+end_src
+
+*** fancy-compilation
+
+ansi filter look better?
+
+#+BEGIN_SRC emacs-lisp :tangle no
+(use-package fancy-compilation
+  :commands (fancy-compilation-mode))
+
+;; (with-eval-after-load 'compile
+;;   (fancy-compilation-mode))
+#+END_SRC
 
 ** comint
 
@@ -3608,6 +3870,8 @@ https://github.com/ahyatt/emacs-calc-tutorials
    "C-c e" 'eshell)
   (my-menu-def
    "e" 'eshell)
+  :custom
+  (eshell-hist-ignoredups 'erase)
   :config
   ;; (setq pcomplete-ignore-case t)
   (setq eshell-cmpl-ignore-case t)
@@ -3720,10 +3984,39 @@ https://github.com/ahyatt/emacs-calc-tutorials
 #+end_src
 
 *** TODO use eshell-alias?
-** shell
+*** eshell zsh history
 
 #+begin_src emacs-lisp
-(use-package vterm)
+(use-package emacs-zsh-history
+  :demand
+  :straight (:host github :repo "kawabata/emacs-zsh-history")
+
+  :config
+  (modify-coding-system-alist 'file ".zsh_history" 'zsh-history)
+  )
+#+end_src
+
+** vterm
+
+#+begin_src emacs-lisp
+(use-package vterm
+  :config
+  (evil-set-initial-state 'vterm-mode 'insert))
+#+end_src
+
+** eat
+
+#+begin_src emacs-lisp
+(use-package eat
+  :straight '( :type git
+               :host codeberg
+               :repo "akib/emacs-eat"
+               :files ("*.el" ("term" "term/*.el") "*.texi"
+                       "*.ti" ("terminfo/e" "terminfo/e/*")
+                       ("terminfo/65" "terminfo/65/*")
+                       ("integration" "integration/*")
+                       (:exclude ".dir-locals.el" "*-tests.el")))
+  )
 #+end_src
 
 ** tramp
@@ -3783,6 +4076,44 @@ recognize the OTP prompt of the KIT uni cluster
 (advice-add 'magit-turn-on-auto-revert-mode-if-desired :around 'execute-only-local-advice)
 #+end_src
 
+*** eshell tramp cd
+
+#+begin_src emacs-lisp
+(defun eshell/lcd (&optional directory)
+  (if (file-remote-p default-directory)
+      (with-parsed-tramp-file-name default-directory nil
+        (message "%s" v)
+        (message "%s" host)
+        (message (format "/%s:%s@%s:%s" method user host (or directory "")))
+        (message "%s" (tramp-make-tramp-file-name
+                       (tramp-file-name-method v)
+                       (tramp-file-name-user v)
+                       (tramp-file-name-host v)
+                       (or directory "")
+                       (tramp-file-name-hop v)))
+        (eshell/cd (format "/%s:%s@%s:%s" method user host (or directory ""))))
+    (eshell/cd directory)))
+#+end_src
+
+** detached/dtach
+
+#+begin_src emacs-lisp
+(use-package detached
+  :disabled
+  :demand
+  :init
+  (detached-init)
+  :bind (;; Replace `async-shell-command' with `detached-shell-command'
+         ;; ([remap async-shell-command] . detached-shell-command)
+         ;; Replace `compile' with `detached-compile'
+         ([remap compile] . detached-compile)
+         ([remap recompile] . detached-compile-recompile)
+         ;; Replace built in completion of sessions with `consult'
+         ([remap detached-open-session] . detached-consult-session))
+  :custom ((detached-show-output-on-attach t)
+           (detached-terminal-data-command system-type)))
+#+end_src
+
 *** TODO project-remote
 
 #+begin_src emacs-lisp :tangle no
@@ -3804,118 +4135,35 @@ recognize the OTP prompt of the KIT uni cluster
 
 #+end_src
 
-** irc
-
-#+BEGIN_SRC emacs-lisp
-(use-package erc
-  :commands (erc erc-tls)
-  )
-
-(setq my-fav-irc '("irc.freenode.net"
-                   "irc.oftc.net"
-                   "irc.mozilla.org"
-                   "irc.gnome.org"))
-#+END_SRC
-
-** compilation
-When compiling follow the buffer
-
-#+BEGIN_SRC emacs-lisp
-(use-package compile
-  :general
-  (general-def
-    :keymaps 'compilation-mode-map
-    "g" nil
-    "gr" 'recompile)
-
-  :config
-  (evil-set-initial-state 'compilation-mode 'motion)
-
-  (setq compilation-scroll-output t)
-  ;; Don't stop on info or warnings.
-  (setq compilation-skip-threshold 2)
-  ;; Stop on the first error with known location.
-  (setq compilation-auto-jump-to-first-error 'first-known)
-
-  (add-hook 'compilation-mode-hook 'follow-mode)
-
-  (defcustom compilation-auto-jump-ignored-file-regexes nil
-    "List of regular expressions for files to ignore in compilation buffers.
-When a file name matches any of these regexes, `compilation--file-known-p'
-will return nil even if the file can be found."
-    :type '(repeat regexp)
-    :group 'compilation)
-
-  (setq compilation-auto-jump-ignored-file-regexes '("python*/site-packages"))
-
-  (defun compilation--file-known-p ()
-    "Say whether the file under point can be found.
-Return nil if the file matches any regex in `compilation-ignored-file-regexes'."
-    (when-let* ((msg (get-text-property (point) 'compilation-message))
-		(loc (compilation--message->loc msg))
-		(file-name (cadr (car (compilation--loc->file-struct loc))))
-		(not-ignored (not (seq-some (lambda (regex)
-                                              (string-match-p regex file-name))
-                                            compilation-auto-jump-ignored-file-regexes)))
-		(elem (compilation-find-file-1
-                       (point-marker)
-                       (caar (compilation--loc->file-struct loc))
-                       file-name
-                       (compilation--file-struct->formats
-			(compilation--loc->file-struct loc)))))
-      (car elem)))
-
-  (add-to-list 'compilation-error-regexp-alist-alist
-               `(python-stacktrace
-                 ,(rx (group "/" (+ (not (in "(")))) ; file path
-                     "("
-                     (group (+ digit))          ; line number
-                     ")"
-                     (? (+ (not (in ")"))))     ; optional function name
-                     )
-		 1 2))
-
-  (add-to-list 'compilation-error-regexp-alist 'python-stacktrace)
-  )
-#+END_SRC
-
-*** color
-https://github.com/atomontage/xterm-color
+** ediff
 
 #+begin_src emacs-lisp
-(setq compilation-environment '("TERM=xterm-256color"))
-
-(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
-(add-hook 'compilation-filter-hook 'ansi-osc-compilation-filter)
-
-;; look into xterm-color
-
-;; (setq comint-output-filter-functions
-;;       (remove 'ansi-color-process-output comint-output-filter-functions))
-
-;; (add-hook 'shell-mode-hook
-;;           (lambda ()
-;;             ;; Disable font-locking in this buffer to improve performance
-;;             (font-lock-mode -1)
-;;             ;; Prevent font-locking from being re-enabled in this buffer
-;;             (make-local-variable 'font-lock-function)
-;;             (setq font-lock-function (lambda (_) nil))
-;;             (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t)))
-
-;; Also set TERM accordingly (xterm-256color) in the shell itself.
+(use-package ediff
+    :defer t
+    :after (winner outline)
+    :init
+    (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+    (setq ediff-split-window-function 'split-window-horizontally)
+    (setq ediff-merge-split-window-function 'split-window-horizontally)
+    :config
+    ;; show org ediffs unfolded
+    (add-hook 'ediff-prepare-buffer-hook #'outline-show-all)
+    ;; restore window layout when done
+    (add-hook 'ediff-quit-hook #'winner-undo))
 #+end_src
 
-*** fancy-compilation
+*** TODO look at linediff
+    https://github.com/rgrinberg/evil-quick-diff
 
-ansi filter look better?
+** calc
 
-#+BEGIN_SRC emacs-lisp :tangle no
-(use-package fancy-compilation
-  :commands (fancy-compilation-mode))
+#+begin_src emacs-lisp
+(my-menu-def
+  "c" '(quick-calc :which-key "calc")
+  "C" '(calc-dispatch :which-key "calc-dispatch"))
+#+end_src
 
-;; (with-eval-after-load 'compile
-;;   (fancy-compilation-mode))
-#+END_SRC
+https://github.com/ahyatt/emacs-calc-tutorials
 
 ** image
 
@@ -3950,26 +4198,6 @@ ansi filter look better?
   (evil-set-initial-state 'archive-mode 'motion))
 #+end_src
 
-** ediff
-
-#+begin_src emacs-lisp
-(use-package ediff
-    :defer t
-    :after (winner outline)
-    :init
-    (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-    (setq ediff-split-window-function 'split-window-horizontally)
-    (setq ediff-merge-split-window-function 'split-window-horizontally)
-    :config
-    ;; show org ediffs unfolded
-    (add-hook 'ediff-prepare-buffer-hook #'outline-show-all)
-    ;; restore window layout when done
-    (add-hook 'ediff-quit-hook #'winner-undo))
-#+end_src
-
-*** TODO look at linediff
-    https://github.com/rgrinberg/evil-quick-diff
-
 ** calendar
 
 #+begin_src emacs-lisp
@@ -3987,15 +4215,18 @@ ansi filter look better?
   )
 #+end_src
 
-** man
+** irc
 
-woman > man because emacs suffices
+#+BEGIN_SRC emacs-lisp
+(use-package erc
+  :commands (erc erc-tls)
+  )
 
-#+begin_src emacs-lisp
-(defalias 'man 'woman)
-(with-eval-after-load 'woman
-  (customize-set-variable 'woman-fill-frame t))
-#+end_src
+(setq my-fav-irc '("irc.freenode.net"
+                   "irc.oftc.net"
+                   "irc.mozilla.org"
+                   "irc.gnome.org"))
+#+END_SRC
 
 ** music
 *** EMMS
@@ -4021,6 +4252,22 @@ woman > man because emacs suffices
 #+end_src
 
 emms-cache-set-from-mpd-all
+
+** olivetti
+
+#+begin_src emacs-lisp
+(use-package olivetti
+  :custom
+  (olivetti-body-width 150)
+  )
+
+(use-package auto-olivetti
+  :straight (auto-olivetti :host sourcehut :repo "ashton314/auto-olivetti")
+  :custom
+  (auto-olivetti-enabled-modes '(text-mode prog-mode Info-mode))
+  :config
+  (auto-olivetti-mode))
+#+end_src
 
 ** keycast
 
@@ -4063,23 +4310,22 @@ emms-cache-set-from-mpd-all
 ** anki
 
 #+begin_src emacs-lisp :tangle no
-(use-package anki-editor)
+(use-package anki-editor
+  :straight (:repo "anki-editor/anki-editor"))
+
+(use-package ankiorg
+  :straight (:host github :repo "orgtre/ankiorg")
+  :custom
+  (ankiorg-sql-database
+   "~/.local/share/Anki2/User 1/collection.anki2")
+  (ankiorg-media-directory
+   "~/.local/share/Anki2/User 1/collection.media/"))
 #+end_src
 
 ** speed-type
 
 #+begin_src emacs-lisp
 (use-package speed-type)
-#+end_src
-
-** performance
-
-#+begin_src emacs-lisp
-(use-package explain-pause-mode
-  :straight (explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode")
-  ;; :config
-  ;; (explain-pause-mode)
-)
 #+end_src
 
 ** http requests / restcient
@@ -4157,6 +4403,33 @@ GET http://tt-agent-web.k.fal-dev.deepl.dev/api
 <!-- Request duration: 0.135381s -->
 #+END_SRC
 
+** subtitles / subed
+
+#+begin_src emacs-lisp
+(use-package subed
+    :straight '(subed :type git :host github :repo "sachac/subed" :files ("subed/*.el"))
+	:config
+	;; Remember cursor position between sessions
+	(add-hook 'subed-mode-hook 'save-place-local-mode)
+	;; Break lines automatically while typing
+	(add-hook 'subed-mode-hook 'turn-on-auto-fill)
+	;; Break lines at 40 characters
+	(add-hook 'subed-mode-hook (lambda () (setq-local fill-column 40)))
+	;; Some reasonable defaults
+	(add-hook 'subed-mode-hook 'subed-enable-pause-while-typing)
+	;; As the player moves, update the point to show the current subtitle
+	(add-hook 'subed-mode-hook 'subed-enable-sync-point-to-player)
+	;; As your point moves in Emacs, update the player to start at the current subtitle
+	(add-hook 'subed-mode-hook 'subed-enable-sync-player-to-point)
+	;; Replay subtitles as you adjust their start or stop time with M-[, M-], M-{, or M-}
+	(add-hook 'subed-mode-hook 'subed-enable-replay-adjusted-subtitle)
+	;; Loop over subtitles
+	(add-hook 'subed-mode-hook 'subed-enable-loop-over-current-subtitle)
+	;; Show characters per second
+	(add-hook 'subed-mode-hook 'subed-enable-show-cps)
+	)
+#+end_src
+
 * Web
 ** TODO shr / simple html rendering
 
@@ -4229,28 +4502,8 @@ This should eventually be contributed as a feature to shr. Port to new adivce-ad
 #+end_src
 
 * AI
-** Speech recognition - speech to text - ASR
-*** whisper
-
-#+begin_src emacs-lisp
-(use-package whisper
-  :straight (whisper :type git :host github :repo "natrys/whisper.el")
-  ;; :bind ("C-H-r" . whisper-run)
-  :config
-  (setq whisper-install-directory "/tmp/"
-        whisper-model "base"
-        whisper-language "en"
-        whisper-translate nil))
-#+end_src
-
-** TODO Speech synthesis - text to speech - TTS
-
-espeak, OpenAI, DeepL voice
-
-English, German, Ukrainian
-
 ** Language modeling - text to text - LLM
-*** Generation / Conversation / gptel
+*** gptel
 
 open ai, chat gpt
 
@@ -4264,12 +4517,12 @@ open ai, chat gpt
     "C-c <return>" 'gptel-send
     "C-c C-<return>" 'gptel-send
     "C-<return>" 'gptel-send
-    [remap evil-org-org-insert-heading-respect-content-below] 'maschm/gptel-org-send
-    [remap org-insert-heading-respect-content-below] 'maschm/gptel-org-send
+    [remap evil-org-org-insert-heading-respect-content-below] 'maschm/gptel-send-org
+    [remap org-insert-heading-respect-content-below] 'maschm/gptel-send-org
     )
   (my-menu-def
-    "RET" 'gptel-send
-    "M-RET" (lambda () (interactive) (gptel-send t))
+    "RET" (defun maschm/gptel-send-wim () (interactive) (gptel-send))
+    "M-RET" 'maschm/gptel-dwim
 
     "G" '(:ignore t :which-key "gptel")
     "G g" 'gptel-menu
@@ -4288,7 +4541,7 @@ open ai, chat gpt
            (defun maschm/gptel-quick-question ()
              (interactive)
              (funcall-interactively 'gptel--suffix-send '("m" "e")))
-            :which-key "quick question")
+           :which-key "quick question")
     "G p" '(gptel-menu :which-key "prompt")
     "G m" (list
            (defun maschm/gptel-choose-backend ()
@@ -4296,44 +4549,73 @@ open ai, chat gpt
              (setq gptel-backend (car (transient-infix-read 'gptel--infix-provider))))
            :which-key "model")
     "G a" 'gptel-add
-    "G C" 'gptel-add
-    "G c" 'gptel-add
-    "G +" 'gptel-add
+    "G C" 'gptel-add-file
+    "G c" 'gptel-context-add-file ;; TODO toogle
+    "G f" 'gptel-context-add-file
+    "G +" (defun maschm/gptel-context-add-all-visible-buffers ()
+            (interactive)
+            (dolist (window (window-list))
+              (with-current-buffer (window-buffer window)
+                (gptel-add))))
+    "G -" (defun maschm/gptel-context-remove-all ()
+            (interactive)
+            (gptel-context-remove-all nil))
+    "G C" 'gptel-context-remove-all
     "G r" (list
            (defun maschm/gptel-refactor ()
              (interactive)
-             (gptel-rewrite-menu))
-            :which-key "quick question")
+             (gptel-rewrite))
+           :which-key "refactor")
 
     "+" 'gptel-add
     "." (list
-         (defun maschm/gptel-at-point ()
+         (defun maschm/gptel-dwim ()
            (interactive)
-           (if (and (derived-mode-p 'prog-mode) (use-region-p))
-               (maschm/gptel-refactor)
-             (gptel-menu)))
-         :which-key "gptel-at-point")
+           (cond ((use-region-p)
+                  (maschm/gptel-refactor))
+                 ;; ((maschm/gptel-inside-context) (d))
+                 (t (gptel-menu))))
+         :which-key "gptel")
     )
 
 
   (my-leader-def
-    "q" 'gptel-quick-question)
+    "q" 'maschm/gptel-quick-question)
 
   :custom
   (gptel-default-mode 'org-mode)
   (gptel-model 'gpt-4o)
   (gptel-track-media t)
+  (gptel-track-response nil)
+  (gptel-max-tokens 4000)
+  (gptel-org-convert-response nil) ;; transformation is a bit slow, TODO prompt the LLM to output org in the first place
+  (gptel-org-branching-context nil)
 
   :config
-  (setq gptel-expert-commands t)
-  (setq-default gptel-org-branching-context nil)
-  (setf (alist-get 'ukrainian gptel-directives) "You are a multilingual language expert helping a German student learn Ukrainian. Your student is already fluent in English, but the optimal approach is to communicate in all three languages simultaneously to promote the formation of new cross-linguistic neural connections. By default, you don't translate the Cyrillic script unless requested.")
+  (require 'gptel-rewrite)
+  (require 'gptel-org)
+  (add-to-list 'warning-suppress-log-types '(gptel)) ;; dont display annoying gpel-model warning
 
-  ;;(setf (alist-get 'default gptel-directives) "You are a multilingual language expert helping a German student learn Ukrainian. Your student is already fluent in English, but the optimal approach is to communicate in all three languages simultaneously to promote the formation of new cross-linguistic neural connections. By default, you don't translate the Cyrillic script unless requested.")
+  (setq gptel-expert-commands t) ; this is not a custom var TODAY
+
+  ;; some keyremappings in gptel's transient interface
+  ;; (with-eval-after-load 'transient
+  ;;   (transient-suffix-put 'gptel-menu (kbd "-m") :key "M")
+  ;;   (transient-suffix-put 'gptel-menu (kbd "-f") :key "f")
+  ;;   (transient-suffix-put 'gptel-menu (kbd "-d") :key "D")
+  ;;   (transient-suffix-put 'gptel-menu (kbd " C") :key " c"))
+
 
   (setf (alist-get 'org-mode gptel-response-prefix-alist) "* AI\n")
   (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "* USER\n")
-  (defun maschm/gptel-org-send ()
+  ;; (with-eval-after-load 'gptel-org
+  ;;   (add-to-list 'gptel-org-ignore-elements 'comment)
+  ;;   (add-to-list 'gptel-org-ignore-elements 'comment-block))
+
+  ;; maybe fixes font-lock
+  (add-hook 'gptel-post-response-functions #'font-lock-fontify-region)
+
+  (defun maschm/gptel-send-org ()
     (interactive)
     (org-next-visible-heading 1)
     (unless (eq (point) (point-max))
@@ -4344,61 +4626,93 @@ open ai, chat gpt
   (prog-mode-hook . ((setq-local gptel--system-message (maschm/build-prog-message))
                      (add-hook 'gptel-rewrite-directives-hook 'maschm/build-prog-message nil t)
                      ))
+  (org-mode-hook . ((setq-local gptel--system-message 'maschm/build-org-system-message)))
   (gptel-mode-hook . ((general-def
                         :keymaps 'override
-                        "C-<return>" 'maschm/gptel-org-send))))
+                        "C-<return>" 'maschm/gptel-send-org)
+                      (evil-insert-state))))
 #+end_src
+
+*** Prompts
+**** Org-mode
+
+#+begin_src emacs-lisp
+(defun maschm/build-org-system-message ()
+  "You are a large language model living in Emacs and a helpful assistant.
+
+By default respond use the Org-mode markup language, because your response will be directly copying it into an Emacs buffer. This means:
+- Use asterisks for headings (** for level 1, *** for level 2, etc.)
+- Single star 0th level headings are reseved for the Editor
+- Format text with *bold*, /italic/, _underlined_, and =code=
+- Create lists with \"-\" or numbered lists with \"1.\" format
+- Format links as [[url][description]]
+- Use |table|syntax| for tables with |---+---| dividers
+- Wrap code blocks in #+BEGIN_SRC language and #+END_SRC
+
+Respond concisely.")
+
+(with-eval-after-load 'gptel-mode
+  (setf (alist-get 'org-mode gptel-directives) 'maschm/build-org-system-message))
+#+end_src
+
+**** Programming
 
 #+begin_src emacs-lisp
 (defun maschm/build-prog-message ()
   (let ((lang-name (major-mode-to-language-name))
-        (script-name (major-mode-to-markdown-syntax)))
-    (concat "You are a careful expert " lang-name " programming assistant editing a code base through the Emacs editor.
-You are expected to answer differently depending on the type of user input you receive.
-The user will ask for your help in different ways:
-- by inserting comments, TODOS etc. into valid %0$s
-  - in this case you must change the code to address the users notes. You should output only vaild " lang-name " code. Don's use ticks.
-- by writing a mix of example " lang-name " code, natural language description and optionally pseudo code.
-  - in this case you should answer the question more general. Provide examples in " lang-name ". If it seems useful please write" (when (eq major-mode 'emacs-lisp-mode) "additional") " Emacs Lisp code to control the editor. Use markdown syntax.")))
+        (script-syntax (major-mode-to-markdown-syntax)))
+    (concat
+"You are a careful expert " lang-name " programming assistant integrated directly into the Emacs text editor.
+You're running as part of the user's Emacs environment and can provide solutions that leverage Emacs functionality.
+
+Your responses should adapt to the type of input you receive:
+
+1. When the user message contains mostly valid " lang-name " code with comments, questions, TODOs or pseudo code:
+   - Modify the code to address the user's requests
+   - Only output valid " lang-name " code
+   - Do not use markdown code blocks or backticks
+   - Maintain the existing code style and conventions
+
+2. When the user provides a mix of code examples and natural language input:
+   - Provide a comprehensive explanation
+   - Include well-documented " lang-name " examples
+   - Use markdown syntax with =" script-syntax " code blocks"
+   (when (eq major-mode 'emacs-lisp-mode)
+     "\n   - Where appropriate, include additional Emacs Lisp code to improve editor integration")
+
+"\n\nAdditional guidance:
+- When fixing errors, explain the underlying issue briefly before providing the solution
+- If multiple approaches exist, briefly mention alternatives with their trade-offs
+- Follow best practices and modern " lang-name " conventions
+- If you need more context to provide a complete solution, ask clarifying questions
+
+Always prioritize correctness, clarity, and maintainability in your code responses.")))
+
+
 
 (defun major-mode-to-language-name (&optional mode)
   "Return a human-readable language name for the given major MODE.
 If MODE is nil, use the current buffer's major mode."
   (let ((mode (or mode major-mode)))
     (cond
-     ((provided-mode-derived-p mode 'emacs-lisp-mode) "Emacs Lisp")
-     ((provided-mode-derived-p mode 'c-mode) "C")
-     ((provided-mode-derived-p mode 'c++-mode) "C++")
-     ((provided-mode-derived-p mode 'java-mode) "Java")
-     ((provided-mode-derived-p mode 'perl-mode) "Perl")
-     ((provided-mode-derived-p mode 'haskell-mode) "Haskell")
      ((provided-mode-derived-p mode 'typescript-mode) "TypeScript")
-     ((provided-mode-derived-p mode 'r-mode) "R")
-     ((provided-mode-derived-p mode 'sh-mode) "shell script")
+     ((provided-mode-derived-p mode 'tsx-ts-mode) "TypeScript")
+     ((provided-mode-derived-p mode 'typescript-ts-base-mode) "TypeScript")
      ((provided-mode-derived-p mode 'html-mode) "HTML")
      ((provided-mode-derived-p mode 'css-mode) "CSS")
-     ((provided-mode-derived-p mode 'markdown-mode) "Markdown")
-     ((provided-mode-derived-p mode 'go-mode) "Go")
-     ((provided-mode-derived-p mode 'rust-mode) "Rust")
-     ((provided-mode-derived-p mode 'swift-mode) "Swift")
-     ((provided-mode-derived-p mode 'scala-mode) "Scala")
-     ((provided-mode-derived-p mode 'kotlin-mode) "Kotlin")
-     ((provided-mode-derived-p mode 'julia-mode) "Julia")
-     ((provided-mode-derived-p mode 'pascal-mode) "Pascal")
-     ((provided-mode-derived-p mode 'lua-mode) "Lua")
-     ((provided-mode-derived-p mode 'tsx-ts-mode) "TypeScript")
      ((provided-mode-derived-p mode 'css-ts-mode) "CSS")
-     ((provided-mode-derived-p mode 'c-ts-mode) "C")
-     ((provided-mode-derived-p mode 'c++-ts-mode) "C++")
-     ((provided-mode-derived-p mode 'python-base-mode) "Python")
-     ((provided-mode-derived-p mode 'ruby-base-mode) "Ruby")
      ((provided-mode-derived-p mode 'js-base-mode) "JavaScript")
      ((provided-mode-derived-p mode 'web-mode) "JavaScript")
      ((provided-mode-derived-p mode 'php-base-mode) "PHP")
-     ((provided-mode-derived-p mode 'typescript-ts-base-mode) "TypeScript")
-     ((provided-mode-derived-p mode 'r-mode) "R")
      ((provided-mode-derived-p mode 'sh-mode) "Bash")
-     (t "Unknown Language"))))
+     ((provided-mode-derived-p mode 'sh-mode) "sh script")
+     ((provided-mode-derived-p mode 'yaml-mode) "YAML")
+     ((provided-mode-derived-p mode 'json-mode) "JSON")
+     ((provided-mode-derived-p mode 'toml-mode) "TOML")
+     ((provided-mode-derived-p mode 'graphql-mode) "GraphQL")
+     ((provided-mode-derived-p mode 'cmake-mode) "CMake")
+     (t (let ((name (symbol-name mode)))
+          (capitalize (replace-regexp-in-string "-mode$\\|-ts-mode$\\|-base-mode$" "" name)))))))
 
 
 (defun major-mode-to-markdown-syntax (&optional mode)
@@ -4407,57 +4721,138 @@ If MODE is nil, use the current buffer's major mode."
   (let ((mode (or mode major-mode)))
     (cond
      ((provided-mode-derived-p mode 'emacs-lisp-mode) "elisp")
-     ((provided-mode-derived-p mode 'c-mode) "c")
      ((provided-mode-derived-p mode 'c++-mode) "cpp")
-     ((provided-mode-derived-p mode 'java-mode) "java")
-     ((provided-mode-derived-p mode 'java-ts-mode) "java")
-     ((provided-mode-derived-p mode 'perl-mode) "perl")
-     ((provided-mode-derived-p mode 'haskell-mode) "haskell")
-     ((provided-mode-derived-p mode 'typescript-mode) "typescript")
-     ((provided-mode-derived-p mode 'r-mode) "R")
-     ((provided-mode-derived-p mode 'sh-mode) "shell script")
-     ((provided-mode-derived-p mode 'html-mode) "html")
-     ((provided-mode-derived-p mode 'css-mode) "css")
-     ((provided-mode-derived-p mode 'markdown-mode) "markdown")
-     ((provided-mode-derived-p mode 'go-mode) "go")
-     ((provided-mode-derived-p mode 'rust-mode) "rust")
-     ((provided-mode-derived-p mode 'swift-mode) "swift")
-     ((provided-mode-derived-p mode 'scala-mode) "scala")
-     ((provided-mode-derived-p mode 'kotlin-mode) "kotlin")
-     ((provided-mode-derived-p mode 'julia-mode) "julia")
-     ((provided-mode-derived-p mode 'pascal-mode) "pascal")
-     ((provided-mode-derived-p mode 'lua-mode) "lua")
-     ((provided-mode-derived-p mode 'tsx-ts-mode) "typescript")
-     ((provided-mode-derived-p mode 'css-ts-mode) "css")
-     ((provided-mode-derived-p mode 'c-ts-mode) "c")
      ((provided-mode-derived-p mode 'c++-ts-mode) "cpp")
-     ((provided-mode-derived-p mode 'python-base-mode) "python")
-     ((provided-mode-derived-p mode 'ruby-base-mode) "ruby")
+     ((provided-mode-derived-p mode 'r-mode) "R")
      ((provided-mode-derived-p mode 'js-base-mode) "javascript")
      ((provided-mode-derived-p mode 'web-mode) "javascript")
-     ((provided-mode-derived-p mode 'php-base-mode) "php")
+     ((provided-mode-derived-p mode 'typescript-mode) "typescript")
      ((provided-mode-derived-p mode 'typescript-ts-base-mode) "typescript")
+     ((provided-mode-derived-p mode 'tsx-ts-mode) "typescript")
+     ((provided-mode-derived-p mode 'sh-mode) "shell script")
      ((provided-mode-derived-p mode 'sh-mode) "bash")
-     (t ""))))
+     (t (replace-regexp-in-string "-mode$\\|-ts-mode$\\|-base-mode$" ""
+                                  (symbol-name mode))))))
 #+end_src
 
-*** Coding / Software Development / aider
-#+begin_src
-(use-package aide
-  :straight (aide :host github
-                  :repo "junjizhi/aide.el"))
+**** Ukrainian
+
+#+begin_src emacs-lisp
+(setq maschm/ukrainian-prompt
+      "You are a professional Ukrainian language tutor specialized in teaching Ukrainian to a German student inside.
+
+,* Student Profile
+- Language Level: Approximately A2 in Ukrainian
+- Native Language: German
+- Fluent Language: English
+- Basic Language Knowledge: Spanish and French
+- Script Proficiency: Fluent in Cyrillic script
+
+,* Communication Guidelines
+1) Language Output:
+  - Use only Ukrainian Cyrillic script
+  - Avoid transliteration or Latin character representations
+  - Provide trilingual translations: Ukrainian/German/English
+
+2) Linguistic Approach:
+  - Highlight linguistic connections between Ukrainian, German, and English
+  - Emphasize cognates and grammatical similarities
+
+,* Error Handling
+- Always correct mistakes in Ukrainian
+- Offer constructive explanations
+
+,* Output Format
+a) When processing lists like inputs:
+  - direct answers without extra output
+  - follow the users input format in your answer
+or
+b) When processing long form text or questions, organize responses with:
+  - Vocabulary Section with a focus on etymology and nuances
+  - Grammar Explanation with comparative analysis
+  - Practice Exercises without solutions
+")
+
+(with-eval-after-load 'gptel
+  (setf (alist-get 'ukrainian gptel-directives) maschm/ukrainian-prompt))
 #+end_src
-*** functions
 
+*** Tools
 
+#+begin_src emacs-lisp
+(with-eval-after-load 'gptel-mode
+  (gptel-make-tool
+   :name "create_file"
+   :function (lambda (path filename content)
+               (let ((full-path (expand-file-name filename path)))
+                 (with-temp-buffer
+                   (insert content)
+                   (write-file full-path))
+                 (format "Created file %s in %s" filename path)))
+   :description "Create a new file with the specified content"
+   :args (list '(:name "path"
+                       :type string
+                       :description "The directory where to create the file")
+               '(:name "filename"
+                       :type string
+                       :description "The name of the file to create")
+               '(:name "content"
+                       :type string
+                       :description "The content to write to the file"))
+   :category "filesystem")
+
+  (gptel-make-tool
+   :name "change_region_in_buffer"
+   :function (lambda (buffer start end content)
+               (with-current-buffer (get-buffer buffer)
+                 (save-excursion
+                   (goto-char start)
+                   (delete-region start end)
+                   (insert content))
+                 (format "Changed region in buffer '%s' from %d to %d" buffer start end)))
+   :description "Change a region in a specified buffer with the given content"
+   :args (list '(:name "buffer"
+                       :type string
+                       :description "The name of the buffer to operate on")
+               '(:name "start"
+                       :type integer
+                       :description "The start position of the region to change")
+               '(:name "end"
+                       :type integer
+                       :description "The end position of the region to change")
+               '(:name "content"
+                       :type string
+                       :description "The content to replace the region with"))
+   :category "buffer")
+
+  (gptel-make-tool
+   :name "append_to_buffer"
+   :function (lambda (buffer content)
+               (with-current-buffer (get-buffer buffer)
+                 (save-excursion
+                   (goto-char (point-max))
+                   (insert content))))
+   :description "Append content to the end of a specified buffer"
+   :args (list '(:name "buffer"
+                       :type string
+                       :description "The name of the buffer to operate on")
+               '(:name "content"
+                       :type string
+                       :description "The content to append to the buffer"))
+   :category "buffer")
+
+  )
+
+;; write a tool to replace a
+#+end_src
 
 *** Translation
 
 DeepL
 
-** TODO image generation
-** Programming
+** Coding Assistant
 *** aider
+
 #+begin_src emacs-lisp
 (use-package aider
   :straight (:host github :repo "tninja/aider.el" :files ("aider.el"))
@@ -4474,7 +4869,49 @@ DeepL
   (setq aider-args '("--model" "gpt-4o"))
   )
 #+end_src
-* Programming languages
+
+**** TODO aide
+
+#+begin_src
+(use-package aide
+  :straight (aide :host github
+                  :repo "junjizhi/aide.el"))
+#+end_src
+
+*** Claude Code
+
+#+begin_src emacs-lisp
+(use-package claude-code-ide
+  :straight (:type git :host github :repo "manzaltu/claude-code-ide.el")
+  :general
+  (my-menu-def
+    "A" 'claude-code-ide-menu) ; Set your favorite keybinding
+  :config
+  (claude-code-ide-emacs-tools-setup)) ; Optionally enable Emacs MCP tools
+#+end_src
+
+** Speech recognition - speech to text - ASR
+*** whisper
+
+#+begin_src emacs-lisp
+(use-package whisper
+  :straight (whisper :type git :host github :repo "natrys/whisper.el")
+  ;; :bind ("C-H-r" . whisper-run)
+  :config
+  (setq whisper-install-directory "/tmp/"
+        whisper-model "base"
+        whisper-language "en"
+        whisper-translate nil))
+#+end_src
+
+** TODO image generation
+** TODO Speech synthesis - text to speech - TTS
+
+espeak, OpenAI, DeepL voice
+
+English, German, Ukrainian
+
+* Programming
 ** prog-mode
 
 #+begin_src emacs-lisp
@@ -4585,12 +5022,88 @@ Highlight trailing whitespace
   (my-menu-def "B f" 'apheleia-format-buffer)
   :custom
   (apheleia-formatters-respect-fill-column t)
+  :config
+  (add-to-list 'apheleia-formatters
+               '(yamlfmt "yamlfmt" "-in"))
+
+  ;; was "ruff" "format"
+  (add-to-list 'apheleia-formatters
+               '(ruff "ruff" "check" "--fix"
+                      (apheleia-formatters-fill-column "--line-length")
+                      "--stdin-filename" filepath
+                      "-"))
+
+  (add-to-list 'apheleia-mode-alist '(yaml-mode . yamlfmt))
+  (add-to-list 'apheleia-mode-alist '(yaml-ts-mode . yamlfmt))
+
+  (setf (alist-get 'python-mode apheleia-mode-alist) 'ruff)
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist) 'ruff)
   )
 #+end_src
 
 *** folding
 hs-minor-mode for now
 waiting for folding package based on treesit
+
+#+begin_src emacs-lisp
+(use-package treesit-fold
+  :custom
+  (treesit-fold-line-count-show t)
+  (treesit-fold-line-count-format " <%d lines> ")
+  :config
+  (global-treesit-fold-mode))
+#+end_src
+
+*** breadcrumbs
+
+#+begin_src emacs-lisp
+(use-package breadcrumb
+  :hook (json-ts-mode . breadcrumb-mode))
+  
+#+end_src
+
+** tree-sitter
+
+#+begin_src emacs-lisp
+(setq treesit-language-source-alist
+      '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+        (cmake "https://github.com/uyha/tree-sitter-cmake")
+        (css "https://github.com/tree-sitter/tree-sitter-css")
+        (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+        (go "https://github.com/tree-sitter/tree-sitter-go")
+        (html "https://github.com/tree-sitter/tree-sitter-html")
+        (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+        (json "https://github.com/tree-sitter/tree-sitter-json")
+        (make "https://github.com/alemuller/tree-sitter-make")
+        (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+        (python "https://github.com/tree-sitter/tree-sitter-python")
+        (rust "https://github.com/tree-sitter/tree-sitter-rust")
+        (toml "https://github.com/tree-sitter/tree-sitter-toml")
+        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+        (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
+              ;; '((css . ("https://github.com/tree-sitter/tree-sitter-css" "v0.20.0"))
+              ;;   (html . ("https://github.com/tree-sitter/tree-sitter-html" "v0.20.1"))
+              ;;   (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript" "v0.20.1" "src"))
+              ;;   (json . ("https://github.com/tree-sitter/tree-sitter-json" "v0.20.2"))
+              ;;   (python . ("https://github.com/tree-sitter/tree-sitter-python" "v0.20.4"))
+              ;;   (toml "https://github.com/tree-sitter/tree-sitter-toml")
+              ;;   (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "tsx/src"))
+              ;;   (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src"))
+              ;;   (yaml . ("https://github.com/ikatyang/tree-sitter-yaml" "v0.5.0")))
+;; (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
+
+(setq major-mode-remap-alist
+ '((yaml-mode . yaml-ts-mode)
+   (bash-mode . bash-ts-mode)
+   (js2-mode . js-ts-mode)
+   (typescript-mode . typescript-ts-mode)
+   (json-mode . json-ts-mode)
+   (css-mode . css-ts-mode)
+   (python-mode . python-ts-mode)))
+#+end_src
+
 ** documentation / devdocs
 
 #+begin_src emacs-lisp
@@ -4642,18 +5155,22 @@ Highlight delimiters such as parentheses, brackets or braces according to their 
     "<escape>" 'symex-mode-interface)
   (general-def
     :states 'insert :keymaps 'symex-mode-map
-    "<escape>" (lambda () (interactive) (if (eq evil-previous-state 'symex) (symex-mode-interface) (evil-normal-state))))
+    "<escape>" (lambda ()
+                 (interactive)
+                 (if (eq evil-previous-state 'symex)
+                     (symex-mode-interface)
+                   (evil-normal-state))))
   (symex-initialize)
   :local
   (lisp-interaction-mode-hook . ((symex-mode)
                                  (symex-mode-interface))))
 #+end_src
 
-*** TODO Common Lisp
+*** INFO Common Lisp
     new: https://joaotavora.github.io/sly/
     old: https://common-lisp.net/project/slime/
 
-*** TODO Closure
+*** INFO Closure
     https://cider.mx/
 
 *** elisp emacs lisp
@@ -4672,6 +5189,7 @@ Highlight delimiters such as parentheses, brackets or braces according to their 
 
 #+begin_src emacs-lisp
 (add-hook 'js-json-mode-hook #'flycheck-mode)
+(add-hook 'json-ts-mode-hook #'flycheck-mode)
 #+end_src
 
 *** jq
@@ -4764,12 +5282,12 @@ was disabled with the switch to corfu
   (my-leader-def
     :keymaps 'python-base-mode-map
     "d" 'pdb)
-  :custom
-  (python-shell-dedicated 'project)
+  (general-def
+    :keymaps '(python-base-mode-map python-mode-map python-ts-mode-map)
+    "C-c C-p" 'maschm/run-python)
   :config
 
   (modify-syntax-entry ?_ "w" python-mode-syntax-table)
-
 
   ;; Use IPython when available or fall back to regular Python
   (cond
@@ -4785,6 +5303,9 @@ was disabled with the switch to corfu
    (t
     (setq python-shell-interpreter "python")))
 
+
+  (setq python-shell-process-environment  '("TERM=xterm-256color"))
+
   (defcustom python-shell-setup-imports
     '("import sys"
       "import os"
@@ -4798,7 +5319,8 @@ was disabled with the switch to corfu
       "from copy import deepcopy, copy"
       "from collections import defaultdict"
       "from typing import *"
-      "from rich import print, print_json"
+      ;; "from rich import print, print_json"
+      ;; "from rich import print_json"
       "import numpy as np"
       "import pandas as pd")
     "List of Python imports to be used when setting up the Python shell."
@@ -4812,7 +5334,7 @@ was disabled with the switch to corfu
            (set-default-toplevel-value symbol value)))
 
   (add-to-list 'python-shell-setup-codes (concat "\n__file__ = \"" python-shell-interpreter "\"\n"))
-
+  ;; (setq python-shell-setup-codes nil)
 
   (defun maschm/python-shell-other-scroll-end (&rest _)
     (interactive)
@@ -4828,11 +5350,35 @@ was disabled with the switch to corfu
   ;; (advice-add 'python-shell-send-string :after 'maschm/python-shell-other-scroll-end)
   ;; (advice-remove 'python-shell-send-string 'maschm/python-shell-other-scroll-end)
 
-  (advice-add 'python-shell-send-buffer :before (defun advice:before:python-shell-send-buffer (&rest _)
-                                                  (python-shell-get-or-create-process (python-shell-calculate-command) python-shell-dedicated nil)))
+  (defun maschm/python-shell-calculate-dedicated ()
+    (if python-shell-dedicated python-shell-dedicated
+      (if (project-current) 'project 'buffer)))
 
-  (advice-add 'python-shell-send-buffer :after (defun advice:after:python-shell-send-buffer (&rest _)
-                                                 (run-python (python-shell-calculate-command) python-shell-dedicated t)))
+  (advice-add 'python-shell-send-buffer :before
+              (defun advice:before:python-shell-send-buffer (&rest _)
+                (save-excursion
+                  (run-python (python-shell-calculate-command) (maschm/python-shell-calculate-dedicated) nil)
+                  ;; (while (not python-shell--first-prompt-received)
+                  ;;   (sit-for 0.1))
+                  )))
+
+  (defun maschm/run-python (&optional cmd dedicated show)
+    (interactive
+     (if current-prefix-arg
+         (list
+          (read-shell-command "Run Python: " (python-shell-calculate-command))
+          (alist-get (car (read-multiple-choice "Make dedicated process?"
+                                                '((?b "to buffer")
+                                                  (?p "to project")
+                                                  (?n "no"))))
+                     '((?b . buffer) (?p . project)))
+          (= (prefix-numeric-value current-prefix-arg) 4))
+       (list (python-shell-calculate-command)
+             (maschm/python-shell-calculate-dedicated)
+             t)))
+    (run-python cmd dedicated show))
+
+  (advice-add 'python-shell-send-buffer :after 'python-shell-switch-to-shell)
 
   :local
   (python-base-mode-hook . ((setq-local compile-command (concat "python " (shell-quote-argument (or buffer-file-name "")))))))
@@ -4843,10 +5389,28 @@ was disabled with the switch to corfu
 #+begin_src emacs-lisp
 (use-package lsp-pyright
   :hook ((python-base-mode . (lambda () (require 'lsp-pyright) (lsp-deferred)))) ; or lsp
+  :custom
+  (lsp-pyright-langserver-command "basedpyright")
   :init
   (setq lsp-pyright-multi-root nil) ;; disable to use different python venv
   :config
-  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.venv"))
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.venv")
+  :local
+    (lsp-mode-hook
+     . ((if (file-exists-p (concat (lsp--workspace-root (cl-first (lsp-workspaces))) "/pyrightconfig.json"))
+            (progn
+              (setq lsp-enable-file-watchers t)
+              (setq lsp-file-watch-ignored-directories (eval (car (get 'lsp-file-watch-ignored-directories 'standard-value))))
+              (require 'json)
+              (let* ((json-object-type 'hash-table)
+                     (json-array-type 'list)
+                     (json-key-type 'string)
+                     (json (json-read-file (concat (lsp--workspace-root (cl-first (lsp-workspaces))) "/pyrightconfig.json")))
+                     (exclude (gethash "exclude" json)))
+                (dolist (exclud exclude)
+                  (push exclud lsp-file-watch-ignored))))
+          (setq lsp-enable-file-watchers 'nil)
+          (setq lsp-file-watch-ignored-directories (eval (car (get 'lsp-file-watch-ignored-directories 'standard-value))))))))
 
 (with-eval-after-load 'dap-mode
   (require 'dap-python)
@@ -4888,18 +5452,20 @@ was disabled with the switch to corfu
 look into poetry-tracking-mode and poetry-tracking-strategy
 
 #+begin_src emacs-lisp
-(use-package pyvenv
+(use-package pet
   :after python
-  :commands (pyvenv-track-virtualenv)
   :config
-  (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("P:" (string-remove-prefix ".venv-" pyvenv-virtual-env-name))))
-  (pyvenv-mode)
-  (pyvenv-tracking-mode))
+  (add-hook 'python-base-mode-hook 'pet-mode -10))
+
+;; (use-package pyvenv
+;;   :after python
+;;   :commands (pyvenv-track-virtualenv)
+;;   :config
+;;   (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("P:" (string-remove-prefix ".venv-" pyvenv-virtual-env-name))))
+;;   (pyvenv-mode)
+;;   (pyvenv-tracking-mode))
 
 (use-package with-venv)
-
-(use-package poetry
-  :ensure t)
 #+end_src
 
 *** pytest
@@ -4917,13 +5483,20 @@ look into poetry-tracking-mode and poetry-tracking-strategy
     "r" 'python-pytest-repeat)
   :custom
   (python-pytest-unsaved-buffers-behavior' save-all)
-  )
+  (python-pytest-preferred-project-manager 'project)
+  :config
+  (inheritenv-add-advice 'python-pytest--run-command))
 
 
 (add-hook 'python-pytest-mode-hook
           (lambda ()
             (add-hook 'completion-at-point-functions
                       'pdb-capf nil t)))
+
+(add-hook 'python-pytest-setup-hook
+           (lambda ()
+             (add-hook 'comint-output-filter-functions #'comint-osc-process-output)))
+
 #+end_src
 
 wbolster/emacs-python-coverage seems interesting as well
@@ -4976,7 +5549,15 @@ wbolster/emacs-python-coverage seems interesting as well
   (setq org-babel-jupyter-resource-directory "/tmp/emacs-jupyter"))
 #+end_src
 
-** TODO Haskell
+** SQL
+
+#+begin_src emacs-lisp
+(add-hook 'sql-interactive-mode-hook
+          (defun maschm/sql-interactive-mode-hook ()
+            (setq-local truncate-lines t)))
+#+end_src
+
+** Haskell
 *** Intero
     intero project has reached the end of its life cycle. city_sunrise
 
@@ -4999,7 +5580,7 @@ https://commercialhaskell.github.io/intero/
   :hook (haskell-mode . intero-mode))
 #+END_SRC
 
-*** Dante
+*** INFO Dante
 https://github.com/jyp/dante
 
 fork of intero
@@ -5298,7 +5879,27 @@ when writing lots of html code
 #+begin_src emacs-lisp
 (use-package typescript-mode
   :hook
-  (typescript-ts-base-mode . lsp-deferred))
+  (typescript-ts-base-mode . lsp-deferred)
+  :local
+  (typescript-ts-base-mode-hook . ((require 'lsp-javascript))))
+#+end_src
+
+*** tailwind
+#+begin_src emacs-lisp :tangle no
+(use-package lsp-tailwindcss
+  :straight '(lsp-tailwindcss :type git :host github :repo "merrickluo/lsp-tailwindcss")
+  :init (setq lsp-tailwindcss-add-on-mode t)
+  :config
+  (dolist (tw-major-mode
+           '(css-mode
+             css-ts-mode
+             typescript-mode
+             typescript-ts-mode
+             tsx-ts-mode
+             js2-mode
+             js-ts-mode
+             clojure-mode))
+    (add-to-list 'lsp-tailwindcss-major-modes tw-major-mode)))
 #+end_src
 
 ** Elm
@@ -5421,9 +6022,17 @@ gradle-mode integrates gradle builds into emacs compilation feature
 
 #+begin_src emacs-lisp
 (use-package markdown-mode
-  :hook (markdown-mode . visual-line-mode))
+  :hook (markdown-mode . visual-line-mode)
+  :custom (markdown-fontify-code-blocks-natively t)
+
+  :config
+  (add-to-list 'markdown-code-lang-modes '("python" . python-mode)))
 #+end_src
 
+*** hcl
+#+begin_src emacs-lisp
+(use-package hcl-mode)
+#+end_src
 ** system & config
 *** Docker
 
@@ -5453,7 +6062,15 @@ Recognize arch linux pgkbuild files
 #+END_SRC
 
 * Settings
-** TODO editorconfig
+** Environment variables
+*** envrc
+
+#+begin_src emacs-lisp
+(use-package envrc
+  :hook (after-init . envrc-global-mode))
+#+end_src
+
+*** TODO editorconfig
 
 #+begin_src emacs-lisp
 (use-package editorconfig
@@ -5543,7 +6160,11 @@ then use with a window manager keybinding
  "T u" 'toggle-input-method)
 #+end_src
 
-My Ukrainian input method maps German sounds to Ukrainian Cyrillic letters. I don't have a need for russian Cyrillic letters.
+My Ukrainian input method maps German phonetics to Ukrainian Cyrillic letters.
+a) The necessity and desire for russian Cyrillic letters are not experienced by the author.
+b) I have neither need nor desire for russian Cyrillic letters.
+claudified: The two sentences convey the same meaning but differ significantly in style:
+
 
 #+begin_src emacs-lisp
 (quail-define-package
@@ -5837,6 +6458,13 @@ My Ukrainian input method maps German sounds to Ukrainian Cyrillic letters. I do
   (interactive)
   (kill-new default-directory))
 
+(defun copy-current-project-path-as-kill ()
+  "Copy the current file-name into the kill ring."
+  (interactive)
+  (let* ((root (project-root (project-current)))
+         (path (file-relative-name buffer-file-name root)))
+    (kill-new path)))
+
 (defun copy-current-line-position-as-kill ()
   "Copy current line in file as '</path/to/file>:<line-number>' into the kill ring."
   (interactive)
@@ -5913,14 +6541,45 @@ My Ukrainian input method maps German sounds to Ukrainian Cyrillic letters. I do
  "Q" 'maschm/q)
 #+END_SRC
 
-** dir-local reload
+** dir-locals
 #+BEGIN_SRC emacs-lisp
+(defun maschm/dir-locals-find ()
+  (if-let* ((current-dir-locals-dir (locate-dominating-file default-directory #'dir-locals--all-files))
+            (current-dir-locals-file (file-name-concat current-dir-locals-dir dir-locals-file)))
+      current-dir-locals-file))
+
+(defun maschm/dir-locals-open ()
+  (interactive)
+  (if-let* (current-dir-locals-file (maschm/dir-locals-find))
+      (find-file current-dir-locals-file)))
+
+;; not working
+(defun dir-locals-read-from-parent-dirs ()
+  "Apply all .dir-locals.el files found in parent directories."
+  (let ((current-dir (directory-file-name default-directory))
+        (dirs '()))
+    (while (not (string= current-dir "/"))
+      (setq current-dir (directory-file-name (file-name-directory current-dir)))
+      (push current-dir dirs))
+    (dolist (dir dirs)
+      (dir-locals-read-from-dir dir))))
+
 (defun reload-dir-locals-for-current-buffer ()
   "reload dir locals for the current buffer"
   (interactive)
   (let ((enable-local-variables :all))
     (hack-dir-local-variables-non-file-buffer)))
 #+END_SRC
+
+** list transforms
+
+#+begin_src emacs-lisp
+(defun flatten-annotated-alist (lst)
+  "Flatten a list of (ITEM . (ANNOTATIONS...)) to a list of (ITEM . ANNOTATION) for each annotation."
+  (cl-loop for (item . annotations) in lst
+           append (cl-loop for annotation in annotations
+                           collect (cons item annotation))))
+#+end_src
 
 ** TODO calendar
 
@@ -5990,7 +6649,8 @@ lines."
 ** libraries
 
 #+begin_src emacs-lisp
-(use-package heap :demand)
+(use-package heap
+  :demand)
 
 (use-package dash
   :config
@@ -6108,10 +6768,24 @@ If ARG is non-nil but not a number, return nil."
 ** ansi-color
 
 #+begin_src emacs-lisp
-(defun display-ansi-colors ()
+(defun ansi-color-buffer ()
   (interactive)
   (require 'ansi-color)
   (ansi-color-apply-on-region (point-min) (point-max)))
+#+end_src
+
+** Pomodore
+
+#+begin_src emacs-lisp :tangle no
+(run-at-time
+ "25 min"
+ nil
+ (lambda ()
+    (require 'notifications)
+   (notifications-notify
+    :title "Pomodoro timer up"
+    :urgency 'critical)
+   ))
 #+end_src
 
 ** debug
@@ -6150,3 +6824,7 @@ If ARG is non-nil but not a number, return nil."
 
 Shadow file
 https://www.emacswiki.org/emacs/ShadowFile
+
+# Local Variables:
+# jinx-languages: "en_US-large de_DE"
+# End:
