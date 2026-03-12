@@ -16,3 +16,8 @@
 (menu-bar-mode -1) ; Turn off mouse interface early in startup to avoid momentary display.
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+
+;; to lazy to figure out how to pass this to the daemon correctly
+(setenv "TERM" "xterm-256color")
+
+(setenv "LSP_USE_PLISTS" "true")
